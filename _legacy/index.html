@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus | Regional Influencer Marketing Platform</title>
+    <meta name="description" content="High-fidelity dashboard for regional influencer marketing and campaign management.">
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon"></div>
+                    <span>Nexus</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active" id="nav-dashboard">
+                        <i data-lucide="layout-grid"></i>
+                        <span>Dashboard</span>
+                    </li>
+                    <li id="nav-campaigns">
+                        <i data-lucide="layers"></i>
+                        <span>Campaigns</span>
+                    </li>
+                    <li id="nav-influencers">
+                        <i data-lucide="users"></i>
+                        <span>Influencers</span>
+                    </li>
+                    <li id="nav-analytics">
+                        <i data-lucide="bar-chart-3"></i>
+                        <span>Analytics</span>
+                    </li>
+                    <li id="nav-messages">
+                        <i data-lucide="message-square"></i>
+                        <span>Messages</span>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="theme-toggle" id="theme-toggle">
+                    <i data-lucide="sun" class="sun-icon"></i>
+                    <i data-lucide="moon" class="moon-icon"></i>
+                    <span>Switch Theme</span>
+                </div>
+                <div class="user-profile">
+                    <div class="avatar">JD</div>
+                    <div class="user-info">
+                        <span class="name">Jane Doe</span>
+                        <span class="role">Marketing Lead</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="search-container">
+                    <i data-lucide="search"></i>
+                    <input type="text" placeholder="Search influencers, regions, or niche...">
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn-icon"><i data-lucide="bell"></i></button>
+                    <button class="btn-primary">Create Campaign</button>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="content-wrapper">
+                <section class="section-header">
+                    <div class="header-text">
+                        <h1>Influencer Discovery</h1>
+                        <p>Regional AI-driven matching for your brand's growth.</p>
+                    </div>
+                    <div class="filters">
+                        <button class="btn-outline">Region <i data-lucide="chevron-down"></i></button>
+                        <button class="btn-outline">Category <i data-lucide="chevron-down"></i></button>
+                        <button class="btn-outline">Filter <i data-lucide="sliders-horizontal"></i></button>
+                    </div>
+                </section>
+
+                <!-- Grid Feed -->
+                <div class="influencer-grid" id="influencer-grid">
+                    <!-- Cards will be injected by JS or hardcoded for demo -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
