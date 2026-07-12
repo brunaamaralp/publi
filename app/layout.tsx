@@ -28,9 +28,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Influencers Marketplace",
+  title: "Publi — Marketplace de influenciadores",
   description:
-    "Marketplace que conecta influenciadores digitais a empresas de publicidade.",
+    "Conecte criadores, marcas e agências com match inteligente, negociação, contrato, pagamento seguro e resultados mensuráveis.",
 };
 
 export default function RootLayout({
