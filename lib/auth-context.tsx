@@ -9,6 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { flushSync } from "react-dom";
 
 import type { Usuario } from "@/lib/types/usuario";
 
@@ -42,6 +43,13 @@ function persistir(usuario: Usuario | null) {
   }
 }
 
+function novoId(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `usr-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+}
+
 function carregar(): Usuario | null {
   if (typeof window === "undefined") return null;
   try {
@@ -67,13 +75,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const normalizado = email.trim().toLowerCase();
     const demo = CONTAS_DEMO[normalizado];
     const next: Usuario = {
-      id: demo?.id ?? crypto.randomUUID(),
+      id: demo?.id ?? novoId(),
       email: normalizado,
       tipo: demo?.tipo ?? "influenciador",
       status: demo?.status ?? "ativo",
       criadoEm: new Date().toISOString(),
     };
-    setUsuario(next);
+    flushSync(() => setUsuario(next));
     persistir(next);
     return next;
   }, []);
@@ -81,13 +89,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const registrarTipo = useCallback(
     (tipo: Usuario["tipo"], email = "novo@publi.app") => {
       const next: Usuario = {
-        id: crypto.randomUUID(),
+        id: novoId(),
         email: email.trim().toLowerCase(),
         tipo,
         status: "pendente_verificacao",
         criadoEm: new Date().toISOString(),
       };
-      setUsuario(next);
+      flushSync(() => setUsuario(next));
       persistir(next);
       return next;
     },

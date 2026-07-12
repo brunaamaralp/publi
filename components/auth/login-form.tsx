@@ -32,7 +32,7 @@ export function LoginForm() {
     setEnviando(true);
     login(email, senha);
     toast.success("Login realizado!");
-    router.push("/inicio");
+    router.replace("/inicio");
     setEnviando(false);
   }
 
