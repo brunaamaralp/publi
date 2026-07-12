@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Building2, Eye, Plus, Search } from "lucide-react";
 import { toast } from "sonner";
 
 import { FormularioCadastroEmpresa } from "@/components/empresa/formulario-cadastro";
 import { SeletorEmpresaCliente } from "@/components/agencia/seletor-empresa-cliente";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -401,8 +402,16 @@ export function PainelAgenciaConcluido() {
                   : "Empresa de terceiros — modo somente visualização."}
               </CardDescription>
             </CardHeader>
-            <CardContent className="text-muted-foreground text-sm">
-              Segmento: {empresaAtiva.segmento}
+            <CardContent className="space-y-4 text-sm">
+              <p className="text-muted-foreground">
+                Segmento: {empresaAtiva.segmento}
+              </p>
+              <Link
+                href="/agencia/dashboard"
+                className={buttonVariants()}
+              >
+                Ir para o dashboard
+              </Link>
             </CardContent>
           </Card>
         ) : null}

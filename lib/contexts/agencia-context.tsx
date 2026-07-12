@@ -33,6 +33,12 @@ type AgenciaContextValue = {
 };
 
 const STORAGE_KEY = "agencia-empresa-ativa";
+const SESSION_STORAGE_KEY = "agencia-sessao";
+
+type AgenciaSessaoSalva = {
+  agencia: Agencia;
+  empresasClientes: EmpresaClienteVinculada[];
+};
 
 const AgenciaContext = createContext<AgenciaContextValue | null>(null);
 
@@ -44,12 +50,35 @@ export function AgenciaProvider({ children }: { children: ReactNode }) {
   const [empresaAtivaId, setEmpresaAtivaIdState] = useState<string | null>(
     null,
   );
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const salvo = localStorage.getItem(STORAGE_KEY);
     if (salvo) setEmpresaAtivaIdState(salvo);
+
+    const sessao = localStorage.getItem(SESSION_STORAGE_KEY);
+    if (sessao) {
+      try {
+        const parsed = JSON.parse(sessao) as AgenciaSessaoSalva;
+        if (parsed.agencia && parsed.empresasClientes?.length) {
+          setAgencia(parsed.agencia);
+          setEmpresasClientes(parsed.empresasClientes);
+        }
+      } catch {
+        /* ignora sessão inválida */
+      }
+    }
+    setHydrated(true);
   }, []);
+
+  useEffect(() => {
+    if (!hydrated || !agencia) return;
+    localStorage.setItem(
+      SESSION_STORAGE_KEY,
+      JSON.stringify({ agencia, empresasClientes }),
+    );
+  }, [hydrated, agencia, empresasClientes]);
 
   const setEmpresaAtivaId = useCallback((empresaId: string) => {
     setEmpresaAtivaIdState(empresaId);
@@ -60,6 +89,10 @@ export function AgenciaProvider({ children }: { children: ReactNode }) {
     (novaAgencia: Agencia, clientes: EmpresaClienteVinculada[]) => {
       setAgencia(novaAgencia);
       setEmpresasClientes(clientes);
+      localStorage.setItem(
+        SESSION_STORAGE_KEY,
+        JSON.stringify({ agencia: novaAgencia, empresasClientes: clientes }),
+      );
       if (clientes[0]) {
         setEmpresaAtivaId(clientes[0].id);
       }

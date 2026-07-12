@@ -1,0 +1,100 @@
+import { EMPRESA_MOCK_ID } from "@/lib/mock-data/avaliacoes";
+import type { MinhaDemandaItem } from "@/lib/empresa/demandas-types";
+
+/** Demandas de exemplo para a listagem "Minhas demandas" (empresa direta). */
+export const MINHAS_DEMANDAS_MOCK: MinhaDemandaItem[] = [
+  {
+    demanda: {
+      id: "minha-dem-001",
+      empresaId: EMPRESA_MOCK_ID,
+      titulo: "Campanha de lançamento — linha fitness",
+      briefing:
+        "Buscamos influenciador(a) de lifestyle fitness para apresentar nossa nova linha de suplementos. Conteúdo em tom motivacional, mostrando rotina de treino e uso do produto no pós-treino.",
+      orcamento: 12000,
+      formatoEntrega: "reels",
+      prazo: "2026-08-20",
+      status: "aberta",
+    },
+    publicoAlvo: [
+      { dimensao: "genero", valor: "Feminino" },
+      { dimensao: "faixa_etaria", valor: "25-34" },
+      { dimensao: "localidade", valor: "São Paulo" },
+    ],
+    matchesGerados: 14,
+    publicadoEm: "2026-07-10T09:00:00.000Z",
+  },
+  {
+    demanda: {
+      id: "minha-dem-002",
+      empresaId: EMPRESA_MOCK_ID,
+      titulo: "Stories — bastidores da fábrica",
+      briefing:
+        "Série de stories mostrando o processo de produção sustentável dos nossos produtos. Tom transparente e educativo, com enquetes sobre preferências do público.",
+      orcamento: 5500,
+      formatoEntrega: "stories",
+      prazo: "2026-07-30",
+      status: "em_negociacao",
+    },
+    publicoAlvo: [
+      { dimensao: "genero", valor: "Todos" },
+      { dimensao: "faixa_etaria", valor: "18-44" },
+    ],
+    matchesGerados: 8,
+    publicadoEm: "2026-07-05T14:00:00.000Z",
+  },
+  {
+    demanda: {
+      id: "minha-dem-003",
+      empresaId: EMPRESA_MOCK_ID,
+      titulo: "Unboxing kit presente Dia das Mães",
+      briefing:
+        "Vídeo de unboxing do kit especial com reação autêntica e destaque para os itens principais. Incluir menção ao cupom exclusivo para seguidores.",
+      orcamento: 3800,
+      formatoEntrega: "unboxing",
+      prazo: "2026-05-10",
+      status: "fechada",
+    },
+    publicoAlvo: [
+      { dimensao: "genero", valor: "Feminino" },
+      { dimensao: "localidade", valor: "Brasil" },
+    ],
+    matchesGerados: 22,
+    publicadoEm: "2026-04-12T11:30:00.000Z",
+  },
+  {
+    demanda: {
+      id: "minha-dem-004",
+      empresaId: EMPRESA_MOCK_ID,
+      titulo: "Live de perguntas e respostas com a marca",
+      briefing:
+        "Live de 30 minutos para tirar dúvidas sobre nossos produtos e lançar novidade. Interação com chat e sorteio ao final.",
+      orcamento: 9000,
+      formatoEntrega: "live",
+      prazo: "2026-06-15",
+      status: "cancelada",
+    },
+    publicoAlvo: [{ dimensao: "faixa_etaria", valor: "25-44" }],
+    matchesGerados: 3,
+    publicadoEm: "2026-05-20T16:00:00.000Z",
+  },
+  {
+    demanda: {
+      id: "minha-dem-005",
+      empresaId: EMPRESA_MOCK_ID,
+      titulo: "Post feed — coleção outono/inverno",
+      briefing:
+        "Carrossel no feed apresentando 3 looks da nova coleção. Fotos em ambiente urbano, estilo editorial casual.",
+      orcamento: 7200,
+      formatoEntrega: "post_feed",
+      prazo: "2026-09-01",
+      status: "aberta",
+    },
+    publicoAlvo: [
+      { dimensao: "genero", valor: "Feminino" },
+      { dimensao: "faixa_etaria", valor: "18-28" },
+      { dimensao: "localidade", valor: "Rio de Janeiro" },
+    ],
+    matchesGerados: 11,
+    publicadoEm: "2026-07-11T08:45:00.000Z",
+  },
+];

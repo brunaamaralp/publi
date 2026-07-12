@@ -11,6 +11,7 @@ const config: Config = {
         "cinza-500": "var(--cinza-500)",
         "cinza-200": "var(--cinza-200)",
         branco: "var(--branco)",
+        "status-negociacao": "var(--status-negociacao)",
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],

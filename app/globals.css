@@ -62,6 +62,7 @@
   --sidebar-ring: var(--verde-acao);
 
   --avaliacao-estrela: #eab308;
+  --status-negociacao: #ca8a04;
   --banner-alerta-bg: #fafafa;
   --banner-alerta-border: var(--cinza-200);
   --banner-alerta-text: var(--cinza-900);
@@ -147,6 +148,7 @@
   --color-cinza-500: var(--cinza-500);
   --color-cinza-200: var(--cinza-200);
   --color-branco: var(--branco);
+  --color-status-negociacao: var(--status-negociacao);
   --radius-sm: var(--radius-button);
   --radius-md: var(--radius-button);
   --radius-lg: var(--radius-card);

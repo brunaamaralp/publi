@@ -35,6 +35,10 @@ type MatchRingProps = {
   showLabel?: boolean;
   label?: string;
   className?: string;
+  /** Substitui o texto central padrão (ex: "240" em vez de "75%") */
+  centerValue?: string;
+  /** Texto do aria-label; padrão descreve percentual de compatibilidade */
+  ariaLabel?: string;
   /** Fundo escuro realça o verde-neon em scores altos */
   darkBackdrop?: boolean;
 };
@@ -51,6 +55,8 @@ export function MatchRing({
   showLabel = false,
   label = "match",
   className,
+  centerValue,
+  ariaLabel,
   darkBackdrop = true,
 }: MatchRingProps) {
   const nivel = nivelMatchRing(score);
@@ -67,7 +73,7 @@ export function MatchRing({
         darkBackdrop && "rounded-card bg-preto px-3 py-2",
         className,
       )}
-      aria-label={`${score}% de compatibilidade`}
+      aria-label={ariaLabel ?? `${score}% de compatibilidade`}
     >
       <div className="relative" style={{ width: dim.box, height: dim.box }}>
         <svg
@@ -105,7 +111,7 @@ export function MatchRing({
               darkBackdrop ? "text-branco" : "text-foreground",
             )}
           >
-            {score}%
+            {centerValue ?? `${score}%`}
           </span>
           {showLabel ? (
             <span
