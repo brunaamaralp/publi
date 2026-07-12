@@ -84,10 +84,10 @@ export function PassoRevisaoPlano({
     <div className="space-y-6">
       <header className="border-border flex flex-col gap-3 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-semibold">
+          <h2 className="font-display text-lg font-bold">
             {draft.nome || "Seu perfil"}
           </h2>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-texto-secundario text-sm font-normal">
             Revise seus dados e acompanhe sua reputação na plataforma.
           </p>
         </div>
@@ -326,7 +326,7 @@ function RevisaoConteudo({
                   {plano.beneficios.map((b) => (
                     <li key={b} className="flex items-start gap-2">
                       <CheckCircle2
-                        className="text-primary mt-0.5 size-3.5 shrink-0"
+                        className="text-verde-neon mt-0.5 size-3.5 shrink-0"
                         aria-hidden
                       />
                       {b}
@@ -343,7 +343,7 @@ function RevisaoConteudo({
         className="banner-informativo flex gap-3 rounded-card p-4"
         role="note"
       >
-        <ShieldCheck className="text-primary mt-0.5 size-4 shrink-0" aria-hidden />
+        <ShieldCheck className="text-verde-neon mt-0.5 size-4 shrink-0" aria-hidden />
         <p className="text-sm">
           Após concluir, seu perfil entrará em análise antes de ficar visível
           para empresas. Você pode continuar navegando normalmente.
@@ -363,10 +363,10 @@ function ResumoSecao({
   children: ReactNode;
 }) {
   return (
-    <Card size="sm">
+    <Card size="sm" className="secao-editavel ring-0">
       <CardHeader className="flex-row items-center justify-between gap-2">
         <div>
-          <CardTitle>{titulo}</CardTitle>
+          <CardTitle className="font-display font-bold">{titulo}</CardTitle>
           <CardDescription className="sr-only">
             Resumo de {titulo}
           </CardDescription>

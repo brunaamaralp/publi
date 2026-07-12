@@ -1,13 +1,9 @@
-import { Lock, ShieldCheck } from "lucide-react";
+import { Clock } from "lucide-react";
 
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { formatarMoeda } from "@/lib/influenciador/cadastro-utils";
+  IndicadorProvedorEscrow,
+  ValorEscrowDestaque,
+} from "@/components/pagamento/escrow-ui";
 import { cn } from "@/lib/utils";
 
 type PagamentoGarantidoCardProps = {
@@ -20,40 +16,34 @@ export function PagamentoGarantidoCard({
   className,
 }: PagamentoGarantidoCardProps) {
   return (
-    <Card
+    <div
       className={cn(
-        "border-verde-acao/25 bg-verde-acao/5 overflow-hidden",
+        "secao-editavel space-y-4 border-lilas/40",
         className,
       )}
     >
-      <CardHeader className="pb-2">
-        <div className="flex items-center gap-2">
-          <div className="bg-verde-acao/15 flex size-9 items-center justify-center rounded-full">
-            <Lock className="text-verde-acao size-4" aria-hidden />
-          </div>
-          <div>
-            <CardTitle className="text-base text-verde-acao">
-              Pagamento garantido
-            </CardTitle>
-            <CardDescription className="text-foreground/80">
-              Valor reservado em escrow
-            </CardDescription>
-          </div>
-          <ShieldCheck
-            className="text-verde-acao ml-auto size-5 shrink-0"
-            aria-hidden
-          />
+      <div className="flex items-start gap-3">
+        <div className="bg-lilas-claro flex size-9 shrink-0 items-center justify-center rounded-full">
+          <Clock className="text-lilas-escuro size-4" aria-hidden />
         </div>
-      </CardHeader>
-      <CardContent>
-        <p className="font-data text-2xl font-bold">
-          {formatarMoeda(valor)}
-        </p>
-        <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
-          O valor já está reservado na plataforma e será liberado para você após
-          a empresa confirmar a entrega do conteúdo.
-        </p>
-      </CardContent>
-    </Card>
+        <div className="min-w-0 space-y-1">
+          <p className="text-lilas-escuro text-sm font-semibold">
+            Pagamento garantido
+          </p>
+          <p className="text-texto-secundario text-sm font-normal">
+            Valor reservado em escrow até a entrega ser confirmada
+          </p>
+        </div>
+      </div>
+
+      <ValorEscrowDestaque valor={valor} status="retido" />
+
+      <IndicadorProvedorEscrow />
+
+      <p className="text-texto-secundario text-sm leading-relaxed font-normal">
+        O valor já está reservado e será liberado para você após a empresa
+        confirmar a entrega do conteúdo.
+      </p>
+    </div>
   );
 }

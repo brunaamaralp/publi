@@ -9,7 +9,7 @@ export function HeroMatchPreview() {
         className="absolute inset-0 -z-10 rounded-full blur-3xl"
         style={{
           background:
-            "radial-gradient(circle, color-mix(in srgb, var(--verde-neon) 35%, transparent) 0%, transparent 70%)",
+            "radial-gradient(circle, color-mix(in srgb, var(--verde-neon) 15%, transparent) 0%, transparent 70%)",
         }}
         aria-hidden
       />

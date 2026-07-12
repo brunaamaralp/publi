@@ -1,7 +1,6 @@
 "use client";
 
-import { AlertTriangle } from "lucide-react";
-
+import { AvisoContatoInline } from "@/components/negociacao/aviso-contato-inline";
 import type { Mensagem } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -21,47 +20,45 @@ export function MensagemBolha({
     minute: "2-digit",
   });
 
+  const temAlerta = mensagem.flagContatoExterno === "alerta_termo";
+  const foiBloqueada = mensagem.flagContatoExterno === "bloqueado_padrao";
+
   return (
     <div
       className={cn(
-        "flex max-w-[85%] flex-col gap-1",
+        "flex w-full max-w-[85%] flex-col gap-1.5",
         ehRemetenteAtual ? "ml-auto items-end" : "items-start",
       )}
     >
       {nomeRemetente ? (
-        <span className="text-muted-foreground px-1 text-xs font-medium">
+        <span className="text-texto-secundario px-1 text-xs font-normal">
           {nomeRemetente}
         </span>
       ) : null}
+
       <div
         className={cn(
-          "flex items-end gap-1.5",
-          ehRemetenteAtual ? "flex-row-reverse" : "flex-row",
+          "rounded-card px-3 py-2 text-sm leading-relaxed font-normal",
+          ehRemetenteAtual
+            ? "bg-verde-carvao-escuro text-white"
+            : "border border-cinza-200 bg-white text-foreground",
+          foiBloqueada && "opacity-60",
         )}
       >
-        <div
-          className={cn(
-            "rounded-card px-3 py-2 text-sm leading-relaxed",
-            ehRemetenteAtual
-              ? "bg-primary text-primary-foreground"
-              : "bg-muted text-foreground",
-          )}
-        >
-          {mensagem.texto}
-        </div>
-        {mensagem.flagContatoExterno === "alerta_termo" ? (
-          <span
-            className="text-status-negociacao/80 shrink-0"
-            title="Termo sensível detectado"
-            aria-label="Alerta: possível tentativa de contato externo"
-          >
-            <AlertTriangle className="size-3.5" aria-hidden />
-          </span>
-        ) : null}
+        {mensagem.texto}
       </div>
+
+      {temAlerta ? (
+        <AvisoContatoInline tipo="alerta_termo" className="mt-0.5" />
+      ) : null}
+
+      {foiBloqueada ? (
+        <AvisoContatoInline tipo="bloqueado_padrao" className="mt-0.5" />
+      ) : null}
+
       <time
         dateTime={mensagem.enviadoEm}
-        className="text-muted-foreground px-1 text-[0.65rem]"
+        className="text-texto-secundario px-1 text-xs font-normal"
       >
         {hora}
       </time>

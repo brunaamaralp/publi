@@ -7,11 +7,27 @@
 :root {
   --verde-neon: #39ff14;
   --verde-acao: #16a34a;
-  --preto: #0a0a0a;
-  --cinza-900: #18181b;
+  /* Superfícies escuras: verde-carvão (nunca preto neutro puro) */
+  --verde-carvao: #22302a;
+  --verde-carvao-escuro: #1c2620;
+  --verde-carvao-claro: #2a3830;
+  /* Texto escuro em fundos claros — grafite esverdeado */
+  --preto: #1a211c;
+  --cinza-900: var(--verde-carvao);
   --cinza-500: #71717a;
   --cinza-200: #e4e4e7;
   --branco: #ffffff;
+
+  /* Segunda cor semântica + superfícies de página */
+  --lilas: #d6ccf0;
+  --lilas-claro: #ede7f8;
+  --lilas-escuro: #3c3489;
+  --fundo-pagina: #f7f6f2;
+  --texto-secundario: #8a8f87;
+  /* Âmbar neutro — disputa / atenção sem tom de erro */
+  --ambar-claro: #fef3c7;
+  --ambar: #d97706;
+  --ambar-escuro: #78350f;
 
   --radius-card: 8px;
   --radius-button: 6px;
@@ -69,42 +85,42 @@
 }
 
 .dark {
-  --background: var(--preto);
+  --background: var(--verde-carvao-escuro);
   --foreground: var(--branco);
 
-  --card: var(--cinza-900);
+  --card: var(--verde-carvao);
   --card-foreground: var(--branco);
 
-  --popover: var(--cinza-900);
+  --popover: var(--verde-carvao);
   --popover-foreground: var(--branco);
 
   --primary: var(--verde-acao);
   --primary-foreground: var(--branco);
 
-  --secondary: #27272a;
+  --secondary: var(--verde-carvao-claro);
   --secondary-foreground: var(--branco);
 
-  --muted: #27272a;
+  --muted: var(--verde-carvao-claro);
   --muted-foreground: var(--cinza-500);
 
-  --accent: #14532d;
+  --accent: #1a3d2e;
   --accent-foreground: #bbf7d0;
 
-  --border: #3f3f46;
-  --input: #3f3f46;
+  --border: #3a4d42;
+  --input: #3a4d42;
   --ring: var(--verde-acao);
 
-  --sidebar: var(--cinza-900);
+  --sidebar: var(--verde-carvao);
   --sidebar-foreground: var(--branco);
   --sidebar-primary: var(--verde-acao);
   --sidebar-primary-foreground: var(--branco);
-  --sidebar-accent: #14532d;
+  --sidebar-accent: #1a3d2e;
   --sidebar-accent-foreground: #bbf7d0;
-  --sidebar-border: #3f3f46;
+  --sidebar-border: #3a4d42;
   --sidebar-ring: var(--verde-acao);
 
-  --banner-alerta-bg: var(--cinza-900);
-  --banner-alerta-border: #3f3f46;
+  --banner-alerta-bg: var(--verde-carvao);
+  --banner-alerta-border: #3a4d42;
   --banner-alerta-text: var(--branco);
 }
 
@@ -143,11 +159,22 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --color-verde-neon: var(--verde-neon);
   --color-verde-acao: var(--verde-acao);
+  --color-verde-carvao: var(--verde-carvao);
+  --color-verde-carvao-escuro: var(--verde-carvao-escuro);
+  --color-verde-carvao-claro: var(--verde-carvao-claro);
   --color-preto: var(--preto);
   --color-cinza-900: var(--cinza-900);
   --color-cinza-500: var(--cinza-500);
   --color-cinza-200: var(--cinza-200);
   --color-branco: var(--branco);
+  --color-lilas: var(--lilas);
+  --color-lilas-claro: var(--lilas-claro);
+  --color-lilas-escuro: var(--lilas-escuro);
+  --color-fundo-pagina: var(--fundo-pagina);
+  --color-texto-secundario: var(--texto-secundario);
+  --color-ambar-claro: var(--ambar-claro);
+  --color-ambar: var(--ambar);
+  --color-ambar-escuro: var(--ambar-escuro);
   --color-status-negociacao: var(--status-negociacao);
   --radius-sm: var(--radius-button);
   --radius-md: var(--radius-button);
@@ -155,7 +182,6 @@
   --radius-xl: calc(var(--radius-card) + 2px);
   --font-sans: var(--font-sans);
   --font-display: var(--font-display);
-  --font-mono: var(--font-mono);
 }
 
 @layer utilities {
@@ -163,9 +189,11 @@
     text-wrap: balance;
   }
 
+  /* Valores, datas e métricas — Manrope com alinhamento tabular (sem aparência de terminal) */
   .font-data {
-    font-family: var(--font-mono), ui-monospace, monospace;
+    font-family: var(--font-sans), system-ui, sans-serif;
     font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
   }
 
   .banner-informativo {
@@ -177,6 +205,22 @@
     border: 1px solid var(--banner-alerta-border);
     background: var(--banner-alerta-bg);
     color: var(--banner-alerta-text);
+  }
+
+  /* Perfil do influenciador — hierarquia editável vs informativa */
+  .secao-editavel {
+    border-radius: var(--radius-card);
+    border: 1px solid var(--cinza-200);
+    background: var(--branco);
+    padding: 1rem;
+  }
+
+  .card-metrica-perfil {
+    border-radius: var(--radius-card);
+    border: 1px solid color-mix(in srgb, var(--lilas) 45%, transparent);
+    background: var(--lilas-claro);
+    color: var(--lilas-escuro);
+    padding: 1rem;
   }
 }
 

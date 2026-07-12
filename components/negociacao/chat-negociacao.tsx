@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { FileSignature, Send } from "lucide-react";
 
+import { AvisoContatoInline } from "@/components/negociacao/aviso-contato-inline";
 import { DocumentoContratoDialog } from "@/components/negociacao/documento-contrato-dialog";
 import { FormularioContratoDialog } from "@/components/negociacao/formulario-contrato-dialog";
 import { MensagemBolha } from "@/components/negociacao/mensagem-bolha";
@@ -15,6 +16,9 @@ import type {
   NegociacaoContexto,
   NegociacaoEstado,
 } from "@/lib/negociacao/negociacao-types";
+
+const CTA_ENVIAR =
+  "border-transparent bg-verde-carvao-escuro text-verde-neon shadow-none hover:bg-verde-carvao hover:text-verde-neon";
 
 type ChatNegociacaoProps = {
   contexto: NegociacaoContexto;
@@ -38,7 +42,8 @@ export function ChatNegociacao({
   onAssinarInfluenciador,
 }: ChatNegociacaoProps) {
   const [texto, setTexto] = useState("");
-  const [erroEnvio, setErroEnvio] = useState<string | null>(null);
+  const [avisoBloqueioVisivel, setAvisoBloqueioVisivel] = useState(false);
+  const [formAviso, setFormAviso] = useState<string | null>(null);
   const [formContratoAberto, setFormContratoAberto] = useState(
     estado.etapaContrato === "formulario",
   );
@@ -52,7 +57,7 @@ export function ChatNegociacao({
 
   useEffect(() => {
     fimListaRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [estado.mensagens.length]);
+  }, [estado.mensagens.length, avisoBloqueioVisivel]);
 
   useEffect(() => {
     setFormContratoAberto(estado.etapaContrato === "formulario");
@@ -64,10 +69,12 @@ export function ChatNegociacao({
     const analise = analisarTextoMensagem(texto);
 
     if (!analise.podeEnviar) {
-      setErroEnvio(
-        analise.motivoBloqueio ??
-          "Não é possível compartilhar contato externo pelo chat",
-      );
+      if (analise.flag === "bloqueado_padrao") {
+        setAvisoBloqueioVisivel(true);
+        setFormAviso(null);
+      } else {
+        setFormAviso(analise.motivoBloqueio ?? "Revise sua mensagem antes de enviar.");
+      }
       return;
     }
 
@@ -77,7 +84,8 @@ export function ChatNegociacao({
       remetenteId: contexto.empresa.usuarioId,
       texto: texto.trim(),
       enviadoEm: new Date().toISOString(),
-      flagContatoExterno: analise.flag === "bloqueado_padrao" ? "nenhum" : analise.flag,
+      flagContatoExterno:
+        analise.flag === "bloqueado_padrao" ? "nenhum" : analise.flag,
     };
 
     onEstadoChange({
@@ -85,7 +93,8 @@ export function ChatNegociacao({
       mensagens: [...estado.mensagens, nova],
     });
     setTexto("");
-    setErroEnvio(null);
+    setFormAviso(null);
+    setAvisoBloqueioVisivel(false);
   }
 
   function abrirFecharContrato() {
@@ -94,12 +103,21 @@ export function ChatNegociacao({
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-8rem)] flex-col">
-      <div className="border-border bg-background/95 sticky top-0 z-10 border-b px-4 py-3 backdrop-blur sm:px-6">
+    <div className="flex min-h-[calc(100vh-8rem)] flex-col rounded-card border border-cinza-200 bg-fundo-pagina">
+      <div className="sticky top-0 z-10 border-b border-cinza-200 bg-white/95 px-4 py-3 backdrop-blur sm:px-6">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="truncate font-medium">{contexto.influenciador.nome}</p>
-            <p className="text-muted-foreground truncate text-xs">
+            <div className="flex items-center gap-2">
+              <p className="truncate font-medium">{contexto.influenciador.nome}</p>
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-4xl border border-cinza-200 bg-white px-2 py-0.5 text-[10px] font-normal text-texto-secundario">
+                <span
+                  className="bg-verde-neon size-1.5 rounded-full"
+                  aria-hidden
+                />
+                Conversa ativa
+              </span>
+            </div>
+            <p className="text-texto-secundario truncate text-xs font-normal">
               {contexto.demanda.titulo}
             </p>
           </div>
@@ -128,14 +146,14 @@ export function ChatNegociacao({
               onEstadoChange({ ...estado, etapaContrato: "documento" });
               setDocContratoAberto(true);
             }}
-            className="banner-informativo mb-4 w-full rounded-card p-3 text-left text-sm hover:opacity-90"
+            className="banner-informativo mb-4 w-full rounded-card p-3 text-left text-sm font-normal hover:opacity-90"
           >
             Contrato em rascunho — clique para revisar e assinar
           </button>
         ) : null}
 
         <div
-          className="flex flex-1 flex-col gap-3 overflow-y-auto pb-4"
+          className="flex flex-1 flex-col gap-4 overflow-y-auto pb-4"
           aria-label="Mensagens da negociação"
         >
           {estado.mensagens.map((msg) => (
@@ -150,40 +168,58 @@ export function ChatNegociacao({
               }
             />
           ))}
+
+          {avisoBloqueioVisivel ? (
+            <AvisoContatoInline tipo="bloqueado_padrao" />
+          ) : null}
+
           <div ref={fimListaRef} />
         </div>
 
         <form
           onSubmit={enviarMensagem}
-          className="border-border bg-background sticky bottom-0 border-t pt-3"
+          className="sticky bottom-0 border-t border-cinza-200 bg-fundo-pagina pt-3"
         >
           <div className="flex gap-2">
             <Input
               value={texto}
               onChange={(e) => {
                 setTexto(e.target.value);
-                if (erroEnvio) setErroEnvio(null);
+                if (formAviso) setFormAviso(null);
+                if (avisoBloqueioVisivel) setAvisoBloqueioVisivel(false);
               }}
               placeholder="Escreva sua mensagem…"
-              aria-invalid={!!erroEnvio}
-              aria-describedby={erroEnvio ? "erro-chat" : undefined}
+              className="border-cinza-200 bg-white font-normal"
+              aria-invalid={!!formAviso}
+              aria-describedby={
+                formAviso ? "aviso-form-chat" : "dica-form-chat"
+              }
               autoComplete="off"
             />
-            <Button type="submit" size="icon" aria-label="Enviar mensagem">
+            <Button
+              type="submit"
+              size="icon"
+              className={CTA_ENVIAR}
+              aria-label="Enviar mensagem"
+            >
               <Send className="size-4" aria-hidden />
             </Button>
           </div>
-          {erroEnvio ? (
+          {formAviso ? (
             <p
-              id="erro-chat"
-              role="alert"
-              className="text-destructive mt-2 text-sm"
+              id="aviso-form-chat"
+              role="status"
+              className="text-texto-secundario mt-2 text-xs font-normal"
             >
-              {erroEnvio}
+              {formAviso}
             </p>
           ) : (
-            <p className="text-muted-foreground mt-2 text-xs">
-              Contatos externos (telefone, e-mail, @) são bloqueados automaticamente.
+            <p
+              id="dica-form-chat"
+              className="text-texto-secundario mt-2 text-xs font-normal"
+            >
+              Para proteger as duas partes, telefones, e-mails e @ não podem ser
+              enviados por aqui — use este chat para combinar tudo com registro.
             </p>
           )}
         </form>

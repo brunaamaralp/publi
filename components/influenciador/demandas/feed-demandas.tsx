@@ -111,128 +111,141 @@ export function FeedDemandas() {
 
   if (itens.length === 0) {
     return (
-      <div className="mx-auto max-w-lg px-4 py-8">
-        <DemandaListaVazia />
+      <div className="min-h-full bg-fundo-pagina">
+        <div className="mx-auto max-w-lg px-4 py-8">
+          <DemandaListaVazia />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto w-full max-w-lg px-4 py-6 sm:max-w-xl sm:py-8">
-      <header className="mb-6">
-        <p className="text-primary text-sm font-medium">Oportunidades</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-          Demandas para você
-        </h1>
-        <p className="text-muted-foreground mt-2 text-sm">
-          Ordenadas por compatibilidade com seu perfil — quanto maior o match,
-          melhor a oportunidade.
-        </p>
-      </header>
+    <div className="min-h-full bg-fundo-pagina">
+      <div className="mx-auto w-full max-w-lg px-4 py-6 sm:max-w-xl sm:py-8">
+        <header className="mb-6">
+          <p className="text-texto-secundario text-sm font-medium">
+            Oportunidades
+          </p>
+          <h1 className="font-display mt-1 text-2xl font-bold tracking-tight">
+            Demandas para você
+          </h1>
+          <p className="text-texto-secundario mt-2 text-sm font-normal">
+            Ordenadas por compatibilidade com seu perfil — quanto maior o match,
+            melhor a oportunidade.
+          </p>
+        </header>
 
-      <FiltrosDemandas
-        filtros={filtros}
-        onChange={setFiltros}
-        className="mb-6"
-      />
+        <FiltrosDemandas
+          filtros={filtros}
+          onChange={setFiltros}
+          className="mb-6"
+        />
 
-      <Tabs value={abaAtiva} onValueChange={setAbaAtiva}>
-        <TabsList className="mb-4 w-full">
-          <TabsTrigger value="para-voce" className="flex-1">
-            Para você
-            {sugeridos.length > 0 ? (
-              <span className="text-muted-foreground ml-1 tabular-nums">
-                ({sugeridos.length})
-              </span>
-            ) : null}
-          </TabsTrigger>
-          <TabsTrigger value="enviados" className="flex-1">
-            Enviados
-            {enviados.length > 0 ? (
-              <span className="text-muted-foreground ml-1 tabular-nums">
-                ({enviados.length})
-              </span>
-            ) : null}
-          </TabsTrigger>
-        </TabsList>
+        <Tabs value={abaAtiva} onValueChange={setAbaAtiva}>
+          <TabsList className="mb-4 w-full">
+            <TabsTrigger value="para-voce" className="flex-1">
+              Para você
+              {sugeridos.length > 0 ? (
+                <span className="text-texto-secundario font-data ml-1">
+                  ({sugeridos.length})
+                </span>
+              ) : null}
+            </TabsTrigger>
+            <TabsTrigger value="enviados" className="flex-1">
+              Enviados
+              {enviados.length > 0 ? (
+                <span className="text-texto-secundario font-data ml-1">
+                  ({enviados.length})
+                </span>
+              ) : null}
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="para-voce" className="space-y-4">
-          {sugeridos.length === 0 ? (
-            <DemandaListaVazia
-              mensagem={
-                totalDisponiveis === 0
-                  ? "Nenhuma demanda disponível no momento — complete seu perfil para aparecer em mais buscas."
-                  : "Nenhuma demanda corresponde aos filtros selecionados. Tente ajustar formato ou orçamento mínimo."
-              }
-              mostrarLinkPerfil={totalDisponiveis === 0}
-            />
-          ) : (
-            <ul className="space-y-4" aria-label="Demandas sugeridas">
-              {sugeridos.map((item) => (
-                <li key={item.match.id}>
-                  <DemandaCard
-                    item={item}
-                    onInteresse={handleInteresse}
-                    onRecusar={setRecusarMatchId}
-                  />
-                </li>
-              ))}
-            </ul>
-          )}
-        </TabsContent>
+          <TabsContent value="para-voce" className="space-y-4">
+            {sugeridos.length === 0 ? (
+              <DemandaListaVazia
+                mensagem={
+                  totalDisponiveis === 0
+                    ? "Nenhuma demanda disponível no momento — complete seu perfil para aparecer em mais buscas."
+                    : "Nenhuma demanda corresponde aos filtros selecionados. Tente ajustar formato ou orçamento mínimo."
+                }
+                mostrarLinkPerfil={totalDisponiveis === 0}
+              />
+            ) : (
+              <ul className="space-y-4" aria-label="Demandas sugeridas">
+                {sugeridos.map((item) => (
+                  <li key={item.match.id}>
+                    <DemandaCard
+                      item={item}
+                      onInteresse={handleInteresse}
+                      onRecusar={setRecusarMatchId}
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </TabsContent>
 
-        <TabsContent value="enviados" className="space-y-4">
-          {enviados.length === 0 ? (
-            <DemandaListaVazia
-              mensagem="Você ainda não demonstrou interesse em nenhuma demanda. Explore a aba 'Para você' e clique em 'Tenho interesse'."
-              mostrarLinkPerfil={false}
-            />
-          ) : (
-            <ul className="space-y-4" aria-label="Demandas com interesse enviado">
-              {enviados.map((item) => (
-                <li key={item.match.id}>
-                  <DemandaCard
-                    item={item}
-                    onInteresse={handleInteresse}
-                    onRecusar={setRecusarMatchId}
-                    modoEnviado
-                  />
-                </li>
-              ))}
-            </ul>
-          )}
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="enviados" className="space-y-4">
+            {enviados.length === 0 ? (
+              <DemandaListaVazia
+                mensagem="Você ainda não demonstrou interesse em nenhuma demanda. Explore a aba 'Para você' e clique em 'Tenho interesse'."
+                mostrarLinkPerfil={false}
+              />
+            ) : (
+              <ul
+                className="space-y-4"
+                aria-label="Demandas com interesse enviado"
+              >
+                {enviados.map((item) => (
+                  <li key={item.match.id}>
+                    <DemandaCard
+                      item={item}
+                      onInteresse={handleInteresse}
+                      onRecusar={setRecusarMatchId}
+                      modoEnviado
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </TabsContent>
+        </Tabs>
 
-      <Dialog
-        open={recusarMatchId !== null}
-        onOpenChange={(open) => {
-          if (!open) setRecusarMatchId(null);
-        }}
-      >
-        <DialogContent className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Recusar esta demanda?</DialogTitle>
-            <DialogDescription>
-              {itemRecusar
-                ? `“${itemRecusar.demanda.titulo}” será removida da sua lista. Você não poderá desfazer esta ação.`
-                : "Esta demanda será removida da sua lista."}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setRecusarMatchId(null)}
-            >
-              Cancelar
-            </Button>
-            <Button type="button" variant="destructive" onClick={confirmarRecusa}>
-              Recusar demanda
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        <Dialog
+          open={recusarMatchId !== null}
+          onOpenChange={(open) => {
+            if (!open) setRecusarMatchId(null);
+          }}
+        >
+          <DialogContent className="sm:max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Recusar esta demanda?</DialogTitle>
+              <DialogDescription>
+                {itemRecusar
+                  ? `“${itemRecusar.demanda.titulo}” será removida da sua lista. Você não poderá desfazer esta ação.`
+                  : "Esta demanda será removida da sua lista."}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setRecusarMatchId(null)}
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={confirmarRecusa}
+              >
+                Recusar demanda
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 }

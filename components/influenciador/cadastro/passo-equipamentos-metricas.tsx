@@ -65,24 +65,27 @@ export function PassoEquipamentosMetricas({
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-lg font-semibold">Equipamentos e métricas</h2>
-        <p className="text-muted-foreground text-sm">
+        <h2 className="font-display text-lg font-bold">Equipamentos e métricas</h2>
+        <p className="text-texto-secundario text-sm font-normal">
           Dados que aumentam a confiança das empresas na hora de contratar você.
         </p>
       </div>
 
-      <section className="space-y-4" aria-labelledby="equipamentos-titulo">
+      <section
+        className="secao-editavel space-y-4"
+        aria-labelledby="equipamentos-titulo"
+      >
         <div>
           <h3 id="equipamentos-titulo" className="text-sm font-medium">
             Equipamentos
           </h3>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-texto-secundario text-sm font-normal">
             Liste câmeras, iluminação, estúdio ou outros recursos que você usa.
           </p>
         </div>
 
         {draft.equipamentos.length === 0 ? (
-          <p className="text-muted-foreground text-sm">
+          <p className="text-texto-secundario text-sm">
             Nenhum equipamento adicionado.
           </p>
         ) : (
@@ -90,7 +93,7 @@ export function PassoEquipamentosMetricas({
             {draft.equipamentos.map((eq, index) => (
               <li
                 key={eq.id}
-                className="border-border flex flex-col gap-2 rounded-card border p-3 sm:flex-row"
+                className="border-border flex flex-col gap-2 rounded-card border bg-fundo-pagina p-3 sm:flex-row"
               >
                 <div className="flex-1 space-y-2">
                   <Label htmlFor={`eq-tipo-${eq.id}`}>
@@ -145,18 +148,21 @@ export function PassoEquipamentosMetricas({
         </Button>
       </section>
 
-      <section className="space-y-4" aria-labelledby="metricas-titulo">
+      <section
+        className="card-metrica-perfil space-y-4"
+        aria-labelledby="metricas-titulo"
+      >
         <div>
           <h3 id="metricas-titulo" className="text-sm font-medium">
             Métricas do Instagram
           </h3>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-sm font-normal opacity-80">
             Envie um print das suas métricas e informe os números principais.
           </p>
         </div>
 
         <div
-          className="banner-alerta flex gap-3 rounded-card p-4"
+          className="banner-alerta flex gap-3 rounded-card bg-white/60 p-4"
           role="note"
         >
           <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
@@ -182,6 +188,7 @@ export function PassoEquipamentosMetricas({
           <Button
             type="button"
             variant="outline"
+            className="border-lilas/40 bg-white hover:bg-white/80"
             onClick={() => printInputRef.current?.click()}
           >
             <Upload className="size-4" aria-hidden />
@@ -193,7 +200,7 @@ export function PassoEquipamentosMetricas({
             </p>
           ) : null}
           {draft.printMetricasUrl ? (
-            <div className="border-border relative mt-2 aspect-video w-full max-w-md overflow-hidden rounded-card border">
+            <div className="border-border relative mt-2 aspect-video w-full max-w-md overflow-hidden rounded-card border bg-white">
               <Image
                 src={draft.printMetricasUrl}
                 alt="Preview do print de métricas"
@@ -215,7 +222,7 @@ export function PassoEquipamentosMetricas({
               type="number"
               min={1}
               step={1}
-              className="font-data"
+              className="font-data border-lilas/40 bg-white text-foreground"
               value={draft.seguidores}
               onChange={(e) => {
                 const val = e.target.value;
@@ -250,7 +257,7 @@ export function PassoEquipamentosMetricas({
               min={0}
               max={100}
               step={0.1}
-              className="font-data"
+              className="font-data border-lilas/40 bg-white text-foreground"
               value={draft.engajamentoMedio}
               onChange={(e) => {
                 const val = e.target.value;
@@ -279,10 +286,10 @@ export function PassoEquipamentosMetricas({
 
       <section className="space-y-4" aria-labelledby="audiencia-titulo">
         <div>
-          <h3 id="audiencia-titulo" className="text-sm font-medium">
+          <h3 id="audiencia-titulo" className="font-display text-sm font-bold">
             Breakdown de audiência
           </h3>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-texto-secundario text-sm font-normal">
             Opcional, mas ajuda empresas a entender seu público.
           </p>
         </div>

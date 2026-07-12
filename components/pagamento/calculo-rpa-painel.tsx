@@ -35,8 +35,8 @@ export function CalculoRpaPainel({
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="font-display text-lg font-semibold">Cálculo de RPA</h2>
-        <p className="text-muted-foreground mt-1 text-sm">
+        <h2 className="font-display text-lg font-bold">Cálculo de RPA</h2>
+        <p className="text-texto-secundario mt-1 text-sm font-normal">
           O influenciador é pessoa física (CPF). A plataforma calcula os descontos
           para auxiliar na emissão do recibo.
         </p>
@@ -58,7 +58,7 @@ export function CalculoRpaPainel({
         </Select>
       </div>
 
-      <dl className="border-border space-y-2 rounded-card border p-4 text-sm">
+      <dl className="secao-editavel space-y-2 text-sm ring-0">
         <LinhaRpa label="Valor bruto" valor={calculo.valorBruto} destaque />
         <LinhaRpa label="INSS (11%)" valor={-calculo.inssRetido} />
         <LinhaRpa

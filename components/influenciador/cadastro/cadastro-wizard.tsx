@@ -23,8 +23,12 @@ import {
   montarPayload,
 } from "@/lib/influenciador/cadastro-utils";
 import { validarPassoCadastro } from "@/lib/schemas/influenciador-cadastro";
+import { cn } from "@/lib/utils";
 
 const STORAGE_KEY = "influenciador-cadastro-rascunho";
+
+const CTA_PRINCIPAL =
+  "border-transparent bg-verde-carvao-escuro text-verde-neon shadow-none hover:bg-verde-carvao hover:text-verde-neon";
 
 function carregarRascunho(): CadastroDraft {
   if (typeof window === "undefined") return criarEstadoInicial();
@@ -156,133 +160,139 @@ export function CadastroWizard() {
 
   if (!hydrated) {
     return (
-      <div className="text-muted-foreground flex min-h-[40vh] items-center justify-center text-sm">
+      <div className="text-muted-foreground flex min-h-[40vh] items-center justify-center bg-fundo-pagina text-sm">
         Carregando rascunho...
       </div>
     );
   }
 
   if (concluido) {
-    return <PerfilEmAnalise />;
+    return (
+      <div className="min-h-full bg-fundo-pagina">
+        <PerfilEmAnalise />
+      </div>
+    );
   }
 
   const progresso = ((currentStep + 1) / CADASTRO_PASSOS.length) * 100;
   const isUltimoPasso = currentStep === CADASTRO_PASSOS.length - 1;
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-10">
-      <header className="mb-8 space-y-4">
-        <div>
-          <p className="text-primary text-sm font-medium">
-            Cadastro de influenciador
-          </p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight">
-            Monte seu perfil profissional
-          </h1>
-          <p className="text-muted-foreground mt-2 text-sm">
-            Quanto mais completo, melhores oportunidades você recebe no match
-            com empresas.
-          </p>
+    <div className="min-h-full bg-fundo-pagina">
+      <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-10">
+        <header className="mb-8 space-y-4">
+          <div>
+            <p className="text-texto-secundario text-sm font-medium">
+              Cadastro de influenciador
+            </p>
+            <h1 className="font-display mt-1 text-2xl font-bold tracking-tight">
+              Monte seu perfil profissional
+            </h1>
+            <p className="text-texto-secundario mt-2 text-sm font-normal">
+              Quanto mais completo, melhores oportunidades você recebe no match
+              com empresas.
+            </p>
+          </div>
+
+          <Progress value={progresso} aria-label="Progresso do cadastro">
+            <div className="flex w-full items-center justify-between gap-2">
+              <ProgressLabel>
+                Passo {currentStep + 1} de {CADASTRO_PASSOS.length}
+              </ProgressLabel>
+              <span className="text-texto-secundario font-data text-sm">
+                {CADASTRO_PASSOS[currentStep]?.label}
+              </span>
+            </div>
+          </Progress>
+
+          <Stepper
+            steps={[...CADASTRO_PASSOS]}
+            currentStep={currentStep}
+            className="hidden sm:block"
+          />
+        </header>
+
+        <div
+          ref={stepRef}
+          tabIndex={-1}
+          className="outline-none"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          {errors.root ? (
+            <p role="alert" className="text-destructive mb-4 text-sm">
+              {errors.root}
+            </p>
+          ) : null}
+
+          {currentStep === 0 && (
+            <PassoDadosBasicos
+              draft={draft}
+              onChange={updateDraft}
+              errors={errors}
+            />
+          )}
+          {currentStep === 1 && (
+            <PassoCategorias
+              draft={draft}
+              onChange={updateDraft}
+              errors={errors}
+            />
+          )}
+          {currentStep === 2 && (
+            <PassoEquipamentosMetricas
+              draft={draft}
+              onChange={updateDraft}
+              errors={errors}
+            />
+          )}
+          {currentStep === 3 && (
+            <PassoPacotesPrecificacao
+              draft={draft}
+              onChange={updateDraft}
+              errors={errors}
+            />
+          )}
+          {currentStep === 4 && (
+            <PassoRevisaoPlano
+              draft={draft}
+              onChange={updateDraft}
+              onEditarPasso={irParaPasso}
+              errors={errors}
+            />
+          )}
         </div>
 
-        <Progress value={progresso} aria-label="Progresso do cadastro">
-          <div className="flex w-full items-center justify-between gap-2">
-            <ProgressLabel>
-              Passo {currentStep + 1} de {CADASTRO_PASSOS.length}
-            </ProgressLabel>
-            <span className="text-muted-foreground text-sm tabular-nums">
-              {CADASTRO_PASSOS[currentStep]?.label}
-            </span>
-          </div>
-        </Progress>
+        <footer className="border-border mt-10 flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:justify-between">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={voltar}
+            disabled={currentStep === 0}
+            className="w-full sm:w-auto"
+          >
+            Voltar
+          </Button>
 
-        <Stepper
-          steps={[...CADASTRO_PASSOS]}
-          currentStep={currentStep}
-          className="hidden sm:block"
-        />
-      </header>
-
-      <div
-        ref={stepRef}
-        tabIndex={-1}
-        className="outline-none"
-        aria-live="polite"
-        aria-atomic="true"
-      >
-        {errors.root ? (
-          <p role="alert" className="text-destructive mb-4 text-sm">
-            {errors.root}
-          </p>
-        ) : null}
-
-        {currentStep === 0 && (
-          <PassoDadosBasicos
-            draft={draft}
-            onChange={updateDraft}
-            errors={errors}
-          />
-        )}
-        {currentStep === 1 && (
-          <PassoCategorias
-            draft={draft}
-            onChange={updateDraft}
-            errors={errors}
-          />
-        )}
-        {currentStep === 2 && (
-          <PassoEquipamentosMetricas
-            draft={draft}
-            onChange={updateDraft}
-            errors={errors}
-          />
-        )}
-        {currentStep === 3 && (
-          <PassoPacotesPrecificacao
-            draft={draft}
-            onChange={updateDraft}
-            errors={errors}
-          />
-        )}
-        {currentStep === 4 && (
-          <PassoRevisaoPlano
-            draft={draft}
-            onChange={updateDraft}
-            onEditarPasso={irParaPasso}
-            errors={errors}
-          />
-        )}
+          {isUltimoPasso ? (
+            <Button
+              type="button"
+              onClick={concluir}
+              className={cn(CTA_PRINCIPAL, "w-full sm:w-auto")}
+            >
+              Concluir cadastro
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              onClick={validarEAvancar}
+              className={cn(CTA_PRINCIPAL, "w-full sm:w-auto")}
+            >
+              Continuar
+            </Button>
+          )}
+        </footer>
       </div>
-
-      <footer className="border-border mt-10 flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:justify-between">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={voltar}
-          disabled={currentStep === 0}
-          className="w-full sm:w-auto"
-        >
-          Voltar
-        </Button>
-
-        {isUltimoPasso ? (
-          <Button
-            type="button"
-            onClick={concluir}
-            className="w-full sm:w-auto"
-          >
-            Concluir cadastro
-          </Button>
-        ) : (
-          <Button
-            type="button"
-            onClick={validarEAvancar}
-            className="w-full sm:w-auto"
-          >
-            Continuar
-          </Button>
-        )}
-      </footer>
     </div>
   );
 }

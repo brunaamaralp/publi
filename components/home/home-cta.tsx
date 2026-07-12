@@ -8,7 +8,7 @@ export function HomeCta() {
   return (
     <section className="py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="rounded-card bg-[var(--cinza-900)] px-6 py-12 text-center text-white sm:px-12 sm:py-16">
+        <div className="rounded-card border border-verde-carvao-claro/50 bg-verde-carvao px-6 py-12 text-center text-white sm:px-12 sm:py-16">
           <h2 className="font-display text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
             Pronto para encontrar a parceria certa?
           </h2>

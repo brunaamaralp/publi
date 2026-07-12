@@ -17,13 +17,16 @@ export function PassoCategorias({
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-lg font-semibold">Áreas de domínio e interesse</h2>
-        <p className="text-muted-foreground text-sm">
+        <h2 className="font-display text-lg font-bold">
+          Áreas de domínio e interesse
+        </h2>
+        <p className="text-texto-secundario text-sm font-normal">
           O algoritmo de match usa essas categorias para conectar você às
           campanhas certas.
         </p>
       </div>
 
+      <div className="secao-editavel space-y-8">
       <CategoriaCombobox
         id="categorias-dominio"
         label="Área de domínio"
@@ -48,6 +51,7 @@ export function PassoCategorias({
           selected={draft.categoriasInteresse}
           onChange={(categoriasInteresse) => onChange({ categoriasInteresse })}
         />
+      </div>
       </div>
     </div>
   );

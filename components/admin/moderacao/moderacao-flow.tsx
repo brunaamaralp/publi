@@ -112,15 +112,15 @@ export function ModeracaoFlow() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-[var(--cinza-900)] px-4 py-3 text-white">
+      <header className="border-b border-verde-carvao-claro/50 bg-verde-carvao px-4 py-3 text-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="text-[var(--verde-neon)] size-4" />
+            <ShieldCheck className="text-verde-neon size-4" />
             <div>
               <p className="text-[10px] font-medium uppercase tracking-widest text-zinc-400">
                 Admin interno
               </p>
-              <h1 className="font-heading text-sm font-semibold">
+              <h1 className="font-display text-sm font-semibold">
                 Moderação de cadastros
               </h1>
             </div>

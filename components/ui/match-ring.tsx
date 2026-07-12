@@ -16,7 +16,7 @@ const RING_STYLES: Record<
 > = {
   alto: {
     stroke: "var(--verde-neon)",
-    glow: "drop-shadow(0 0 8px color-mix(in srgb, var(--verde-neon) 65%, transparent))",
+    glow: "drop-shadow(0 0 6px color-mix(in srgb, var(--verde-neon) 35%, transparent))",
     label: "text-verde-neon",
   },
   medio: {
@@ -39,7 +39,7 @@ type MatchRingProps = {
   centerValue?: string;
   /** Texto do aria-label; padrão descreve percentual de compatibilidade */
   ariaLabel?: string;
-  /** Fundo escuro realça o verde-neon em scores altos */
+  /** Fundo verde-carvão realça o neon apenas no traço do anel (scores altos) */
   darkBackdrop?: boolean;
 };
 
@@ -70,7 +70,7 @@ export function MatchRing({
     <div
       className={cn(
         "inline-flex flex-col items-center gap-1",
-        darkBackdrop && "rounded-card bg-preto px-3 py-2",
+        darkBackdrop && "rounded-card bg-verde-carvao-escuro px-3 py-2",
         className,
       )}
       aria-label={ariaLabel ?? `${score}% de compatibilidade`}
@@ -87,7 +87,7 @@ export function MatchRing({
             cy={center}
             r={dim.r}
             fill="none"
-            stroke="var(--cinza-900)"
+            stroke="var(--verde-carvao-claro)"
             strokeWidth={dim.stroke}
           />
           <circle

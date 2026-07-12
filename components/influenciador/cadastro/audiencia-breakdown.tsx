@@ -16,6 +16,8 @@ type AudienciaBreakdownProps = {
   onChange: (linhas: AudienciaLinha[]) => void;
 };
 
+const CORES_SERIE = ["bg-verde-neon", "bg-lilas"] as const;
+
 export function AudienciaBreakdown({
   titulo,
   descricao,
@@ -57,65 +59,95 @@ export function AudienciaBreakdown({
   }
 
   return (
-    <div className="border-border space-y-3 rounded-card border p-4">
+    <div className="secao-editavel space-y-3">
       <div>
         <h3 className="text-sm font-medium">{titulo}</h3>
-        <p className="text-muted-foreground text-sm">{descricao}</p>
+        <p className="text-texto-secundario text-sm font-normal">{descricao}</p>
       </div>
 
       {linhas.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
+        <p className="text-texto-secundario text-sm">
           Nenhuma linha adicionada.
         </p>
       ) : (
-        <ul className="space-y-2" aria-label={titulo}>
-          {linhas.map((linha, index) => (
-            <li key={linha.id} className="flex flex-col gap-2 sm:flex-row">
-              <div className="flex-1">
-                <Label className="sr-only" htmlFor={`${linha.id}-valor`}>
-                  Valor {index + 1} em {titulo}
-                </Label>
-                <Input
-                  id={`${linha.id}-valor`}
-                  placeholder="Ex: Feminino, 18-24, São Paulo"
-                  value={linha.valor}
-                  onChange={(e) =>
-                    atualizarLinha(linha.id, "valor", e.target.value)
-                  }
-                />
-              </div>
-              <div className="flex gap-2 sm:w-40">
-                <div className="flex-1">
-                  <Label className="sr-only" htmlFor={`${linha.id}-pct`}>
-                    Percentual {index + 1}
-                  </Label>
-                  <Input
-                    id={`${linha.id}-pct`}
-                    type="number"
-                    min={0}
-                    max={100}
-                    step={0.1}
-                    placeholder="%"
-                    value={linha.percentual}
-                    onChange={(e) =>
-                      atualizarLinha(linha.id, "percentual", e.target.value)
-                    }
-                    className="font-data"
-                    aria-label={`Percentual da linha ${index + 1}`}
-                  />
+        <ul className="space-y-3" aria-label={titulo}>
+          {linhas.map((linha, index) => {
+            const percentual =
+              typeof linha.percentual === "number" ? linha.percentual : 0;
+            const corSerie = CORES_SERIE[index % CORES_SERIE.length];
+
+            return (
+              <li key={linha.id} className="space-y-2">
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <div className="flex-1">
+                    <Label className="sr-only" htmlFor={`${linha.id}-valor`}>
+                      Valor {index + 1} em {titulo}
+                    </Label>
+                    <Input
+                      id={`${linha.id}-valor`}
+                      placeholder="Ex: Feminino, 18-24, São Paulo"
+                      value={linha.valor}
+                      onChange={(e) =>
+                        atualizarLinha(linha.id, "valor", e.target.value)
+                      }
+                    />
+                  </div>
+                  <div className="flex gap-2 sm:w-40">
+                    <div className="flex-1">
+                      <Label className="sr-only" htmlFor={`${linha.id}-pct`}>
+                        Percentual {index + 1}
+                      </Label>
+                      <Input
+                        id={`${linha.id}-pct`}
+                        type="number"
+                        min={0}
+                        max={100}
+                        step={0.1}
+                        placeholder="%"
+                        value={linha.percentual}
+                        onChange={(e) =>
+                          atualizarLinha(linha.id, "percentual", e.target.value)
+                        }
+                        className="font-data"
+                        aria-label={`Percentual da linha ${index + 1}`}
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      onClick={() => removerLinha(linha.id)}
+                      aria-label={`Remover linha ${index + 1}`}
+                    >
+                      <Trash2 className="size-4" aria-hidden />
+                    </Button>
+                  </div>
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => removerLinha(linha.id)}
-                  aria-label={`Remover linha ${index + 1}`}
-                >
-                  <Trash2 className="size-4" aria-hidden />
-                </Button>
-              </div>
-            </li>
-          ))}
+                {percentual > 0 ? (
+                  <div
+                    className="flex items-center gap-2"
+                    aria-hidden
+                    title={`${percentual}%`}
+                  >
+                    <div className="bg-muted h-1.5 min-w-0 flex-1 overflow-hidden rounded-full">
+                      <div
+                        className={cn(
+                          "h-full rounded-full transition-all",
+                          corSerie,
+                        )}
+                        style={{
+                          width: `${Math.min(percentual, 100)}%`,
+                        }}
+                      />
+                    </div>
+                    <span className="text-texto-secundario font-data w-10 shrink-0 text-right text-xs">
+                      {percentual}%
+                    </span>
+                  </div>
+                ) : null}
+              </li>
+            );
+          })}
         </ul>
       )}
 

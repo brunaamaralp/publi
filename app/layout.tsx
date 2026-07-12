@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, Manrope, Space_Grotesk } from "next/font/google";
+import { Manrope, Space_Grotesk } from "next/font/google";
 
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,13 +17,7 @@ const spaceGrotesk = Space_Grotesk({
 const manrope = Manrope({
   subsets: ["latin"],
   variable: "--font-sans",
-  weight: ["400", "500"],
-  display: "swap",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -41,11 +35,7 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
-      className={cn(
-        spaceGrotesk.variable,
-        manrope.variable,
-        jetbrainsMono.variable,
-      )}
+      className={cn(spaceGrotesk.variable, manrope.variable)}
     >
       <body className="min-h-screen antialiased">
         <TooltipProvider>

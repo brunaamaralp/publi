@@ -50,7 +50,7 @@ export function FiltrosDemandas({
   return (
     <div
       className={cn(
-        "border-border bg-card space-y-4 rounded-card border p-4",
+        "secao-editavel space-y-4 ring-0",
         className,
       )}
     >
@@ -118,7 +118,7 @@ export function FiltrosDemandas({
         <div className="space-y-2 sm:col-span-1">
           <div className="flex items-center justify-between gap-2">
             <Label htmlFor="filtro-orcamento">Orçamento mínimo</Label>
-            <span className="text-muted-foreground text-xs tabular-nums">
+            <span className="text-texto-secundario font-data text-xs">
               {formatarMoeda(filtros.orcamentoMinimo)}+
             </span>
           </div>

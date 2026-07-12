@@ -27,12 +27,12 @@ export function CabecalhoDemandasEmpresa({
     <header className={cn("space-y-4", className)}>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-primary text-sm font-medium">Demandas</p>
-          <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight">
+          <p className="text-texto-secundario text-sm font-medium">Demandas</p>
+          <h1 className="mt-1 font-display text-2xl font-bold tracking-tight">
             {titulo}
           </h1>
           {descricao ? (
-            <p className="text-muted-foreground mt-2 max-w-2xl text-sm">
+            <p className="text-texto-secundario mt-2 max-w-2xl text-sm font-normal">
               {descricao}
             </p>
           ) : null}
@@ -40,7 +40,10 @@ export function CabecalhoDemandasEmpresa({
         {mostrarCtaNova ? (
           <Link
             href="/empresa/demandas/nova"
-            className={cn(buttonVariants(), "shrink-0")}
+            className={cn(
+              buttonVariants(),
+              "shrink-0 border-transparent bg-verde-carvao-escuro text-verde-neon shadow-none hover:bg-verde-carvao hover:text-verde-neon",
+            )}
           >
             <Plus className="size-4" aria-hidden />
             Nova demanda
@@ -49,14 +52,12 @@ export function CabecalhoDemandasEmpresa({
       </div>
 
       {publicador.modo === "agencia" ? (
-        <div className="border-border flex flex-col gap-3 rounded-card border p-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-muted-foreground text-sm">
+        <div className="flex flex-col gap-3 rounded-card border border-lilas-claro bg-lilas-claro p-4 text-lilas-escuro sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm font-normal">
             Agência{" "}
-            <span className="text-foreground font-medium">
-              {publicador.agenciaNome}
-            </span>
+            <span className="font-semibold">{publicador.agenciaNome}</span>
           </p>
-          <SeletorEmpresaCliente />
+          <SeletorEmpresaCliente className="text-lilas-escuro [&_span]:text-lilas-escuro/70" />
         </div>
       ) : null}
     </header>

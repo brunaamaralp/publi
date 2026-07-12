@@ -6,21 +6,19 @@ import { Calendar, Wallet } from "lucide-react";
 
 import {
   BadgeEmpresa,
+  BadgeFormatoDemanda,
   IndicadorMatch,
 } from "@/components/influenciador/demandas/indicador-match";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
 import { formatarPrazo, labelFormatoEntrega } from "@/lib/demandas/utils";
 import { formatarMoeda } from "@/lib/influenciador/cadastro-utils";
 import type { DemandaFeedItem } from "@/lib/mock-data/demandas";
+import { cn } from "@/lib/utils";
 
 const BRIEFING_LIMITE = 140;
+
+const CTA_INTERESSE =
+  "border-transparent bg-verde-carvao-escuro text-verde-neon shadow-none hover:bg-verde-carvao hover:text-verde-neon";
 
 type DemandaCardProps = {
   item: DemandaFeedItem;
@@ -44,29 +42,35 @@ export function DemandaCard({
       : `${demanda.briefing.slice(0, BRIEFING_LIMITE).trim()}…`;
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="flex flex-row items-start gap-3 pb-2">
-        <div className="min-w-0 flex-1 space-y-2">
+    <article
+      className={cn(
+        "overflow-hidden rounded-card border border-cinza-200 bg-white transition-[border-color,box-shadow]",
+        "hover:border-verde-neon focus-within:border-verde-neon",
+        modoEnviado && "border-verde-neon/40",
+      )}
+    >
+      <header className="border-b border-cinza-200/80 p-4 pb-3">
+        <div className="flex justify-end">
+          <IndicadorMatch score={match.score} />
+        </div>
+        <div className="mt-3 space-y-2">
           <BadgeEmpresa nome={empresaNome} verificada={empresaVerificada} />
-          <h3 className="text-base leading-snug font-semibold">
-            {demanda.titulo}
-          </h3>
+          <h3 className="text-base leading-snug font-bold">{demanda.titulo}</h3>
           <div className="flex flex-wrap gap-1.5">
-            <Badge variant="secondary">
+            <BadgeFormatoDemanda>
               {labelFormatoEntrega(demanda.formatoEntrega)}
-            </Badge>
+            </BadgeFormatoDemanda>
           </div>
         </div>
-        <IndicadorMatch score={match.score} />
-      </CardHeader>
+      </header>
 
-      <CardContent className="space-y-3">
-        <p className="text-muted-foreground text-sm leading-relaxed">
+      <div className="space-y-3 p-4">
+        <p className="text-texto-secundario text-sm leading-relaxed font-normal">
           {briefingExibido}
           {briefingLongo ? (
             <button
               type="button"
-              className="text-primary ml-1 font-medium hover:underline"
+              className="text-verde-acao ml-1 font-medium hover:underline"
               onClick={() => setExpandido((v) => !v)}
             >
               {expandido ? "ver menos" : "ver mais"}
@@ -74,10 +78,10 @@ export function DemandaCard({
           ) : null}
         </p>
 
-        <div className="text-muted-foreground flex flex-wrap gap-4 text-sm">
+        <div className="text-texto-secundario flex flex-wrap gap-4 text-sm font-normal">
           <span className="inline-flex items-center gap-1.5">
             <Wallet className="size-3.5" aria-hidden />
-            <span className="text-foreground font-data font-semibold">
+            <span className="text-foreground font-data font-medium">
               {formatarMoeda(demanda.orcamento)}
             </span>
           </span>
@@ -89,10 +93,10 @@ export function DemandaCard({
             </span>
           </span>
         </div>
-      </CardContent>
+      </div>
 
       {!modoEnviado ? (
-        <CardFooter className="flex gap-2 border-t pt-4">
+        <footer className="flex gap-2 border-t border-cinza-200/80 p-4">
           <Button
             type="button"
             variant="outline"
@@ -103,20 +107,20 @@ export function DemandaCard({
           </Button>
           <Button
             type="button"
-            className="flex-1"
+            className={cn(CTA_INTERESSE, "flex-1")}
             onClick={() => onInteresse(match.id)}
           >
             Tenho interesse
           </Button>
-        </CardFooter>
+        </footer>
       ) : (
-        <CardFooter className="border-t pt-4">
-          <p className="text-primary w-full text-center text-sm font-medium">
+        <footer className="border-t border-cinza-200/80 p-4">
+          <p className="text-verde-acao w-full text-center text-sm font-medium">
             Interesse enviado — aguardando resposta da empresa
           </p>
-        </CardFooter>
+        </footer>
       )}
-    </Card>
+    </article>
   );
 }
 
@@ -130,14 +134,14 @@ export function DemandaListaVazia({
   mostrarLinkPerfil = true,
 }: DemandaListaVaziaProps) {
   return (
-    <div className="flex flex-col items-center justify-center px-4 py-16 text-center">
-      <p className="text-muted-foreground max-w-sm text-sm leading-relaxed">
+    <div className="flex flex-col items-center justify-center rounded-card border border-dashed border-cinza-200 bg-white px-4 py-16 text-center">
+      <p className="text-texto-secundario max-w-sm text-sm leading-relaxed font-normal">
         {mensagem}
       </p>
       {mostrarLinkPerfil ? (
         <Link
           href="/influenciador/cadastro"
-          className="text-primary mt-4 text-sm font-medium hover:underline"
+          className="text-verde-acao mt-4 text-sm font-medium hover:underline"
         >
           Completar meu perfil →
         </Link>

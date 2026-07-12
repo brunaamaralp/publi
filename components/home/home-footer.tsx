@@ -9,7 +9,7 @@ const LINKS = [
 
 export function HomeFooter() {
   return (
-    <footer className="border-t bg-[var(--cinza-900)] text-zinc-400">
+    <footer className="border-t border-verde-carvao-claro/50 bg-verde-carvao text-zinc-400">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div>
           <p className="font-display text-lg font-semibold text-white">Publi</p>
@@ -36,7 +36,7 @@ export function HomeFooter() {
       </div>
 
       <div className="border-t border-white/10 px-4 py-4 sm:px-6">
-        <p className="text-muted-foreground mx-auto max-w-6xl text-center text-xs text-zinc-500">
+        <p className="mx-auto max-w-6xl text-center text-xs text-zinc-500">
           © {new Date().getFullYear()} Publi. Todos os direitos reservados.
         </p>
       </div>

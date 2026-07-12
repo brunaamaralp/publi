@@ -39,12 +39,13 @@ export function PassoDadosBasicos({
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold">Dados básicos</h2>
-        <p className="text-muted-foreground text-sm">
+        <h2 className="font-display text-lg font-bold">Dados básicos</h2>
+        <p className="text-texto-secundario text-sm font-normal">
           Essas informações aparecem no seu perfil profissional para empresas.
         </p>
       </div>
 
+      <div className="secao-editavel space-y-6">
       <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-start">
         <div
           className="border-border bg-muted relative flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-full border"
@@ -125,8 +126,8 @@ export function PassoDadosBasicos({
           <Label htmlFor="bio">Bio</Label>
           <span
             className={cn(
-              "text-xs tabular-nums",
-              bioLength > 500 ? "text-destructive" : "text-muted-foreground",
+              "font-data text-xs",
+              bioLength > 500 ? "text-destructive" : "text-texto-secundario",
             )}
             aria-live="polite"
           >
@@ -154,11 +155,13 @@ export function PassoDadosBasicos({
         className="banner-informativo flex gap-3 rounded-card p-4"
         role="note"
       >
-        <Info className="text-primary mt-0.5 size-4 shrink-0" aria-hidden />
+        <Info className="text-verde-neon mt-0.5 size-4 shrink-0" aria-hidden />
         <p className="text-sm">
-          Perfis completos e verificados recebem prioridade no match com
-          empresas. Dedique alguns minutos para preencher com atenção.
+          <span className="text-verde-neon font-medium">Perfis completos</span>{" "}
+          e verificados recebem prioridade no match com empresas. Dedique alguns
+          minutos para preencher com atenção.
         </p>
+      </div>
       </div>
     </div>
   );

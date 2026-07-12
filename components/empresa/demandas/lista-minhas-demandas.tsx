@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Plus, Users } from "lucide-react";
 import { toast } from "sonner";
 
-import { BadgeStatusDemanda } from "@/components/empresa/demandas/badge-status-demanda";
+import { BadgeStatusDemanda, BORDA_LINHA_DEMANDA } from "@/components/empresa/demandas/badge-status-demanda";
 import { CabecalhoDemandasEmpresa } from "@/components/empresa/demandas/cabecalho-demandas-empresa";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -63,7 +63,8 @@ export function ListaMinhasDemandas() {
   const itemCancelar = itens.find((i) => i.demanda.id === cancelarId);
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8 px-4 py-8 sm:px-6">
+    <div className="min-h-full bg-fundo-pagina">
+      <div className="mx-auto max-w-5xl space-y-8 px-4 py-8 sm:px-6">
       <CabecalhoDemandasEmpresa
         titulo="Minhas demandas"
         descricao="Gerencie as campanhas publicadas para influenciadores. Cada demanda aberta alimenta o feed de match do outro lado da plataforma."
@@ -76,7 +77,10 @@ export function ListaMinhasDemandas() {
           </p>
           <Link
             href="/empresa/demandas/nova"
-            className={cn(buttonVariants(), "mt-6")}
+            className={cn(
+              buttonVariants(),
+              "mt-6 border-transparent bg-verde-carvao-escuro text-verde-neon shadow-none hover:bg-verde-carvao hover:text-verde-neon",
+            )}
           >
             <Plus className="size-4" aria-hidden />
             Publicar primeira demanda
@@ -84,10 +88,10 @@ export function ListaMinhasDemandas() {
         </div>
       ) : (
         <>
-          <div className="hidden overflow-x-auto rounded-card border md:block">
+          <div className="hidden overflow-x-auto overflow-y-hidden rounded-card border bg-card md:block">
             <table className="w-full min-w-[720px] text-left text-sm">
               <thead>
-                <tr className="border-border bg-muted/40 border-b">
+                <tr className="border-border border-b bg-muted/40">
                   <th className="px-4 py-3 font-medium">Título</th>
                   <th className="px-4 py-3 font-medium">Status</th>
                   <th className="px-4 py-3 font-medium">Matches</th>
@@ -102,11 +106,14 @@ export function ListaMinhasDemandas() {
                 {itens.map((item) => (
                   <tr
                     key={item.demanda.id}
-                    className="border-border border-b last:border-0"
+                    className={cn(
+                      "border-border border-b last:border-0",
+                      BORDA_LINHA_DEMANDA[item.demanda.status],
+                    )}
                   >
                     <td className="px-4 py-3">
-                      <p className="font-medium">{item.demanda.titulo}</p>
-                      <p className="text-muted-foreground mt-0.5 text-xs">
+                      <p className="font-bold">{item.demanda.titulo}</p>
+                      <p className="text-texto-secundario mt-0.5 text-xs font-normal">
                         {labelFormatoEntrega(item.demanda.formatoEntrega)}
                       </p>
                     </td>
@@ -114,15 +121,15 @@ export function ListaMinhasDemandas() {
                       <BadgeStatusDemanda status={item.demanda.status} />
                     </td>
                     <td className="px-4 py-3">
-                      <span className="font-data inline-flex items-center gap-1">
-                        <Users className="size-3.5" aria-hidden />
+                      <span className="font-data inline-flex items-center gap-1 font-medium">
+                        <Users className="text-texto-secundario size-3.5" aria-hidden />
                         {item.matchesGerados}
                       </span>
                     </td>
-                    <td className="px-4 py-3 font-data font-medium">
+                    <td className="font-data px-4 py-3 font-medium">
                       {formatarMoeda(item.demanda.orcamento)}
                     </td>
-                    <td className="px-4 py-3 font-data">
+                    <td className="font-data text-texto-secundario px-4 py-3">
                       {formatarPrazo(item.demanda.prazo)}
                     </td>
                     <td className="px-4 py-3 text-right">
@@ -149,17 +156,22 @@ export function ListaMinhasDemandas() {
           <ul className="space-y-4 md:hidden" aria-label="Minhas demandas">
             {itens.map((item) => (
               <li key={item.demanda.id}>
-                <Card>
+                <Card
+                  className={cn(
+                    "overflow-hidden",
+                    BORDA_LINHA_DEMANDA[item.demanda.status],
+                  )}
+                >
                   <CardHeader className="pb-2">
                     <div className="flex items-start justify-between gap-3">
-                      <CardTitle className="text-base leading-snug">
+                      <CardTitle className="font-sans text-base leading-snug font-bold">
                         {item.demanda.titulo}
                       </CardTitle>
                       <BadgeStatusDemanda status={item.demanda.status} />
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-2 text-sm">
-                    <div className="text-muted-foreground flex flex-wrap gap-x-4 gap-y-1">
+                    <div className="text-texto-secundario flex flex-wrap gap-x-4 gap-y-1 font-normal">
                       <span>
                         Matches:{" "}
                         <span className="text-foreground font-data font-medium">
@@ -179,7 +191,7 @@ export function ListaMinhasDemandas() {
                         </span>
                       </span>
                     </div>
-                    <p className="text-muted-foreground text-xs">
+                    <p className="text-texto-secundario text-xs font-normal">
                       {labelFormatoEntrega(item.demanda.formatoEntrega)}
                     </p>
                   </CardContent>
@@ -234,6 +246,7 @@ export function ListaMinhasDemandas() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 }

@@ -35,7 +35,7 @@ export function ListaAvaliacoes({
 
   if (ordenadas.length === 0) {
     return (
-      <p className={cn("text-muted-foreground text-sm", className)}>
+      <p className={cn("text-texto-secundario text-sm font-normal", className)}>
         Nenhuma avaliação recebida ainda. Após concluir campanhas, as empresas
         poderão avaliar seu trabalho aqui.
       </p>
@@ -46,21 +46,22 @@ export function ListaAvaliacoes({
     <div className={cn("space-y-4", className)}>
       <ul className="space-y-4" aria-label="Avaliações recebidas">
         {exibidas.map((avaliacao) => (
-          <li
-            key={avaliacao.id}
-            className="border-border space-y-2 border-b pb-4 last:border-0 last:pb-0"
-          >
+          <li key={avaliacao.id} className="space-y-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <EstrelasNota nota={avaliacao.notaFornecedor} tamanho="md" />
               <time
                 dateTime={avaliacao.criadoEm}
-                className="text-muted-foreground text-xs"
+                className="text-texto-secundario text-xs font-normal"
               >
                 {formatarDataRelativa(avaliacao.criadoEm)}
               </time>
             </div>
             {avaliacao.comentario ? (
-              <p className="text-sm leading-relaxed">{avaliacao.comentario}</p>
+              <div className="secao-editavel ring-0">
+                <p className="text-sm leading-relaxed font-normal">
+                  {avaliacao.comentario}
+                </p>
+              </div>
             ) : null}
           </li>
         ))}

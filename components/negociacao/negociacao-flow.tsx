@@ -71,15 +71,15 @@ export function NegociacaoFlow({ matchId }: NegociacaoFlowProps) {
 
   if (!carregado || !estado) {
     return (
-      <div className="text-muted-foreground flex min-h-[50vh] items-center justify-center text-sm">
+      <div className="text-texto-secundario flex min-h-[50vh] items-center justify-center bg-fundo-pagina text-sm font-normal">
         Carregando negociação…
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
-      <header className="border-border border-b px-4 py-3 sm:px-6">
+    <div className="min-h-screen bg-fundo-pagina">
+      <header className="border-b border-cinza-200 bg-white/95 px-4 py-3 backdrop-blur sm:px-6">
         <div className="mx-auto flex max-w-3xl items-center gap-3">
           <Link
             href="/empresa/demandas"
@@ -92,7 +92,7 @@ export function NegociacaoFlow({ matchId }: NegociacaoFlowProps) {
             Voltar
           </Link>
           <div className="min-w-0">
-            <p className="text-primary text-xs font-medium">Negociação</p>
+            <p className="text-texto-secundario text-xs font-medium">Negociação</p>
             <p className="truncate text-sm font-medium">
               {contexto.demanda.titulo}
             </p>
@@ -100,7 +100,7 @@ export function NegociacaoFlow({ matchId }: NegociacaoFlowProps) {
         </div>
       </header>
 
-      <main className="px-4 py-6 sm:px-6">
+      <main>
         {!estado.desbloqueado ? (
           <PaywallDesbloqueio
             contexto={contexto}

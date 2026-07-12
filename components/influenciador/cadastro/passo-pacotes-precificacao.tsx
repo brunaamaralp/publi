@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, X } from "lucide-react";
+import { Plus, Sparkles, X } from "lucide-react";
 import { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -73,14 +73,17 @@ export function PassoPacotesPrecificacao({
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-lg font-semibold">Pacotes e precificação</h2>
-        <p className="text-muted-foreground text-sm">
+        <h2 className="font-display text-lg font-bold">Pacotes e precificação</h2>
+        <p className="text-texto-secundario text-sm font-normal">
           Defina seus preços com transparência. O preço-base garante remuneração
           justa para o seu porte de audiência.
         </p>
       </div>
 
-      <section className="space-y-4" aria-labelledby="tabela-precos-titulo">
+      <section
+        className="secao-editavel space-y-4"
+        aria-labelledby="tabela-precos-titulo"
+      >
         <div>
           <h3 id="tabela-precos-titulo" className="text-sm font-medium">
             Tabela de preços por tipo de serviço
@@ -105,7 +108,7 @@ export function PassoPacotesPrecificacao({
         </div>
       </section>
 
-      <section className="space-y-4" aria-labelledby="pacotes-titulo">
+      <section className="secao-editavel space-y-4" aria-labelledby="pacotes-titulo">
         <div className="flex items-center justify-between gap-2">
           <div>
             <h3 id="pacotes-titulo" className="text-sm font-medium">
@@ -175,15 +178,16 @@ function LinhaTabelaPreco({
   }
 
   return (
-    <div className="border-border grid gap-3 rounded-card border p-4 sm:grid-cols-[1fr_auto_1fr] sm:items-end">
+    <div className="border-border grid gap-3 rounded-card border bg-fundo-pagina p-4 sm:grid-cols-[1fr_auto_1fr] sm:items-end">
       <div>
         <p className="text-sm font-medium">{label}</p>
-        <p className="text-muted-foreground text-xs">
-          Preço-base sugerido:{" "}
-          <span className="text-foreground font-data font-medium">
+        <div className="card-metrica-perfil mt-2 inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs">
+          <Sparkles className="size-3 shrink-0 opacity-60" aria-hidden />
+          <span className="opacity-80">Preço-base sugerido:</span>
+          <span className="font-data font-medium">
             {formatarMoeda(item.precoBaseSugerido)}
           </span>
-        </p>
+        </div>
       </div>
       <div className="hidden text-center text-xs text-muted-foreground sm:block">
         →

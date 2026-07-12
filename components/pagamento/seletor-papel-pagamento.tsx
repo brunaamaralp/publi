@@ -13,8 +13,8 @@ export function SeletorPapelPagamento({
   onPapelChange,
 }: SeletorPapelPagamentoProps) {
   return (
-    <div className="border-border bg-muted/40 rounded-card border p-3">
-      <p className="text-muted-foreground mb-2 text-xs font-medium uppercase tracking-wide">
+    <div className="border-border bg-muted/40 secao-editavel space-y-2 ring-0 p-3">
+      <p className="text-texto-secundario text-xs font-medium uppercase tracking-wide">
         Simular visão (demo)
       </p>
       <Tabs

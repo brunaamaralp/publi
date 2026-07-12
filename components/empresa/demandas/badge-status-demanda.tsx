@@ -3,13 +3,18 @@ import { LABELS_STATUS_DEMANDA } from "@/lib/empresa/demandas-utils";
 import { cn } from "@/lib/utils";
 
 const STATUS_CLASSES: Record<Demanda["status"], string> = {
-  aberta:
-    "border-verde-acao/25 bg-verde-acao/10 text-verde-acao",
-  em_negociacao:
-    "border-status-negociacao/30 bg-status-negociacao/10 text-status-negociacao",
+  aberta: "border-verde-carvao-escuro bg-verde-carvao-escuro text-verde-neon",
+  em_negociacao: "border-lilas-claro bg-lilas-claro text-lilas-escuro",
   fechada: "border-cinza-500/25 bg-cinza-500/10 text-cinza-500",
-  cancelada:
-    "border-destructive/25 bg-destructive/10 text-destructive",
+  cancelada: "border-destructive/25 bg-destructive/10 text-destructive",
+};
+
+/** Borda lateral de 3px nas linhas da tabela, por status */
+export const BORDA_LINHA_DEMANDA: Record<Demanda["status"], string> = {
+  aberta: "border-l-[3px] border-l-verde-neon",
+  em_negociacao: "border-l-[3px] border-l-lilas",
+  fechada: "",
+  cancelada: "",
 };
 
 type BadgeStatusDemandaProps = {

@@ -6,37 +6,53 @@ import { cn } from "@/lib/utils";
 
 type EstrelasNotaProps = {
   nota: number;
-  tamanho?: "sm" | "md";
+  tamanho?: "sm" | "md" | "lg";
   className?: string;
+  mostrarNumero?: boolean;
 };
 
 export function EstrelasNota({
   nota,
   tamanho = "sm",
   className,
+  mostrarNumero = false,
 }: EstrelasNotaProps) {
-  const sizeClass = tamanho === "sm" ? "size-3.5" : "size-4";
+  const sizeClass =
+    tamanho === "sm" ? "size-3.5" : tamanho === "md" ? "size-4" : "size-5";
 
   return (
     <span
-      className={cn("inline-flex items-center gap-0.5", className)}
+      className={cn("inline-flex items-center gap-2", className)}
       aria-label={`Nota ${nota} de 5`}
     >
-      {Array.from({ length: 5 }, (_, i) => {
-        const preenchida = i < nota;
-        return (
-          <Star
-            key={i}
-            className={cn(
-              sizeClass,
-              preenchida
-                ? "fill-[var(--avaliacao-estrela)] text-[var(--avaliacao-estrela)]"
-                : "text-muted-foreground/40",
-            )}
-            aria-hidden
-          />
-        );
-      })}
+      <span className="inline-flex items-center gap-0.5">
+        {Array.from({ length: 5 }, (_, i) => {
+          const preenchida = i < nota;
+          return (
+            <Star
+              key={i}
+              className={cn(
+                sizeClass,
+                preenchida
+                  ? "fill-verde-neon text-verde-neon"
+                  : "text-cinza-200",
+              )}
+              aria-hidden
+            />
+          );
+        })}
+      </span>
+      {mostrarNumero ? (
+        <span
+          className={cn(
+            "font-display font-bold tabular-nums",
+            tamanho === "lg" ? "text-3xl" : "text-lg",
+            nota >= 4 ? "text-verde-neon" : "text-foreground",
+          )}
+        >
+          {nota.toFixed(1)}
+        </span>
+      ) : null}
     </span>
   );
 }

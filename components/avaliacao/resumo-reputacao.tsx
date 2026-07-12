@@ -1,7 +1,8 @@
 "use client";
 
-import { Star } from "lucide-react";
+import { Sparkles, Star } from "lucide-react";
 
+import { EstrelasNota } from "@/components/avaliacao/estrelas-nota";
 import type { Avaliacao } from "@/lib/types";
 import {
   calcularMediaAvaliacoes,
@@ -25,9 +26,21 @@ export function ResumoReputacao({
 
   if (media === null) {
     return (
-      <p className={cn("text-muted-foreground text-sm", className)}>
-        Sem avaliações ainda
-      </p>
+      <div
+        className={cn(
+          "card-metrica-perfil relative space-y-1 pr-8",
+          className,
+        )}
+      >
+        <Sparkles
+          className="absolute top-3 right-3 size-3.5 opacity-50"
+          aria-hidden
+        />
+        <p className="text-[10px] font-medium tracking-wide uppercase opacity-70">
+          Calculado pela plataforma
+        </p>
+        <p className="text-sm opacity-80">Sem avaliações ainda</p>
+      </div>
     );
   }
 
@@ -35,36 +48,53 @@ export function ResumoReputacao({
 
   if (variante === "compacta") {
     return (
-      <p
+      <div
         className={cn(
-          "inline-flex items-center gap-1 text-sm font-medium",
+          "card-metrica-perfil relative space-y-1 pr-8",
           className,
         )}
         aria-label={`Nota média ${mediaFormatada} de 5, baseada em ${total} avaliações`}
       >
-        <span className="font-data">{mediaFormatada}</span>
-        <Star
-          className="size-3.5 fill-[var(--avaliacao-estrela)] text-[var(--avaliacao-estrela)]"
+        <Sparkles
+          className="absolute top-3 right-3 size-3.5 opacity-50"
           aria-hidden
         />
-        <span className="text-muted-foreground font-normal">
-          ({total} {total === 1 ? "avaliação" : "avaliações"})
-        </span>
-      </p>
+        <p className="text-[10px] font-medium tracking-wide uppercase opacity-70">
+          Calculado pela plataforma
+        </p>
+        <p className="inline-flex items-center gap-2 text-sm font-medium">
+          <span
+            className={cn(
+              "font-display text-lg font-bold tabular-nums",
+              media >= 4 ? "text-verde-neon" : "text-lilas-escuro",
+            )}
+          >
+            {mediaFormatada}
+          </span>
+          <Star
+            className="size-3.5 fill-verde-neon text-verde-neon"
+            aria-hidden
+          />
+          <span className="font-normal opacity-80">
+            ({total} {total === 1 ? "avaliação" : "avaliações"})
+          </span>
+        </p>
+      </div>
     );
   }
 
   return (
-    <div className={cn("space-y-0.5", className)}>
-      <p className="inline-flex items-center gap-1.5 font-display text-lg font-semibold">
-        <span className="font-data">{mediaFormatada}</span>
-        <Star
-          className="size-4 fill-[var(--avaliacao-estrela)] text-[var(--avaliacao-estrela)]"
-          aria-hidden
-        />
+    <div className={cn("card-metrica-perfil relative space-y-2 pr-8", className)}>
+      <Sparkles
+        className="absolute top-3 right-3 size-3.5 opacity-50"
+        aria-hidden
+      />
+      <p className="text-[10px] font-medium tracking-wide uppercase opacity-70">
+        Calculado pela plataforma
       </p>
-      <p className="text-muted-foreground text-sm">
-        baseado em {total} {total === 1 ? "avaliação" : "avaliações"}
+      <EstrelasNota nota={Math.round(media)} tamanho="lg" mostrarNumero />
+      <p className="text-sm font-normal opacity-80">
+        Média baseada em {total} {total === 1 ? "avaliação" : "avaliações"}
       </p>
     </div>
   );

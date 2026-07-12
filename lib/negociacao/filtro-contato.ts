@@ -26,7 +26,8 @@ export function analisarTextoMensagem(texto: string): ResultadoFiltroContato {
     return {
       podeEnviar: false,
       flag: "bloqueado_padrao",
-      motivoBloqueio: "Não é possível compartilhar contato externo pelo chat",
+      motivoBloqueio:
+        "Para manter tudo registrado, não é possível enviar telefones, e-mails ou @ neste chat.",
     };
   }
 

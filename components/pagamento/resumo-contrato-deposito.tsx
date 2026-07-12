@@ -1,13 +1,9 @@
 import { formatarPrazo } from "@/lib/demandas/utils";
-import type { ContratoPagamentoContexto } from "@/lib/pagamento/pagamento-types";
-import { formatarMoeda } from "@/lib/influenciador/cadastro-utils";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  IndicadorProvedorEscrow,
+  ValorEscrowDestaque,
+} from "@/components/pagamento/escrow-ui";
+import type { ContratoPagamentoContexto } from "@/lib/pagamento/pagamento-types";
 
 type ResumoContratoDepositoProps = {
   contexto: ContratoPagamentoContexto;
@@ -17,30 +13,38 @@ export function ResumoContratoDeposito({ contexto }: ResumoContratoDepositoProps
   const { contrato, influenciador, demandaTitulo } = contexto;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">{demandaTitulo}</CardTitle>
-        <CardDescription>Contrato assinado — pronto para depósito</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-3 text-sm">
-        <div className="flex justify-between gap-2">
-          <span className="text-muted-foreground">Influenciador(a)</span>
-          <span className="font-medium">{influenciador.nome}</span>
-        </div>
-        <div className="flex justify-between gap-2">
-          <span className="text-muted-foreground">Valor</span>
-          <span className="font-data font-semibold">
-            {formatarMoeda(contrato.valor)}
-          </span>
-        </div>
-        <div className="flex justify-between gap-2">
-          <span className="text-muted-foreground">Prazo de entrega</span>
-          <span className="font-data">{formatarPrazo(contrato.prazoEntrega)}</span>
-        </div>
-        <p className="text-muted-foreground border-border border-t pt-3 text-xs leading-relaxed">
-          {contrato.escopo}
+    <div className="secao-editavel space-y-4">
+      <div>
+        <h2 className="font-display text-lg font-bold">{demandaTitulo}</h2>
+        <p className="text-texto-secundario text-sm font-normal">
+          Contrato assinado — pronto para depósito em escrow
         </p>
-      </CardContent>
-    </Card>
+      </div>
+
+      <ValorEscrowDestaque
+        valor={contrato.valor}
+        status="aguardando_deposito"
+        tamanho="md"
+      />
+
+      <IndicadorProvedorEscrow />
+
+      <dl className="space-y-2 border-t border-cinza-200 pt-3 text-sm">
+        <div className="flex justify-between gap-2">
+          <dt className="text-texto-secundario font-normal">Influenciador(a)</dt>
+          <dd className="font-medium">{influenciador.nome}</dd>
+        </div>
+        <div className="flex justify-between gap-2">
+          <dt className="text-texto-secundario font-normal">Prazo de entrega</dt>
+          <dd className="font-data font-medium">
+            {formatarPrazo(contrato.prazoEntrega)}
+          </dd>
+        </div>
+      </dl>
+
+      <p className="text-texto-secundario border-t border-cinza-200 pt-3 text-xs leading-relaxed font-normal">
+        {contrato.escopo}
+      </p>
+    </div>
   );
 }
