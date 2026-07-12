@@ -12,6 +12,8 @@ import {
   Wallet,
 } from "lucide-react";
 
+import type { Usuario } from "@/lib/types/usuario";
+
 export type NavItem = {
   href: string;
   label: string;
@@ -116,3 +118,14 @@ export const SESSAO_MOCK = {
   tipo: "influenciador" as const,
   plano: "Pro",
 };
+
+const GRUPOS_POR_TIPO: Record<Usuario["tipo"], string[]> = {
+  influenciador: ["Geral", "Influenciador", "Operação"],
+  empresa: ["Geral", "Empresa", "Operação"],
+  agencia: ["Geral", "Agência", "Empresa", "Operação"],
+};
+
+export function navGruposParaUsuario(tipo: Usuario["tipo"]): NavGrupo[] {
+  const permitidos = new Set(GRUPOS_POR_TIPO[tipo]);
+  return NAV_GRUPOS.filter((grupo) => permitidos.has(grupo.titulo));
+}

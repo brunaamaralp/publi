@@ -18,7 +18,7 @@ export function HomeCta() {
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
-              href="/influenciador/cadastro"
+              href="/cadastro"
               className={cn(buttonVariants({ size: "lg" }), "h-10 px-6")}
             >
               Começar gratuitamente

@@ -1,3 +1,4 @@
+import { ProtectedRoute } from "@/components/auth/protected-route";
 import { AgenciaProvider } from "@/lib/contexts/agencia-context";
 
 export default function AgenciaLayout({
@@ -5,5 +6,9 @@ export default function AgenciaLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <AgenciaProvider>{children}</AgenciaProvider>;
+  return (
+    <ProtectedRoute>
+      <AgenciaProvider>{children}</AgenciaProvider>
+    </ProtectedRoute>
+  );
 }

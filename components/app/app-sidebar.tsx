@@ -1,14 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 
 import { SeletorEmpresaCliente } from "@/components/agencia/seletor-empresa-cliente";
 import { buttonVariants } from "@/components/ui/button";
-import { NAV_GRUPOS, SESSAO_MOCK } from "@/lib/app/nav-items";
+import { navGruposParaUsuario } from "@/lib/app/nav-items";
+import { useAuth } from "@/lib/auth-context";
 import { useAgenciaOpcional } from "@/lib/contexts/agencia-context";
 import { cn } from "@/lib/utils";
+
+const LABEL_TIPO: Record<string, string> = {
+  influenciador: "Influenciador",
+  empresa: "Empresa",
+  agencia: "Agência",
+};
+
+const LABEL_STATUS: Record<string, string> = {
+  ativo: "Ativo",
+  pendente_verificacao: "Em análise",
+  suspenso: "Suspenso",
+};
 
 type AppSidebarProps = {
   onNavigate?: () => void;
@@ -17,11 +30,21 @@ type AppSidebarProps = {
 
 export function AppSidebar({ onNavigate, className }: AppSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { usuario, logout } = useAuth();
   const agenciaCtx = useAgenciaOpcional();
+
+  const grupos = usuario ? navGruposParaUsuario(usuario.tipo) : [];
 
   function isActive(href: string) {
     if (href === "/inicio") return pathname === "/inicio";
     return pathname === href;
+  }
+
+  function handleLogout() {
+    logout();
+    onNavigate?.();
+    router.push("/login");
   }
 
   return (
@@ -39,11 +62,19 @@ export function AppSidebar({ onNavigate, className }: AppSidebarProps) {
         >
           Publi
         </Link>
-        <p className="mt-3 text-xs uppercase tracking-wide text-zinc-500">
-          Conta ativa
-        </p>
-        <p className="mt-1 truncate text-sm font-medium">{SESSAO_MOCK.nome}</p>
-        <p className="truncate text-xs text-zinc-500">{SESSAO_MOCK.email}</p>
+        {usuario ? (
+          <>
+            <p className="mt-3 text-xs uppercase tracking-wide text-zinc-500">
+              {LABEL_TIPO[usuario.tipo] ?? usuario.tipo}
+              {" · "}
+              {LABEL_STATUS[usuario.status] ?? usuario.status}
+            </p>
+            <p className="mt-1 truncate text-sm font-medium">{usuario.email}</p>
+            <p className="font-data truncate text-xs text-zinc-500">
+              {usuario.id.slice(0, 12)}…
+            </p>
+          </>
+        ) : null}
       </div>
 
       {agenciaCtx?.agencia ? (
@@ -56,7 +87,7 @@ export function AppSidebar({ onNavigate, className }: AppSidebarProps) {
       ) : null}
 
       <nav className="flex-1 overflow-y-auto p-3" aria-label="App">
-        {NAV_GRUPOS.map((grupo) => (
+        {grupos.map((grupo) => (
           <div key={grupo.titulo} className="mb-5 last:mb-0">
             <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
               {grupo.titulo}
@@ -88,17 +119,27 @@ export function AppSidebar({ onNavigate, className }: AppSidebarProps) {
         ))}
       </nav>
 
-      <div className="border-t border-white/10 p-3">
-        <Link
-          href="/"
-          onClick={onNavigate}
+      <div className="space-y-1 border-t border-white/10 p-3">
+        <button
+          type="button"
+          onClick={handleLogout}
           className={cn(
             buttonVariants({ variant: "ghost", size: "sm" }),
             "w-full justify-start text-zinc-400 hover:bg-white/10 hover:text-white",
           )}
         >
           <LogOut className="size-4" aria-hidden />
-          Sair para o site
+          Sair
+        </button>
+        <Link
+          href="/"
+          onClick={onNavigate}
+          className={cn(
+            buttonVariants({ variant: "ghost", size: "sm" }),
+            "w-full justify-start text-zinc-500 hover:bg-white/10 hover:text-white",
+          )}
+        >
+          Site institucional
         </Link>
       </div>
     </aside>

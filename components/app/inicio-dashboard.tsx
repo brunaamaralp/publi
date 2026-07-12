@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   ArrowRight,
@@ -8,7 +10,7 @@ import {
 } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
-import { SESSAO_MOCK } from "@/lib/app/nav-items";
+import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 
 const CTA_PRIMARIO =
@@ -57,18 +59,23 @@ const RESUMO = [
 ] as const;
 
 export function InicioDashboard() {
-  const primeiroNome = SESSAO_MOCK.nome.split(" ")[0];
+  const { usuario } = useAuth();
+  const primeiroNome =
+    usuario?.email.split("@")[0]?.replace(/\./g, " ") ?? "usuário";
+  const nomeExibicao =
+    primeiroNome.charAt(0).toUpperCase() + primeiroNome.slice(1);
 
   return (
     <div className="mx-auto max-w-5xl space-y-8 px-4 py-8 sm:px-6">
       <header className="space-y-2">
         <p className="text-texto-secundario text-sm font-normal">Início</p>
         <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
-          Olá, {primeiroNome}
+          Olá, {nomeExibicao}
         </h1>
         <p className="text-texto-secundario text-sm font-normal">
-          Plano {SESSAO_MOCK.plano} · acompanhe matches, campanhas e ganhos pelo
-          menu lateral.
+          {usuario?.status === "pendente_verificacao"
+            ? "Seu perfil está em análise — você já pode explorar a plataforma."
+            : "Acompanhe matches, campanhas e ganhos pelo menu lateral."}
         </p>
       </header>
 

@@ -31,7 +31,7 @@ export function HomeNav() {
 
         <div className="flex items-center gap-2">
           <Link
-            href="/inicio"
+            href="/login"
             className={cn(
               buttonVariants({ variant: "ghost", size: "sm" }),
               "text-zinc-300 hover:bg-white/10 hover:text-white",
@@ -40,7 +40,7 @@ export function HomeNav() {
             Entrar
           </Link>
           <Link
-            href="/influenciador/cadastro"
+            href="/cadastro"
             className={cn(buttonVariants({ size: "sm" }))}
           >
             Criar conta

@@ -41,7 +41,7 @@ export function HomeHero() {
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Link
-              href="/inicio"
+              href="/cadastro"
               className={cn(buttonVariants({ size: "lg" }), "h-10 px-5")}
             >
               Sou influenciador

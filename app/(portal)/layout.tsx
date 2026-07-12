@@ -1,5 +1,6 @@
-import { AgenciaProvider } from "@/lib/contexts/agencia-context";
+import { ProtectedRoute } from "@/components/auth/protected-route";
 import { AppShell } from "@/components/app/app-shell";
+import { AgenciaProvider } from "@/lib/contexts/agencia-context";
 
 export default function PortalLayout({
   children,
@@ -7,8 +8,10 @@ export default function PortalLayout({
   children: React.ReactNode;
 }) {
   return (
-    <AgenciaProvider>
-      <AppShell>{children}</AppShell>
-    </AgenciaProvider>
+    <ProtectedRoute>
+      <AgenciaProvider>
+        <AppShell>{children}</AppShell>
+      </AgenciaProvider>
+    </ProtectedRoute>
   );
 }
