@@ -19,7 +19,7 @@ export function AppShell({ children }: AppShellProps) {
   const [menuAberto, setMenuAberto] = useState(false);
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-fundo-pagina">
       <div className="hidden w-60 shrink-0 lg:block">
         <AppSidebar className="fixed inset-y-0 left-0 z-30 w-60" />
       </div>
@@ -36,7 +36,7 @@ export function AppShell({ children }: AppShellProps) {
       </Sheet>
 
       <div className="flex min-w-0 flex-1 flex-col lg:pl-60">
-        <header className="border-border bg-background/95 sticky top-0 z-20 flex h-14 items-center gap-3 border-b px-4 backdrop-blur lg:hidden">
+        <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-cinza-200 bg-fundo-pagina/95 px-4 backdrop-blur lg:hidden">
           <Button
             type="button"
             variant="ghost"
@@ -46,7 +46,7 @@ export function AppShell({ children }: AppShellProps) {
           >
             <Menu className="size-5" />
           </Button>
-          <span className="font-display text-sm font-semibold">Publi</span>
+          <span className="font-display text-sm font-bold">Publi</span>
         </header>
 
         <main className="flex-1">{children}</main>
