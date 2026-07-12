@@ -407,10 +407,10 @@ export function PainelAgenciaConcluido() {
                 Segmento: {empresaAtiva.segmento}
               </p>
               <Link
-                href="/agencia/dashboard"
+                href="/inicio"
                 className={buttonVariants()}
               >
-                Ir para o dashboard
+                Ir para o início
               </Link>
             </CardContent>
           </Card>
