@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera, Info } from "lucide-react";
+import { BadgeCheck, Camera, Info } from "lucide-react";
 import Image from "next/image";
 import { useRef } from "react";
 
@@ -24,6 +24,8 @@ export function PassoDadosBasicos({
 }: PassoDadosBasicosProps) {
   const fotoInputRef = useRef<HTMLInputElement>(null);
   const bioLength = draft.bio.length;
+  const dadosEssenciaisOk =
+    draft.nome.trim().length >= 2 && draft.bio.trim().length >= 20;
 
   function handleFotoChange(file: File | null) {
     if (draft.fotoPerfilUrl) {
@@ -155,11 +157,30 @@ export function PassoDadosBasicos({
         className="banner-informativo flex gap-3 rounded-card p-4"
         role="note"
       >
-        <Info className="text-verde-neon mt-0.5 size-4 shrink-0" aria-hidden />
+        {dadosEssenciaisOk ? (
+          <BadgeCheck
+            className="text-verde-neon mt-0.5 size-4 shrink-0"
+            aria-hidden
+          />
+        ) : (
+          <Info className="text-verde-neon mt-0.5 size-4 shrink-0" aria-hidden />
+        )}
         <p className="text-sm">
-          <span className="text-verde-neon font-medium">Perfis completos</span>{" "}
-          e verificados recebem prioridade no match com empresas. Dedique alguns
-          minutos para preencher com atenção.
+          {dadosEssenciaisOk ? (
+            <>
+              <span className="text-verde-neon font-medium">
+                Dados essenciais preenchidos
+              </span>{" "}
+              — perfis completos e verificados recebem prioridade no match com
+              empresas.
+            </>
+          ) : (
+            <>
+              <span className="text-verde-neon font-medium">Perfis completos</span>{" "}
+              e verificados recebem prioridade no match com empresas. Dedique
+              alguns minutos para preencher com atenção.
+            </>
+          )}
         </p>
       </div>
       </div>

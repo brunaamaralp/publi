@@ -1,8 +1,9 @@
 "use client";
 
-import { Sparkles, Star } from "lucide-react";
+import { Star } from "lucide-react";
 
 import { EstrelasNota } from "@/components/avaliacao/estrelas-nota";
+import { IndicadorMetrica } from "@/components/influenciador/cadastro/indicador-metrica";
 import type { Avaliacao } from "@/lib/types";
 import {
   calcularMediaAvaliacoes,
@@ -28,17 +29,11 @@ export function ResumoReputacao({
     return (
       <div
         className={cn(
-          "card-metrica-perfil relative space-y-1 pr-8",
+          "card-metrica-perfil relative space-y-1",
           className,
         )}
       >
-        <Sparkles
-          className="absolute top-3 right-3 size-3.5 opacity-50"
-          aria-hidden
-        />
-        <p className="text-[10px] font-medium tracking-wide uppercase opacity-70">
-          Calculado pela plataforma
-        </p>
+        <IndicadorMetrica tipo="auto-calculado" />
         <p className="text-sm opacity-80">Sem avaliações ainda</p>
       </div>
     );
@@ -50,29 +45,28 @@ export function ResumoReputacao({
     return (
       <div
         className={cn(
-          "card-metrica-perfil relative space-y-1 pr-8",
+          "card-metrica-perfil relative space-y-1",
           className,
         )}
         aria-label={`Nota média ${mediaFormatada} de 5, baseada em ${total} avaliações`}
       >
-        <Sparkles
-          className="absolute top-3 right-3 size-3.5 opacity-50"
-          aria-hidden
-        />
-        <p className="text-[10px] font-medium tracking-wide uppercase opacity-70">
-          Calculado pela plataforma
-        </p>
+        <IndicadorMetrica tipo="auto-calculado" />
         <p className="inline-flex items-center gap-2 text-sm font-medium">
           <span
             className={cn(
-              "font-display text-lg font-bold tabular-nums",
+              "font-display text-lg font-bold",
               media >= 4 ? "text-verde-neon" : "text-lilas-escuro",
             )}
           >
-            {mediaFormatada}
+            <span className="font-data">{mediaFormatada}</span>
           </span>
           <Star
-            className="size-3.5 fill-verde-neon text-verde-neon"
+            className={cn(
+              "size-3.5",
+              media >= 4
+                ? "fill-verde-neon text-verde-neon"
+                : "text-cinza-200",
+            )}
             aria-hidden
           />
           <span className="font-normal opacity-80">
@@ -84,14 +78,8 @@ export function ResumoReputacao({
   }
 
   return (
-    <div className={cn("card-metrica-perfil relative space-y-2 pr-8", className)}>
-      <Sparkles
-        className="absolute top-3 right-3 size-3.5 opacity-50"
-        aria-hidden
-      />
-      <p className="text-[10px] font-medium tracking-wide uppercase opacity-70">
-        Calculado pela plataforma
-      </p>
+    <div className={cn("card-metrica-perfil relative space-y-2", className)}>
+      <IndicadorMetrica tipo="auto-calculado" />
       <EstrelasNota nota={Math.round(media)} tamanho="lg" mostrarNumero />
       <p className="text-sm font-normal opacity-80">
         Média baseada em {total} {total === 1 ? "avaliação" : "avaliações"}

@@ -58,7 +58,7 @@ export function CalculoRpaPainel({
         </Select>
       </div>
 
-      <dl className="secao-editavel space-y-2 text-sm ring-0">
+      <dl className="secao-editavel grid gap-2 text-sm ring-0">
         <LinhaRpa label="Valor bruto" valor={calculo.valorBruto} destaque />
         <LinhaRpa label="INSS (11%)" valor={-calculo.inssRetido} />
         <LinhaRpa
@@ -69,16 +69,16 @@ export function CalculoRpaPainel({
           }
         />
         <LinhaRpa label="ISS (3%)" valor={-calculo.issRetido} />
-        <div className="border-border border-t pt-2">
+        <div className="border-cinza-200 border-t pt-2">
           <LinhaRpa label="Valor líquido" valor={calculo.valorLiquido} destaque />
         </div>
       </dl>
 
-      <div className="banner-alerta flex gap-3 rounded-card p-4 text-sm">
+      <div className="flex gap-3 rounded-card border border-ambar/35 bg-ambar-claro p-4 text-sm text-ambar-escuro">
         <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
-        <p>
+        <p className="font-normal">
           Este RPA é emitido em nome de{" "}
-          <strong className="text-foreground">{empresaNome}</strong> — a
+          <strong className="font-semibold">{empresaNome}</strong> — a
           responsabilidade pelo recolhimento é da empresa contratante.
         </p>
       </div>
@@ -87,7 +87,12 @@ export function CalculoRpaPainel({
         <Button type="button" variant="outline" onClick={onVoltar}>
           Voltar
         </Button>
-        <Button type="button" onClick={onConfirmar} disabled={!municipio}>
+        <Button
+          type="button"
+          variant="cta"
+          onClick={onConfirmar}
+          disabled={!municipio}
+        >
           Confirmar RPA e depositar
         </Button>
       </div>
@@ -110,16 +115,20 @@ function LinhaRpa({
   const absoluto = Math.abs(valor);
 
   return (
-    <div className="flex items-baseline justify-between gap-2">
-      <dt className="text-muted-foreground">
+    <div className="grid grid-cols-[1fr_auto] items-baseline gap-4">
+      <dt className="text-texto-secundario font-normal">
         {label}
         {observacao ? (
-          <span className="text-muted-foreground/80 block text-xs">{observacao}</span>
+          <span className="text-texto-secundario block text-xs font-normal">
+            {observacao}
+          </span>
         ) : null}
       </dt>
       <dd
         className={
-          destaque ? "font-data font-semibold" : "font-data text-muted-foreground"
+          destaque
+            ? "font-data text-right font-semibold tabular-nums"
+            : "font-data text-texto-secundario text-right tabular-nums"
         }
       >
         {prefixo}

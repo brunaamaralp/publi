@@ -17,9 +17,6 @@ import { cn } from "@/lib/utils";
 
 const BRIEFING_LIMITE = 140;
 
-const CTA_INTERESSE =
-  "border-transparent bg-verde-carvao-escuro text-verde-neon shadow-none hover:bg-verde-carvao hover:text-verde-neon";
-
 type DemandaCardProps = {
   item: DemandaFeedItem;
   onInteresse: (matchId: string) => void;
@@ -46,20 +43,22 @@ export function DemandaCard({
       className={cn(
         "overflow-hidden rounded-card border border-cinza-200 bg-white transition-[border-color,box-shadow]",
         "hover:border-verde-neon focus-within:border-verde-neon",
-        modoEnviado && "border-verde-neon/40",
+        modoEnviado && "border-verde-neon/50",
       )}
     >
-      <header className="border-b border-cinza-200/80 p-4 pb-3">
-        <div className="flex justify-end">
-          <IndicadorMatch score={match.score} />
-        </div>
-        <div className="mt-3 space-y-2">
-          <BadgeEmpresa nome={empresaNome} verificada={empresaVerificada} />
-          <h3 className="text-base leading-snug font-bold">{demanda.titulo}</h3>
-          <div className="flex flex-wrap gap-1.5">
-            <BadgeFormatoDemanda>
-              {labelFormatoEntrega(demanda.formatoEntrega)}
-            </BadgeFormatoDemanda>
+      <header className="border-b border-cinza-200/80 p-4">
+        <div className="flex items-start gap-4">
+          <IndicadorMatch score={match.score} alinhamento="inicio" />
+          <div className="min-w-0 flex-1 space-y-2 pt-0.5">
+            <BadgeEmpresa nome={empresaNome} verificada={empresaVerificada} />
+            <h3 className="font-display text-base leading-snug font-bold">
+              {demanda.titulo}
+            </h3>
+            <div className="flex flex-wrap gap-1.5">
+              <BadgeFormatoDemanda>
+                {labelFormatoEntrega(demanda.formatoEntrega)}
+              </BadgeFormatoDemanda>
+            </div>
           </div>
         </div>
       </header>
@@ -70,7 +69,7 @@ export function DemandaCard({
           {briefingLongo ? (
             <button
               type="button"
-              className="text-verde-acao ml-1 font-medium hover:underline"
+              className="text-lilas-escuro ml-1 font-medium hover:underline"
               onClick={() => setExpandido((v) => !v)}
             >
               {expandido ? "ver menos" : "ver mais"}
@@ -78,15 +77,15 @@ export function DemandaCard({
           ) : null}
         </p>
 
-        <div className="text-texto-secundario flex flex-wrap gap-4 text-sm font-normal">
+        <div className="text-texto-secundario flex flex-wrap gap-x-5 gap-y-2 text-sm font-normal">
           <span className="inline-flex items-center gap-1.5">
-            <Wallet className="size-3.5" aria-hidden />
+            <Wallet className="size-3.5 shrink-0" aria-hidden />
             <span className="text-foreground font-data font-medium">
               {formatarMoeda(demanda.orcamento)}
             </span>
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <Calendar className="size-3.5" aria-hidden />
+            <Calendar className="size-3.5 shrink-0" aria-hidden />
             Prazo:{" "}
             <span className="text-foreground font-data">
               {formatarPrazo(demanda.prazo)}
@@ -107,7 +106,8 @@ export function DemandaCard({
           </Button>
           <Button
             type="button"
-            className={cn(CTA_INTERESSE, "flex-1")}
+            variant="cta"
+            className="flex-1"
             onClick={() => onInteresse(match.id)}
           >
             Tenho interesse
@@ -115,7 +115,7 @@ export function DemandaCard({
         </footer>
       ) : (
         <footer className="border-t border-cinza-200/80 p-4">
-          <p className="text-verde-acao w-full text-center text-sm font-medium">
+          <p className="text-verde-neon w-full text-center text-sm font-medium">
             Interesse enviado — aguardando resposta da empresa
           </p>
         </footer>
@@ -141,7 +141,7 @@ export function DemandaListaVazia({
       {mostrarLinkPerfil ? (
         <Link
           href="/influenciador/cadastro"
-          className="text-verde-acao mt-4 text-sm font-medium hover:underline"
+          className="text-lilas-escuro mt-4 text-sm font-medium hover:underline"
         >
           Completar meu perfil →
         </Link>

@@ -11,10 +11,8 @@ import {
 
 import { buttonVariants } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
+import { formatarNomeExibicao } from "@/lib/app/formatar-nome-exibicao";
 import { cn } from "@/lib/utils";
-
-const CTA_PRIMARIO =
-  "border-transparent bg-verde-carvao-escuro text-verde-neon shadow-none hover:bg-verde-carvao hover:text-verde-neon";
 
 const ATALHOS = [
   {
@@ -22,48 +20,41 @@ const ATALHOS = [
     titulo: "Ver demandas",
     descricao: "12 oportunidades com match acima de 70%",
     icone: FileText,
-    primario: true,
-    borda: "border-l-verde-neon",
+    destaque: true,
   },
   {
     href: "/influenciador/treinamentos",
     titulo: "Continuar treinamento",
     descricao: "1 trilha em andamento · nível Iniciante",
     icone: GraduationCap,
-    primario: false,
-    borda: "border-l-lilas",
+    destaque: false,
   },
   {
     href: "/influenciador/financeiro",
     titulo: "Painel financeiro",
     descricao: "R$ 4.200 previstos neste mês",
     icone: Wallet,
-    primario: false,
-    borda: "border-l-lilas",
+    destaque: false,
   },
   {
     href: "/influenciador/resultados",
     titulo: "Registrar resultados",
     descricao: "2 campanhas aguardando métricas",
     icone: BarChart3,
-    primario: false,
-    borda: "border-l-lilas",
+    destaque: false,
   },
 ] as const;
 
 const RESUMO = [
-  { label: "Matches novos", valor: "5", destaque: false },
-  { label: "Campanhas ativas", valor: "3", destaque: false },
-  { label: "XP de treinamento", valor: "240", destaque: false },
-  { label: "Nota média", valor: "4,8", destaque: true },
+  { label: "Matches novos", valor: "5", lilas: true },
+  { label: "Campanhas ativas", valor: "3", lilas: true },
+  { label: "XP de treinamento", valor: "240", lilas: true },
+  { label: "Nota média", valor: "4,8", lilas: false, notaAlta: true },
 ] as const;
 
 export function InicioDashboard() {
   const { usuario } = useAuth();
-  const primeiroNome =
-    usuario?.email.split("@")[0]?.replace(/\./g, " ") ?? "usuário";
-  const nomeExibicao =
-    primeiroNome.charAt(0).toUpperCase() + primeiroNome.slice(1);
+  const nomeExibicao = formatarNomeExibicao(usuario?.email);
 
   return (
     <div className="mx-auto max-w-5xl space-y-8 px-4 py-8 sm:px-6">
@@ -72,7 +63,7 @@ export function InicioDashboard() {
         <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
           Olá, {nomeExibicao}
         </h1>
-        <p className="text-texto-secundario text-sm font-normal">
+        <p className="text-texto-secundario max-w-2xl text-sm font-normal leading-relaxed">
           {usuario?.status === "pendente_verificacao"
             ? "Seu perfil está em análise — você já pode explorar a plataforma."
             : "Acompanhe matches, campanhas e ganhos pelo menu lateral."}
@@ -84,17 +75,24 @@ export function InicioDashboard() {
           <div
             key={item.label}
             className={cn(
-              "rounded-card border border-cinza-200 bg-white p-4",
-              item.destaque && "border-l-[3px] border-l-verde-neon",
+              "rounded-card p-4",
+              item.lilas
+                ? "card-metrica-perfil ring-0"
+                : "border border-cinza-200 bg-white",
             )}
           >
-            <p className="text-texto-secundario text-xs font-normal">
+            <p
+              className={cn(
+                "text-xs font-normal",
+                item.lilas ? "opacity-80" : "text-texto-secundario",
+              )}
+            >
               {item.label}
             </p>
             <p
               className={cn(
-                "mt-1 font-display text-2xl font-bold tabular-nums",
-                item.destaque ? "text-verde-neon" : "text-foreground",
+                "font-data mt-1 text-2xl font-semibold",
+                "notaAlta" in item && item.notaAlta ? "text-verde-neon" : "",
               )}
             >
               {item.valor}
@@ -104,10 +102,7 @@ export function InicioDashboard() {
       </div>
 
       <section className="space-y-4" aria-labelledby="atalhos-inicio">
-        <h2
-          id="atalhos-inicio"
-          className="font-display text-lg font-bold"
-        >
+        <h2 id="atalhos-inicio" className="font-display text-lg font-bold">
           Atalhos
         </h2>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -115,9 +110,8 @@ export function InicioDashboard() {
             <article
               key={atalho.href}
               className={cn(
-                "secao-editavel flex flex-col gap-4 ring-0",
-                "border-l-[3px]",
-                atalho.borda,
+                "flex flex-col gap-4 rounded-card border border-cinza-200 bg-white p-4",
+                atalho.destaque && "border-l-[3px] border-l-verde-neon",
               )}
             >
               <div className="flex items-start gap-3">
@@ -128,7 +122,7 @@ export function InicioDashboard() {
                   <h3 className="font-display text-base font-bold">
                     {atalho.titulo}
                   </h3>
-                  <p className="text-texto-secundario text-sm font-normal">
+                  <p className="text-texto-secundario text-sm font-normal leading-relaxed">
                     {atalho.descricao}
                   </p>
                 </div>
@@ -137,10 +131,9 @@ export function InicioDashboard() {
                 href={atalho.href}
                 className={cn(
                   buttonVariants({
-                    variant: atalho.primario ? "default" : "outline",
+                    variant: atalho.destaque ? "cta" : "outline",
                     size: "sm",
                   }),
-                  atalho.primario && CTA_PRIMARIO,
                   "w-fit",
                 )}
               >
@@ -149,35 +142,6 @@ export function InicioDashboard() {
               </Link>
             </article>
           ))}
-        </div>
-      </section>
-
-      <section
-        className="rounded-card border border-cinza-200 bg-white px-4 py-3"
-        aria-label="Trocar visão de perfil"
-      >
-        <p className="text-texto-secundario text-sm font-normal">
-          Testar outro perfil no protótipo:
-        </p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          <Link
-            href="/empresa/demandas"
-            className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
-          >
-            Empresa
-          </Link>
-          <Link
-            href="/agencia/dashboard"
-            className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
-          >
-            Agência
-          </Link>
-          <Link
-            href="/admin/moderacao"
-            className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
-          >
-            Moderação
-          </Link>
         </div>
       </section>
     </div>

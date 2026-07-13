@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 
+import { ComentarioAvaliacaoCard } from "@/components/avaliacao/comentario-avaliacao-card";
 import { EstrelasNota } from "@/components/avaliacao/estrelas-nota";
 import { Button } from "@/components/ui/button";
 import { formatarDataRelativa } from "@/lib/avaliacao/utils";
@@ -57,11 +58,9 @@ export function ListaAvaliacoes({
               </time>
             </div>
             {avaliacao.comentario ? (
-              <div className="secao-editavel ring-0">
-                <p className="text-sm leading-relaxed font-normal">
-                  {avaliacao.comentario}
-                </p>
-              </div>
+              <ComentarioAvaliacaoCard>
+                {avaliacao.comentario}
+              </ComentarioAvaliacaoCard>
             ) : null}
           </li>
         ))}

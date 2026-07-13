@@ -1,10 +1,11 @@
 "use client";
 
-import { Plus, Sparkles, X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { IndicadorMetrica } from "@/components/influenciador/cadastro/indicador-metrica";
 import {
   Card,
   CardContent,
@@ -181,12 +182,14 @@ function LinhaTabelaPreco({
     <div className="border-border grid gap-3 rounded-card border bg-fundo-pagina p-4 sm:grid-cols-[1fr_auto_1fr] sm:items-end">
       <div>
         <p className="text-sm font-medium">{label}</p>
-        <div className="card-metrica-perfil mt-2 inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs">
-          <Sparkles className="size-3 shrink-0 opacity-60" aria-hidden />
-          <span className="opacity-80">Preço-base sugerido:</span>
-          <span className="font-data font-medium">
-            {formatarMoeda(item.precoBaseSugerido)}
-          </span>
+        <div className="card-metrica-perfil relative mt-2 space-y-1 p-2.5">
+          <IndicadorMetrica tipo="auto-calculado" />
+          <p className="text-xs">
+            <span className="opacity-80">Preço-base sugerido:</span>{" "}
+            <span className="font-data font-medium">
+              {formatarMoeda(item.precoBaseSugerido)}
+            </span>
+          </p>
         </div>
       </div>
       <div className="hidden text-center text-xs text-muted-foreground sm:block">

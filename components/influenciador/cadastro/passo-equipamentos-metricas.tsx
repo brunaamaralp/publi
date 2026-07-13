@@ -1,10 +1,12 @@
 "use client";
 
-import { AlertTriangle, Plus, Trash2, Upload } from "lucide-react";
+import { Plus, Trash2, Upload } from "lucide-react";
 import Image from "next/image";
 import { useRef } from "react";
 
 import { AudienciaBreakdown } from "@/components/influenciador/cadastro/audiencia-breakdown";
+import { CardMetricaValor } from "@/components/influenciador/cadastro/card-metrica-valor";
+import { IndicadorMetrica } from "@/components/influenciador/cadastro/indicador-metrica";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -149,11 +151,12 @@ export function PassoEquipamentosMetricas({
       </section>
 
       <section
-        className="card-metrica-perfil space-y-4"
+        className="card-metrica-perfil relative space-y-4 pr-2"
         aria-labelledby="metricas-titulo"
       >
-        <div>
-          <h3 id="metricas-titulo" className="text-sm font-medium">
+        <div className="space-y-1">
+          <IndicadorMetrica tipo="informativo" />
+          <h3 id="metricas-titulo" className="font-display text-sm font-bold">
             Métricas do Instagram
           </h3>
           <p className="text-sm font-normal opacity-80">
@@ -161,17 +164,33 @@ export function PassoEquipamentosMetricas({
           </p>
         </div>
 
-        <div
-          className="banner-alerta flex gap-3 rounded-card bg-white/60 p-4"
+        <p
+          className="rounded-button border border-lilas/30 bg-white/70 px-3 py-2 text-sm font-normal"
           role="note"
         >
-          <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
-          <p className="text-sm font-medium">
-            Essas métricas podem ser atualizadas a cada 3 meses
-          </p>
-        </div>
+          Essas métricas podem ser atualizadas a cada 3 meses.
+        </p>
 
-        <div className="space-y-2">
+        {draft.seguidores !== "" || draft.engajamentoMedio !== "" ? (
+          <div className="grid gap-3 sm:grid-cols-2">
+            {draft.seguidores !== "" ? (
+              <CardMetricaValor
+                variante="inline"
+                rotulo="Seguidores"
+                valor={Number(draft.seguidores).toLocaleString("pt-BR")}
+              />
+            ) : null}
+            {draft.engajamentoMedio !== "" ? (
+              <CardMetricaValor
+                variante="inline"
+                rotulo="Engajamento médio"
+                valor={`${draft.engajamentoMedio}%`}
+              />
+            ) : null}
+          </div>
+        ) : null}
+
+        <div className="secao-editavel space-y-2 ring-0">
           <Label htmlFor="print-metricas">
             Print de métricas <span className="text-destructive">*</span>
           </Label>
@@ -213,7 +232,7 @@ export function PassoEquipamentosMetricas({
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
+          <div className="secao-editavel space-y-2 ring-0">
             <Label htmlFor="seguidores">
               Seguidores <span className="text-destructive">*</span>
             </Label>
@@ -222,7 +241,7 @@ export function PassoEquipamentosMetricas({
               type="number"
               min={1}
               step={1}
-              className="font-data border-lilas/40 bg-white text-foreground"
+              className="font-data"
               value={draft.seguidores}
               onChange={(e) => {
                 const val = e.target.value;
@@ -247,7 +266,7 @@ export function PassoEquipamentosMetricas({
             ) : null}
           </div>
 
-          <div className="space-y-2">
+          <div className="secao-editavel space-y-2 ring-0">
             <Label htmlFor="engajamento">
               Engajamento médio (%) <span className="text-destructive">*</span>
             </Label>
@@ -257,7 +276,7 @@ export function PassoEquipamentosMetricas({
               min={0}
               max={100}
               step={0.1}
-              className="font-data border-lilas/40 bg-white text-foreground"
+              className="font-data"
               value={draft.engajamentoMedio}
               onChange={(e) => {
                 const val = e.target.value;

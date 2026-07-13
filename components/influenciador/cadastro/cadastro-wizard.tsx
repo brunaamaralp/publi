@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { BadgeCheck } from "lucide-react";
 import { toast } from "sonner";
 
 import { PassoCategorias } from "@/components/influenciador/cadastro/passo-categorias";
@@ -19,6 +20,7 @@ import {
 } from "@/lib/influenciador/cadastro-types";
 import {
   atualizarPrecosBase,
+  calcularCompletudePerfil,
   criarEstadoInicial,
   montarPayload,
 } from "@/lib/influenciador/cadastro-utils";
@@ -26,9 +28,6 @@ import { validarPassoCadastro } from "@/lib/schemas/influenciador-cadastro";
 import { cn } from "@/lib/utils";
 
 const STORAGE_KEY = "influenciador-cadastro-rascunho";
-
-const CTA_PRINCIPAL =
-  "border-transparent bg-verde-carvao-escuro text-verde-neon shadow-none hover:bg-verde-carvao hover:text-verde-neon";
 
 function carregarRascunho(): CadastroDraft {
   if (typeof window === "undefined") return criarEstadoInicial();
@@ -176,22 +175,52 @@ export function CadastroWizard() {
 
   const progresso = ((currentStep + 1) / CADASTRO_PASSOS.length) * 100;
   const isUltimoPasso = currentStep === CADASTRO_PASSOS.length - 1;
+  const completude = calcularCompletudePerfil(draft);
+  const perfilCompleto = completude >= 80;
 
   return (
     <div className="min-h-full bg-fundo-pagina">
       <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-10">
         <header className="mb-8 space-y-4">
-          <div>
-            <p className="text-texto-secundario text-sm font-medium">
-              Cadastro de influenciador
-            </p>
-            <h1 className="font-display mt-1 text-2xl font-bold tracking-tight">
-              Monte seu perfil profissional
-            </h1>
-            <p className="text-texto-secundario mt-2 text-sm font-normal">
-              Quanto mais completo, melhores oportunidades você recebe no match
-              com empresas.
-            </p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="text-texto-secundario text-sm font-medium">
+                Cadastro de influenciador
+              </p>
+              <h1 className="font-display mt-1 text-2xl font-bold tracking-tight">
+                Monte seu perfil profissional
+              </h1>
+              <p className="text-texto-secundario mt-2 text-sm font-normal">
+                Quanto mais completo, melhores oportunidades você recebe no match
+                com empresas.
+              </p>
+            </div>
+
+            <div
+              className={cn(
+                "secao-editavel flex shrink-0 items-center gap-2 self-start px-3 py-2 ring-0",
+                perfilCompleto && "border-lilas/40",
+              )}
+              aria-label={`Perfil ${completude}% completo`}
+            >
+              {perfilCompleto ? (
+                <BadgeCheck
+                  className="text-verde-neon size-4 shrink-0"
+                  aria-hidden
+                />
+              ) : null}
+              <div className="text-sm">
+                <p className="font-medium">Completude do perfil</p>
+                <p
+                  className={cn(
+                    "font-data text-lg font-bold leading-tight",
+                    perfilCompleto ? "text-verde-neon" : "text-lilas-escuro",
+                  )}
+                >
+                  {completude}%
+                </p>
+              </div>
+            </div>
           </div>
 
           <Progress value={progresso} aria-label="Progresso do cadastro">
@@ -277,16 +306,18 @@ export function CadastroWizard() {
           {isUltimoPasso ? (
             <Button
               type="button"
+              variant="cta"
               onClick={concluir}
-              className={cn(CTA_PRINCIPAL, "w-full sm:w-auto")}
+              className="w-full sm:w-auto"
             >
               Concluir cadastro
             </Button>
           ) : (
             <Button
               type="button"
+              variant="cta"
               onClick={validarEAvancar}
-              className={cn(CTA_PRINCIPAL, "w-full sm:w-auto")}
+              className="w-full sm:w-auto"
             >
               Continuar
             </Button>

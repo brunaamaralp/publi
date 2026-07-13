@@ -27,7 +27,7 @@ export function analisarTextoMensagem(texto: string): ResultadoFiltroContato {
       podeEnviar: false,
       flag: "bloqueado_padrao",
       motivoBloqueio:
-        "Para manter tudo registrado, não é possível enviar telefones, e-mails ou @ neste chat.",
+        "Telefones, e-mails e @ não podem ser enviados neste chat — assim a conversa fica registrada e ambas as partes ficam protegidas.",
     };
   }
 

@@ -19,6 +19,7 @@ export function EstrelasNota({
 }: EstrelasNotaProps) {
   const sizeClass =
     tamanho === "sm" ? "size-3.5" : tamanho === "md" ? "size-4" : "size-5";
+  const notaAlta = nota >= 4;
 
   return (
     <span
@@ -45,12 +46,12 @@ export function EstrelasNota({
       {mostrarNumero ? (
         <span
           className={cn(
-            "font-display font-bold tabular-nums",
-            tamanho === "lg" ? "text-3xl" : "text-lg",
-            nota >= 4 ? "text-verde-neon" : "text-foreground",
+            "font-display font-bold",
+            tamanho === "lg" ? "text-3xl sm:text-4xl" : "text-lg",
+            notaAlta ? "text-verde-neon" : "text-foreground",
           )}
         >
-          {nota.toFixed(1)}
+          <span className="font-data">{nota.toFixed(1)}</span>
         </span>
       ) : null}
     </span>

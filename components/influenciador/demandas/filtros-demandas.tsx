@@ -55,8 +55,11 @@ export function FiltrosDemandas({
       )}
     >
       <div className="flex items-center gap-2">
-        <SlidersHorizontal className="text-muted-foreground size-4" aria-hidden />
-        <h2 className="text-sm font-medium">Filtros</h2>
+        <SlidersHorizontal
+          className="text-texto-secundario size-4"
+          aria-hidden
+        />
+        <h2 className="font-display text-sm font-bold">Filtros</h2>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">

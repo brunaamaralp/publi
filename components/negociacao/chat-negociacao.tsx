@@ -17,9 +17,6 @@ import type {
   NegociacaoEstado,
 } from "@/lib/negociacao/negociacao-types";
 
-const CTA_ENVIAR =
-  "border-transparent bg-verde-carvao-escuro text-verde-neon shadow-none hover:bg-verde-carvao hover:text-verde-neon";
-
 type ChatNegociacaoProps = {
   contexto: NegociacaoContexto;
   estado: NegociacaoEstado;
@@ -108,10 +105,12 @@ export function ChatNegociacao({
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <p className="truncate font-medium">{contexto.influenciador.nome}</p>
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-4xl border border-cinza-200 bg-white px-2 py-0.5 text-[10px] font-normal text-texto-secundario">
+              <p className="font-display truncate font-medium">
+              {contexto.influenciador.nome}
+            </p>
+              <span className="inline-flex shrink-0 items-center gap-1.5 rounded-4xl border border-cinza-200 bg-white px-2 py-0.5 text-[10px] font-normal text-texto-secundario">
                 <span
-                  className="bg-verde-neon size-1.5 rounded-full"
+                  className="bg-verde-neon size-1.5 shrink-0 rounded-full"
                   aria-hidden
                 />
                 Conversa ativa
@@ -170,7 +169,7 @@ export function ChatNegociacao({
           ))}
 
           {avisoBloqueioVisivel ? (
-            <AvisoContatoInline tipo="bloqueado_padrao" />
+            <AvisoContatoInline tipo="bloqueado_padrao" variante="central" />
           ) : null}
 
           <div ref={fimListaRef} />
@@ -198,8 +197,8 @@ export function ChatNegociacao({
             />
             <Button
               type="submit"
+              variant="cta"
               size="icon"
-              className={CTA_ENVIAR}
               aria-label="Enviar mensagem"
             >
               <Send className="size-4" aria-hidden />
@@ -219,7 +218,8 @@ export function ChatNegociacao({
               className="text-texto-secundario mt-2 text-xs font-normal"
             >
               Para proteger as duas partes, telefones, e-mails e @ não podem ser
-              enviados por aqui — use este chat para combinar tudo com registro.
+              enviados por aqui — use este chat para combinar tudo com registro na
+              plataforma.
             </p>
           )}
         </form>

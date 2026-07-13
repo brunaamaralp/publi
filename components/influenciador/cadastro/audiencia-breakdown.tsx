@@ -16,7 +16,7 @@ type AudienciaBreakdownProps = {
   onChange: (linhas: AudienciaLinha[]) => void;
 };
 
-const CORES_SERIE = ["bg-verde-neon", "bg-lilas"] as const;
+const CORES_SERIE = ["grafico-serie-neon", "grafico-serie-lilas"] as const;
 
 export function AudienciaBreakdown({
   titulo,
@@ -61,7 +61,7 @@ export function AudienciaBreakdown({
   return (
     <div className="secao-editavel space-y-3">
       <div>
-        <h3 className="text-sm font-medium">{titulo}</h3>
+        <h3 className="font-display text-sm font-bold">{titulo}</h3>
         <p className="text-texto-secundario text-sm font-normal">{descricao}</p>
       </div>
 
@@ -129,7 +129,7 @@ export function AudienciaBreakdown({
                     aria-hidden
                     title={`${percentual}%`}
                   >
-                    <div className="bg-muted h-1.5 min-w-0 flex-1 overflow-hidden rounded-full">
+                    <div className="grafico-trilha h-1.5 min-w-0 flex-1 overflow-hidden rounded-full">
                       <div
                         className={cn(
                           "h-full rounded-full transition-all",

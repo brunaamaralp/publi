@@ -68,12 +68,12 @@ export function EstrelasInput({
         {value !== null ? (
           <span
             className={cn(
-              "font-display text-2xl font-bold tabular-nums",
+              "font-display text-2xl font-bold",
               value >= 4 ? "text-verde-neon" : "text-foreground",
             )}
             aria-hidden
           >
-            {value}.0
+            <span className="font-data">{value}.0</span>
           </span>
         ) : null}
       </div>

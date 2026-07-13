@@ -4,18 +4,11 @@ import { Clock, Lock } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
+import { BadgeEstadoAvaliacao } from "@/components/avaliacao/badge-estado-avaliacao";
+import { ComentarioAvaliacaoCard } from "@/components/avaliacao/comentario-avaliacao-card";
 import { EstrelasInput } from "@/components/avaliacao/estrelas-input";
 import { EstrelasNota } from "@/components/avaliacao/estrelas-nota";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { jaAvaliouContrato } from "@/lib/avaliacao/utils";
@@ -23,9 +16,6 @@ import { avaliacaoFormSchema } from "@/lib/schemas/avaliacao";
 import type { Avaliacao } from "@/lib/types";
 import type { Contrato } from "@/lib/types/contrato";
 import { cn } from "@/lib/utils";
-
-const CTA_ENVIAR =
-  "border-transparent bg-verde-carvao-escuro text-verde-neon shadow-none hover:bg-verde-carvao hover:text-verde-neon";
 
 type AvaliacaoDialogProps = {
   contrato: Pick<Contrato, "id" | "status">;
@@ -46,7 +36,6 @@ export function AvaliacaoDialog({
   onAvaliacaoEnviada,
   className,
 }: AvaliacaoDialogProps) {
-  const [aberto, setAberto] = useState(false);
   const [nota, setNota] = useState<number | null>(null);
   const [comentario, setComentario] = useState("");
   const [enviado, setEnviado] = useState(false);
@@ -59,12 +48,6 @@ export function AvaliacaoDialog({
   const jaAvaliou =
     enviado ||
     jaAvaliouContrato(avaliacoesExistentes, contrato.id, avaliadorId);
-
-  function resetarFormulario() {
-    setNota(null);
-    setComentario("");
-    setErro(null);
-  }
 
   function handleEnviar() {
     if (nota === null) return;
@@ -98,8 +81,7 @@ export function AvaliacaoDialog({
 
     onAvaliacaoEnviada?.(novaAvaliacao);
     setEnviado(true);
-    setAberto(false);
-    resetarFormulario();
+    setErro(null);
     toast.success("Avaliação enviada com sucesso!");
   }
 
@@ -107,16 +89,22 @@ export function AvaliacaoDialog({
     return (
       <div
         className={cn(
-          "rounded-card border border-lilas/40 bg-lilas-claro p-4",
+          "secao-editavel space-y-3 border-l-[3px] border-l-lilas ring-0",
           className,
         )}
       >
+        <div className="flex flex-wrap items-center gap-2">
+          <BadgeEstadoAvaliacao estado="pendente" />
+        </div>
         <div className="flex items-start gap-3">
-          <Clock className="text-lilas-escuro mt-0.5 size-4 shrink-0" aria-hidden />
+          <Clock
+            className="text-lilas-escuro mt-0.5 size-4 shrink-0"
+            aria-hidden
+          />
           <div className="space-y-1">
-            <p className="text-lilas-escuro text-sm font-semibold">
-              Avaliação pendente
-            </p>
+            <h2 className="font-display text-lg font-bold text-lilas-escuro">
+              Avaliar {nomeContraparte}
+            </h2>
             <p className="text-lilas-escuro/90 text-sm font-normal leading-relaxed">
               Disponível quando o contrato for concluído (status{" "}
               <strong className="font-medium">cumprido</strong>). Cada parte
@@ -130,45 +118,45 @@ export function AvaliacaoDialog({
 
   if (jaAvaliou) {
     const notaFinal = avaliacaoEnviada?.notaFornecedor ?? nota;
+    const comentarioFinal =
+      avaliacaoEnviada?.comentario?.trim() || "Nenhum comentário adicionado.";
 
     return (
-      <div className={cn("space-y-4", className)}>
-        <div className="rounded-card border border-cinza-200 bg-cinza-200/35 px-3 py-2.5">
-          <div className="flex items-center gap-2">
-            <Lock className="text-cinza-500 size-3.5 shrink-0" aria-hidden />
-            <p className="text-cinza-500 text-sm font-semibold">
-              Avaliação já enviada
-            </p>
-          </div>
-          <p className="text-texto-secundario mt-1 text-xs font-normal">
-            Uma avaliação por contrato e por avaliador — não é possível alterar
-            ou reenviar.
+      <div
+        className={cn("secao-editavel space-y-5 ring-0", className)}
+        aria-label={`Avaliação enviada para ${nomeContraparte}`}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="font-display text-xl font-bold">
+            Avaliar {nomeContraparte}
+          </h2>
+          <BadgeEstadoAvaliacao estado="concluida" />
+        </div>
+
+        <div className="flex items-start gap-2 rounded-card border border-cinza-200 bg-cinza-200/30 px-3 py-2.5">
+          <Lock className="text-cinza-500 mt-0.5 size-3.5 shrink-0" aria-hidden />
+          <p className="text-texto-secundario text-xs font-normal leading-relaxed">
+            Avaliação já enviada para este contrato. Uma avaliação por contrato
+            e por avaliador — não é possível alterar ou reenviar.
           </p>
         </div>
 
         <div
-          className="secao-editavel pointer-events-none space-y-4 opacity-80"
+          className="pointer-events-none space-y-5 opacity-75"
           aria-disabled="true"
-          aria-label={`Avaliação enviada para ${nomeContraparte}`}
         >
-          <h2 className="font-display text-lg font-bold">
-            Avaliar {nomeContraparte}
-          </h2>
-
-          {notaFinal ? (
-            <EstrelasNota nota={notaFinal} tamanho="lg" mostrarNumero />
-          ) : null}
+          <div className="space-y-2">
+            <Label className="text-texto-secundario font-normal">Nota</Label>
+            {notaFinal ? (
+              <EstrelasNota nota={notaFinal} tamanho="lg" mostrarNumero />
+            ) : null}
+          </div>
 
           <div className="space-y-2">
             <Label className="text-texto-secundario font-normal">
               Comentário
             </Label>
-            <div className="rounded-card border border-cinza-200 bg-white p-3">
-              <p className="text-sm leading-relaxed font-normal">
-                {avaliacaoEnviada?.comentario?.trim() ||
-                  "Nenhum comentário adicionado."}
-              </p>
-            </div>
+            <ComentarioAvaliacaoCard>{comentarioFinal}</ComentarioAvaliacaoCard>
           </div>
         </div>
       </div>
@@ -178,108 +166,90 @@ export function AvaliacaoDialog({
   const comentarioLength = comentario.length;
 
   return (
-    <Dialog
-      open={aberto}
-      onOpenChange={(open) => {
-        setAberto(open);
-        if (!open) resetarFormulario();
-      }}
-    >
-      <DialogTrigger
-        render={
-          <Button
-            type="button"
-            className={cn(CTA_ENVIAR, className)}
-          />
-        }
-      >
-        Avaliar {nomeContraparte}
-      </DialogTrigger>
+    <div className={cn("secao-editavel space-y-5 ring-0", className)}>
+      <div className="space-y-2">
+        <h2 className="font-display text-xl font-bold">
+          Avaliar {nomeContraparte}
+        </h2>
+        <p className="text-texto-secundario text-sm font-normal">
+          Sua avaliação ajuda a construir reputação na plataforma. Cada parte
+          avalia a outra uma única vez por contrato concluído.
+        </p>
+      </div>
 
-      <DialogContent className="border-cinza-200 bg-fundo-pagina sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="font-display text-xl font-bold">
-            Avaliar {nomeContraparte}
-          </DialogTitle>
-          <DialogDescription className="text-texto-secundario font-normal">
-            Sua avaliação ajuda a construir reputação na plataforma. Cada parte
-            avalia a outra uma única vez por contrato concluído.
-          </DialogDescription>
-        </DialogHeader>
+      <div className="rounded-card border border-lilas/40 bg-lilas-claro px-3 py-2.5">
+        <p className="text-lilas-escuro text-xs font-normal leading-relaxed">
+          <span className="font-semibold">Uma avaliação por contrato.</span>{" "}
+          Após enviar, o formulário ficará bloqueado para este contrato e este
+          avaliador.
+        </p>
+      </div>
 
-        <div className="space-y-5 py-2">
-          <div className="rounded-card border border-lilas/30 bg-lilas-claro/60 px-3 py-2">
-            <p className="text-lilas-escuro text-xs font-normal">
-              <span className="font-semibold">Uma avaliação por contrato.</span>{" "}
-              Após enviar, o formulário ficará bloqueado para este contrato.
-            </p>
-          </div>
+      <div className="space-y-2">
+        <Label id="nota-avaliacao-label" className="font-normal">
+          Nota
+        </Label>
+        <EstrelasInput
+          id="nota-avaliacao"
+          value={nota}
+          onChange={(n) => {
+            setNota(n);
+            setErro(null);
+          }}
+        />
+      </div>
 
-          <div className="space-y-2">
-            <Label id="nota-avaliacao-label" className="font-normal">
-              Nota
-            </Label>
-            <EstrelasInput
-              id="nota-avaliacao"
-              value={nota}
-              onChange={setNota}
-            />
-          </div>
-
-          <div className="secao-editavel space-y-2 ring-0">
-            <div className="flex items-center justify-between gap-2">
-              <Label htmlFor="comentario-avaliacao" className="font-normal">
-                Comentário (opcional)
-              </Label>
-              <span
-                className={cn(
-                  "font-data text-xs",
-                  comentarioLength > 300
-                    ? "text-destructive"
-                    : "text-texto-secundario",
-                )}
-                aria-live="polite"
-              >
-                {comentarioLength}/300
-              </span>
-            </div>
-            <Textarea
-              id="comentario-avaliacao"
-              value={comentario}
-              onChange={(e) => setComentario(e.target.value)}
-              placeholder="Compartilhe como foi a experiência de trabalho..."
-              rows={3}
-              maxLength={300}
-              className="border-cinza-200 bg-white font-normal"
-              aria-describedby="comentario-avaliacao-hint"
-            />
-            <p
-              id="comentario-avaliacao-hint"
-              className="text-texto-secundario text-xs font-normal"
-            >
-              Visível para a contraparte após o envio. O card permanece neutro
-              independentemente da nota.
-            </p>
-          </div>
-
-          {erro ? (
-            <p role="alert" className="text-texto-secundario text-sm font-normal">
-              {erro}
-            </p>
-          ) : null}
-        </div>
-
-        <DialogFooter>
-          <Button
-            type="button"
-            onClick={handleEnviar}
-            disabled={nota === null}
-            className={CTA_ENVIAR}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between gap-2">
+          <Label htmlFor="comentario-avaliacao" className="font-normal">
+            Comentário (opcional)
+          </Label>
+          <span
+            className={cn(
+              "font-data text-xs",
+              comentarioLength > 300
+                ? "text-destructive"
+                : "text-texto-secundario",
+            )}
+            aria-live="polite"
           >
-            Enviar avaliação
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+            {comentarioLength}/300
+          </span>
+        </div>
+        <Textarea
+          id="comentario-avaliacao"
+          value={comentario}
+          onChange={(e) => setComentario(e.target.value)}
+          placeholder="Compartilhe como foi a experiência de trabalho..."
+          rows={4}
+          maxLength={300}
+          className="border-cinza-200 bg-white font-normal"
+          aria-describedby="comentario-avaliacao-hint"
+        />
+        <p
+          id="comentario-avaliacao-hint"
+          className="text-texto-secundario text-xs font-normal"
+        >
+          O comentário fica em card neutro — a nota não altera as cores do
+          formulário.
+        </p>
+      </div>
+
+      {erro ? (
+        <p role="alert" className="text-texto-secundario text-sm font-normal">
+          {erro}
+        </p>
+      ) : null}
+
+      <Button
+        type="button"
+        variant="cta"
+        className="w-full sm:w-auto"
+        onClick={handleEnviar}
+        disabled={nota === null}
+      >
+        Enviar avaliação
+      </Button>
+    </div>
   );
 }

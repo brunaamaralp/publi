@@ -8,7 +8,9 @@ import { toast } from "sonner";
 import { DepositoEmpresa } from "@/components/pagamento/deposito-empresa";
 import {
   BadgeStatusEscrow,
+  CardEscrow,
   IndicadorProvedorEscrow,
+  ValorEscrowDestaque,
 } from "@/components/pagamento/escrow-ui";
 import { FormularioEntregaDialog } from "@/components/pagamento/formulario-entrega-dialog";
 import { PagamentoGarantidoCard } from "@/components/pagamento/pagamento-garantido-card";
@@ -32,9 +34,6 @@ import {
   valorExibicaoPagamento,
 } from "@/lib/pagamento/pagamento-utils";
 import { cn } from "@/lib/utils";
-
-const CTA_PRINCIPAL =
-  "border-transparent bg-verde-carvao-escuro text-verde-neon shadow-none hover:bg-verde-carvao hover:text-verde-neon";
 
 type PagamentoFlowProps = {
   contratoId: string;
@@ -118,25 +117,27 @@ export function PagamentoFlow({ contratoId }: PagamentoFlowProps) {
             <p className="text-texto-secundario mt-1 text-sm font-normal">
               {contexto.demandaTitulo}
             </p>
+            <IndicadorProvedorEscrow className="mt-2" />
           </div>
           <SeletorPapelPagamento papel={papel} onPapelChange={setPapel} />
         </header>
 
         {emDisputa ? (
-          <div className="space-y-3 rounded-card border border-ambar-claro bg-ambar-claro p-4">
+          <CardEscrow status="em_disputa" className="space-y-3 p-4">
             <div className="flex flex-wrap items-center gap-2">
               <h2 className="font-display text-base font-bold text-ambar-escuro">
                 Pagamento em análise
               </h2>
               <BadgeStatusEscrow status="em_disputa" />
             </div>
+            <ValorEscrowDestaque valor={valor} status="em_disputa" tamanho="md" />
             <p className="text-ambar-escuro/90 text-sm leading-relaxed font-normal">
               Uma das partes contestou a entrega. O valor permanece retido no
               escrow parceiro enquanto a plataforma media o caso — isso não
               indica culpa automática de influenciador ou empresa.
             </p>
-            <IndicadorProvedorEscrow className="text-ambar-escuro/70" />
-          </div>
+            <IndicadorProvedorEscrow className="text-cinza-500" />
+          </CardEscrow>
         ) : null}
 
         {pagamentoLiberado ? (
@@ -162,7 +163,8 @@ export function PagamentoFlow({ contratoId }: PagamentoFlowProps) {
             <PagamentoGarantidoCard valor={valor} />
             <Button
               type="button"
-              className={cn(CTA_PRINCIPAL, "w-full")}
+              variant="cta"
+              className="w-full"
               onClick={() => setDialogEntregaAberto(true)}
             >
               <Package className="size-4" aria-hidden />
@@ -173,6 +175,7 @@ export function PagamentoFlow({ contratoId }: PagamentoFlowProps) {
           <RevisaoEntregaEmpresa
             entrega={estado.entrega!}
             influenciadorNome={contexto.influenciador.nome}
+            valor={valor}
             printPreview={estado.printEntregaPreview}
             onConfirmar={() => {
               persistir(confirmarEntrega);
@@ -182,16 +185,20 @@ export function PagamentoFlow({ contratoId }: PagamentoFlowProps) {
         ) : pagamentoRetido && entregaAguardando && papel === "influenciador" ? (
           <div className="space-y-4">
             <PagamentoGarantidoCard valor={valor} />
-            <p className="text-texto-secundario rounded-card border border-lilas/40 bg-lilas-claro p-4 text-center text-sm font-normal">
+            <p className="text-texto-secundario rounded-card border border-cinza-200 border-l-[3px] border-l-lilas bg-lilas-claro p-4 text-center text-sm font-normal">
               Entrega registrada. Aguardando confirmação da empresa para liberar
               o pagamento.
             </p>
           </div>
         ) : pagamentoRetido && papel === "empresa" && !estado.entrega ? (
-          <p className="text-texto-secundario secao-editavel p-6 text-center text-sm font-normal">
-            Pagamento retido no escrow — aguardando o influenciador registrar a
-            entrega.
-          </p>
+          <CardEscrow status="retido" className="space-y-3 p-4">
+            <ValorEscrowDestaque valor={valor} status="retido" tamanho="md" />
+            <p className="text-texto-secundario text-center text-sm font-normal">
+              Pagamento retido no escrow — aguardando o influenciador registrar a
+              entrega.
+            </p>
+            <IndicadorProvedorEscrow />
+          </CardEscrow>
         ) : null}
 
         <FormularioEntregaDialog

@@ -4,6 +4,7 @@ import { ExternalLink } from "lucide-react";
 import {
   BadgeStatusEscrow,
   BORDA_LINHA_ESCROW,
+  LinhaHistoricoPagamento,
 } from "@/components/pagamento/escrow-ui";
 import type { TransacaoFinanceira } from "@/lib/mock-data/financeiro";
 import { formatarMoeda } from "@/lib/influenciador/cadastro-utils";
@@ -56,12 +57,14 @@ export function ListaTransacoesRecentes({
                     BORDA_LINHA_ESCROW[tx.statusPagamento],
                   )}
                 >
-                  <td className="text-texto-secundario px-4 py-3 font-data font-normal">
-                    {formatarData(tx.data)}
+                  <td className="text-texto-secundario px-4 py-3 font-normal">
+                    <span className="font-data">{formatarData(tx.data)}</span>
                   </td>
                   <td className="px-4 py-3 font-medium">{tx.empresaNome}</td>
-                  <td className="px-4 py-3 text-right font-data font-semibold tabular-nums">
-                    {formatarMoeda(tx.valor)}
+                  <td className="px-4 py-3 text-right">
+                    <span className="font-data font-semibold tabular-nums">
+                      {formatarMoeda(tx.valor)}
+                    </span>
                   </td>
                   <td className="px-4 py-3">
                     <BadgeStatusEscrow status={tx.statusPagamento} />
@@ -69,7 +72,7 @@ export function ListaTransacoesRecentes({
                   <td className="px-4 py-3 text-right">
                     <Link
                       href={`/contrato/${tx.contratoId}/pagamento`}
-                      className="text-verde-acao inline-flex items-center gap-1 text-xs font-medium hover:underline"
+                      className="text-lilas-escuro inline-flex items-center gap-1 text-xs font-medium hover:underline"
                     >
                       Ver contrato
                       <ExternalLink className="size-3" aria-hidden />
@@ -83,33 +86,21 @@ export function ListaTransacoesRecentes({
 
         <ul className="divide-y divide-cinza-200 md:hidden">
           {transacoes.map((tx) => (
-            <li
-              key={tx.id}
-              className={cn(
-                "space-y-2 px-4 py-4",
-                BORDA_LINHA_ESCROW[tx.statusPagamento],
-              )}
-            >
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <p className="font-medium">{tx.empresaNome}</p>
-                  <p className="text-texto-secundario font-data text-xs font-normal">
-                    {formatarData(tx.data)}
-                  </p>
-                </div>
-                <p className="font-data text-right font-semibold tabular-nums">
-                  {formatarMoeda(tx.valor)}
-                </p>
-              </div>
-              <div className="flex items-center justify-between gap-2">
-                <BadgeStatusEscrow status={tx.statusPagamento} />
-                <Link
-                  href={`/contrato/${tx.contratoId}/pagamento`}
-                  className="text-verde-acao text-xs font-medium hover:underline"
-                >
-                  Ver contrato →
-                </Link>
-              </div>
+            <li key={tx.id}>
+              <LinhaHistoricoPagamento
+                data={formatarData(tx.data)}
+                titulo={tx.empresaNome}
+                valor={tx.valor}
+                status={tx.statusPagamento}
+                acao={
+                  <Link
+                    href={`/contrato/${tx.contratoId}/pagamento`}
+                    className="text-lilas-escuro text-xs font-medium hover:underline"
+                  >
+                    Ver →
+                  </Link>
+                }
+              />
             </li>
           ))}
         </ul>

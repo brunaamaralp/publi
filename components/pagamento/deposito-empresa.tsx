@@ -9,10 +9,6 @@ import { Button } from "@/components/ui/button";
 import type { ContratoPagamentoContexto } from "@/lib/pagamento/pagamento-types";
 import { calcularRpa } from "@/lib/pagamento/pagamento-utils";
 import { formatarMoeda } from "@/lib/influenciador/cadastro-utils";
-import { cn } from "@/lib/utils";
-
-const CTA_DEPOSITO =
-  "border-transparent bg-verde-carvao-escuro text-verde-neon shadow-none hover:bg-verde-carvao hover:text-verde-neon";
 
 type DepositoEmpresaProps = {
   contexto: ContratoPagamentoContexto;
@@ -78,7 +74,7 @@ export function DepositoEmpresa({
     <>
       <div className="space-y-6">
         <ResumoContratoDeposito contexto={contexto} />
-        <div className="rounded-card border border-lilas/40 bg-lilas-claro p-4 text-sm text-lilas-escuro">
+        <div className="rounded-card border border-cinza-200 border-l-[3px] border-l-lilas bg-lilas-claro p-4 text-sm text-lilas-escuro">
           O valor ficará{" "}
           <span className="font-semibold">retido no escrow parceiro</span> até a
           entrega ser confirmada. Nem você nem o influenciador terão acesso
@@ -86,10 +82,12 @@ export function DepositoEmpresa({
         </div>
         <Button
           type="button"
-          className={cn(CTA_DEPOSITO, "w-full")}
+          variant="cta"
+          className="w-full"
           onClick={iniciarDeposito}
         >
-          Depositar valor na plataforma — {formatarMoeda(contrato.valor)}
+          Depositar valor na plataforma —{" "}
+          <span className="font-data">{formatarMoeda(contrato.valor)}</span>
         </Button>
       </div>
       <CheckoutSimuladoDialog

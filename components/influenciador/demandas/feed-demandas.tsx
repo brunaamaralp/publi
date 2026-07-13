@@ -133,6 +133,11 @@ export function FeedDemandas() {
             Ordenadas por compatibilidade com seu perfil — quanto maior o match,
             melhor a oportunidade.
           </p>
+          {filtros.ordenacao === "melhor_match" && sugeridos.length > 0 ? (
+            <p className="text-lilas-escuro mt-3 text-xs font-medium">
+              Exibindo do maior para o menor score de match
+            </p>
+          ) : null}
         </header>
 
         <FiltrosDemandas

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { AvaliacaoDialog } from "@/components/avaliacao/avaliacao-dialog";
 import { Button } from "@/components/ui/button";
 import {
+  CardEscrow,
   IndicadorProvedorEscrow,
   ValorEscrowDestaque,
 } from "@/components/pagamento/escrow-ui";
@@ -31,7 +32,7 @@ export function ResumoPagamentoLiberado({
   const contratoCumprido: Contrato = estado.contrato;
 
   return (
-    <div className="secao-editavel space-y-6">
+    <CardEscrow status="liberado" className="space-y-6 p-4">
       <div className="space-y-2">
         <h2 className="font-display text-xl font-bold">Pagamento liberado</h2>
         <p className="text-texto-secundario text-sm font-normal">
@@ -65,6 +66,6 @@ export function ResumoPagamentoLiberado({
           Pagamento processado
         </Button>
       )}
-    </div>
+    </CardEscrow>
   );
 }

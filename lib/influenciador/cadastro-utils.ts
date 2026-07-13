@@ -166,3 +166,27 @@ export function criarEstadoInicial(): CadastroDraft {
     plano: "pro",
   };
 }
+
+/** Percentual de completude do perfil (0–100) para indicador visual no wizard. */
+export function calcularCompletudePerfil(draft: CadastroDraft): number {
+  let pontos = 0;
+
+  if (draft.nome.trim().length >= 2) pontos += 20;
+  if (draft.bio.trim().length >= 20) pontos += 10;
+  if (draft.fotoPerfilUrl) pontos += 5;
+  if (draft.categoriasDominio.length > 0) pontos += 15;
+  if (draft.seguidores !== "" && draft.engajamentoMedio !== "") pontos += 20;
+  if (draft.printMetricasUrl) pontos += 5;
+  if (draft.equipamentos.some((e) => e.tipo.trim())) pontos += 10;
+  if (
+    draft.audienciaGenero.length > 0 ||
+    draft.audienciaFaixaEtaria.length > 0 ||
+    draft.audienciaLocalidade.length > 0
+  ) {
+    pontos += 10;
+  }
+  if (draft.pacotes.some((p) => p.nome.trim())) pontos += 5;
+
+  return Math.min(100, pontos);
+}
+

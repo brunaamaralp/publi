@@ -7,6 +7,7 @@ import { CheckCircle2, Pencil, ShieldCheck } from "lucide-react";
 import { AvaliacaoDialog } from "@/components/avaliacao/avaliacao-dialog";
 import { ListaAvaliacoes } from "@/components/avaliacao/lista-avaliacoes";
 import { ResumoReputacao } from "@/components/avaliacao/resumo-reputacao";
+import { CardMetricaValor } from "@/components/influenciador/cadastro/card-metrica-valor";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -240,17 +241,17 @@ function RevisaoConteudo({
         titulo="Equipamentos e métricas"
         onEditar={() => onEditarPasso(2)}
       >
-        <p>
-          <span className="text-muted-foreground">Seguidores:</span>{" "}
-          <span className="font-data">
-            {draft.seguidores.toLocaleString("pt-BR")}
-          </span>
-        </p>
-        <p>
-          <span className="text-muted-foreground">Engajamento:</span>{" "}
-          <span className="font-data">{draft.engajamentoMedio}%</span>
-        </p>
-        <p className="text-muted-foreground text-sm">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <CardMetricaValor
+            rotulo="Seguidores"
+            valor={Number(draft.seguidores).toLocaleString("pt-BR")}
+          />
+          <CardMetricaValor
+            rotulo="Engajamento médio"
+            valor={`${draft.engajamentoMedio}%`}
+          />
+        </div>
+        <p className="text-texto-secundario pt-2 text-sm">
           {draft.equipamentos.filter((e) => e.tipo.trim()).length} equipamento(s)
           · Print de métricas anexado
         </p>

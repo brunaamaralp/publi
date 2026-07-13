@@ -5,7 +5,7 @@
 
 /* === Design tokens da marca === */
 :root {
-  --verde-neon: #39ff14;
+  --verde-neon: #39ff6a;
   --verde-acao: #16a34a;
   /* Superfícies escuras: verde-carvão (nunca preto neutro puro) */
   --verde-carvao: #22302a;
@@ -62,11 +62,11 @@
   --input: var(--cinza-200);
   --ring: var(--verde-acao);
 
-  --chart-1: var(--verde-acao);
+  --chart-1: var(--lilas-escuro);
   --chart-2: var(--verde-neon);
-  --chart-3: var(--cinza-500);
-  --chart-4: var(--cinza-900);
-  --chart-5: var(--preto);
+  --chart-3: var(--lilas);
+  --chart-4: color-mix(in srgb, var(--verde-neon) 70%, var(--lilas-escuro));
+  --chart-5: color-mix(in srgb, var(--lilas) 80%, var(--lilas-escuro));
 
   --sidebar: var(--branco);
   --sidebar-foreground: var(--preto);
@@ -222,6 +222,38 @@
     color: var(--lilas-escuro);
     padding: 1rem;
   }
+
+  .indicador-auto-calculado {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    opacity: 0.75;
+  }
+
+  .grafico-serie-neon {
+    background: var(--verde-neon);
+  }
+
+  .grafico-serie-lilas {
+    background: var(--lilas-escuro);
+  }
+
+  /* Chat de negociação */
+  .bolha-interlocutor {
+    border: 1px solid var(--cinza-200);
+    background: var(--branco);
+    color: var(--preto);
+  }
+
+  .bolha-propria {
+    border: 1px solid var(--verde-carvao-claro);
+    background: var(--verde-carvao-escuro);
+    color: var(--branco);
+  }
 }
 
 @layer base {
@@ -234,7 +266,12 @@
   }
 
   h1,
-  h2,
+  h2 {
+    font-family: var(--font-display), system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
   h3,
   h4 {
     font-family: var(--font-display), system-ui, sans-serif;

@@ -64,25 +64,28 @@ export function AppSidebar({ onNavigate, className }: AppSidebarProps) {
         </Link>
         {usuario ? (
           <>
-            <p className="mt-3 text-xs uppercase tracking-wide text-zinc-500">
+            <p className="mt-3 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
               {LABEL_TIPO[usuario.tipo] ?? usuario.tipo}
-              {" · "}
-              {LABEL_STATUS[usuario.status] ?? usuario.status}
+              <span className="text-zinc-600"> · </span>
+              <span
+                className={cn(
+                  usuario.status === "ativo" && "text-zinc-400",
+                  usuario.status === "pendente_verificacao" && "text-lilas",
+                )}
+              >
+                {LABEL_STATUS[usuario.status] ?? usuario.status}
+              </span>
             </p>
-            <p className="mt-1 truncate text-sm font-medium">{usuario.email}</p>
-            <p className="font-data truncate text-xs text-zinc-500">
-              {usuario.id.slice(0, 12)}…
+            <p className="mt-2 truncate text-sm font-medium leading-snug">
+              {usuario.email}
             </p>
           </>
         ) : null}
       </div>
 
-      {agenciaCtx?.agencia ? (
+      {usuario?.tipo === "agencia" && agenciaCtx?.agencia ? (
         <div className="border-b border-white/10 p-4">
-          <p className="mb-2 text-[10px] uppercase tracking-wide text-zinc-500">
-            Contexto agência
-          </p>
-          <SeletorEmpresaCliente className="text-white [&_span]:text-zinc-400" />
+          <SeletorEmpresaCliente tema="sidebar" />
         </div>
       ) : null}
 
@@ -101,10 +104,10 @@ export function AppSidebar({ onNavigate, className }: AppSidebarProps) {
                       href={item.href}
                       onClick={onNavigate}
                       className={cn(
-                        "flex items-center gap-2.5 rounded-button border-l-2 px-2.5 py-2 text-sm transition-colors",
+                        "flex items-center gap-2.5 rounded-button border-l-[3px] py-2 pr-2.5 pl-2 text-sm font-normal transition-colors",
                         ativo
-                          ? "border-verde-neon bg-white/5 text-white"
-                          : "border-transparent text-zinc-300 hover:bg-white/10 hover:text-white",
+                          ? "border-l-verde-neon bg-white/[0.04] font-medium text-white"
+                          : "border-l-transparent text-zinc-400 hover:bg-white/[0.06] hover:text-white",
                       )}
                       aria-current={ativo ? "page" : undefined}
                     >

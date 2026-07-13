@@ -8,6 +8,8 @@ import { cn } from "@/lib/utils";
 type IndicadorMatchProps = {
   score: number;
   className?: string;
+  /** Posição do badge no card — início (esquerda) para destaque no feed */
+  alinhamento?: "inicio" | "fim";
 };
 
 function nivelScore(score: number): "alto" | "medio" | "baixo" {
@@ -16,12 +18,21 @@ function nivelScore(score: number): "alto" | "medio" | "baixo" {
   return "baixo";
 }
 
-export function IndicadorMatch({ score, className }: IndicadorMatchProps) {
+export function IndicadorMatch({
+  score,
+  className,
+  alinhamento = "fim",
+}: IndicadorMatchProps) {
   const nivel = nivelScore(score);
+  const alinhaInicio = alinhamento === "inicio";
 
   return (
     <div
-      className={cn("flex shrink-0 flex-col items-end gap-1", className)}
+      className={cn(
+        "flex shrink-0 flex-col gap-1.5",
+        alinhaInicio ? "items-start" : "items-end",
+        className,
+      )}
       aria-label={
         nivel === "baixo"
           ? `${score}% de match estimado — score inicial sem histórico na plataforma`
@@ -30,21 +41,20 @@ export function IndicadorMatch({ score, className }: IndicadorMatchProps) {
     >
       <div
         className={cn(
-          "flex min-w-[4.5rem] flex-col items-center rounded-card border px-3 py-2",
+          "flex min-w-[5rem] flex-col rounded-card border px-3 py-2.5",
           nivel === "alto" &&
             "border-verde-neon bg-verde-carvao-escuro",
           nivel === "medio" &&
             "border-cinza-200 bg-verde-carvao-escuro",
-          nivel === "baixo" &&
-            "border-cinza-200 bg-cinza-200/30",
+          nivel === "baixo" && "border-cinza-200 bg-white",
         )}
       >
         <span
           className={cn(
-            "font-display text-3xl leading-none font-bold tabular-nums sm:text-4xl",
-            nivel === "alto" && "text-verde-neon",
-            nivel === "medio" && "text-white",
-            nivel === "baixo" && "text-cinza-500",
+            "font-display text-4xl leading-none font-bold sm:text-[2.75rem]",
+            nivel === "alto" && "text-verde-neon font-data",
+            nivel === "medio" && "font-data text-white",
+            nivel === "baixo" && "font-data text-cinza-500",
           )}
         >
           {score}%
@@ -61,11 +71,21 @@ export function IndicadorMatch({ score, className }: IndicadorMatchProps) {
         </span>
       </div>
       {nivel === "baixo" ? (
-        <p className="text-cinza-500 max-w-[7.5rem] text-right text-[10px] leading-snug font-normal">
-          Estimativa inicial — sem histórico na plataforma ainda
+        <p
+          className={cn(
+            "max-w-[8.5rem] text-[11px] leading-snug font-normal text-cinza-500",
+            alinhaInicio ? "text-left" : "text-right",
+          )}
+        >
+          Estimativa inicial — ainda sem histórico na plataforma
         </p>
       ) : (
-        <p className="text-texto-secundario text-right text-[10px] font-normal">
+        <p
+          className={cn(
+            "text-texto-secundario text-[11px] font-normal",
+            alinhaInicio ? "text-left" : "text-right",
+          )}
+        >
           Compatível com você
         </p>
       )}
@@ -104,7 +124,7 @@ export function BadgeFormatoDemanda({
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-4xl border border-lilas-claro bg-lilas-claro px-2 py-0.5 text-xs font-medium text-lilas-escuro",
+        "inline-flex items-center rounded-4xl bg-lilas-claro px-2.5 py-0.5 text-xs font-medium text-lilas-escuro",
         className,
       )}
     >

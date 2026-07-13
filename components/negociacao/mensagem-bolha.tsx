@@ -31,29 +31,34 @@ export function MensagemBolha({
       )}
     >
       {nomeRemetente ? (
-        <span className="text-texto-secundario px-1 text-xs font-normal">
+        <span
+          className={cn(
+            "px-1 text-xs font-normal",
+            ehRemetenteAtual
+              ? "text-verde-neon/90"
+              : "text-texto-secundario",
+          )}
+        >
           {nomeRemetente}
         </span>
       ) : null}
 
       <div
         className={cn(
-          "rounded-card px-3 py-2 text-sm leading-relaxed font-normal",
-          ehRemetenteAtual
-            ? "bg-verde-carvao-escuro text-white"
-            : "border border-cinza-200 bg-white text-foreground",
-          foiBloqueada && "opacity-60",
+          "rounded-card px-3.5 py-2.5 text-sm leading-relaxed font-normal",
+          ehRemetenteAtual ? "bolha-propria" : "bolha-interlocutor",
+          foiBloqueada && "opacity-70",
         )}
       >
         {mensagem.texto}
       </div>
 
       {temAlerta ? (
-        <AvisoContatoInline tipo="alerta_termo" className="mt-0.5" />
+        <AvisoContatoInline tipo="alerta_termo" variante="inline" />
       ) : null}
 
       {foiBloqueada ? (
-        <AvisoContatoInline tipo="bloqueado_padrao" className="mt-0.5" />
+        <AvisoContatoInline tipo="bloqueado_padrao" variante="inline" />
       ) : null}
 
       <time

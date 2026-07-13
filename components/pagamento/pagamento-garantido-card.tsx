@@ -1,6 +1,7 @@
 import { Clock } from "lucide-react";
 
 import {
+  CardEscrow,
   IndicadorProvedorEscrow,
   ValorEscrowDestaque,
 } from "@/components/pagamento/escrow-ui";
@@ -16,12 +17,7 @@ export function PagamentoGarantidoCard({
   className,
 }: PagamentoGarantidoCardProps) {
   return (
-    <div
-      className={cn(
-        "secao-editavel space-y-4 border-lilas/40",
-        className,
-      )}
-    >
+    <CardEscrow status="retido" className={cn("space-y-4 p-4", className)}>
       <div className="flex items-start gap-3">
         <div className="bg-lilas-claro flex size-9 shrink-0 items-center justify-center rounded-full">
           <Clock className="text-lilas-escuro size-4" aria-hidden />
@@ -44,6 +40,6 @@ export function PagamentoGarantidoCard({
         O valor já está reservado e será liberado para você após a empresa
         confirmar a entrega do conteúdo.
       </p>
-    </div>
+    </CardEscrow>
   );
 }

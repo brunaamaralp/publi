@@ -3,6 +3,10 @@
 import Image from "next/image";
 import { Clock, ExternalLink } from "lucide-react";
 
+import {
+  IndicadorProvedorEscrow,
+  ValorEscrowDestaque,
+} from "@/components/pagamento/escrow-ui";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import type { Entrega } from "@/lib/types";
@@ -11,14 +15,11 @@ import {
   prazoConfirmacaoAutomaticaDias,
 } from "@/lib/pagamento/pagamento-utils";
 import { formatarDataRelativa } from "@/lib/avaliacao/utils";
-import { cn } from "@/lib/utils";
-
-const CTA_CONFIRMAR =
-  "border-transparent bg-verde-carvao-escuro text-verde-neon shadow-none hover:bg-verde-carvao hover:text-verde-neon";
 
 type RevisaoEntregaEmpresaProps = {
   entrega: Entrega;
   influenciadorNome: string;
+  valor: number;
   printPreview?: string;
   onConfirmar: () => void;
 };
@@ -26,6 +27,7 @@ type RevisaoEntregaEmpresaProps = {
 export function RevisaoEntregaEmpresa({
   entrega,
   influenciadorNome,
+  valor,
   printPreview,
   onConfirmar,
 }: RevisaoEntregaEmpresaProps) {
@@ -36,7 +38,7 @@ export function RevisaoEntregaEmpresa({
     100;
 
   return (
-    <div className="secao-editavel space-y-4">
+    <div className="secao-editavel space-y-4 border-l-[3px] border-l-lilas ring-0">
       <div>
         <h2 className="font-display text-base font-bold">
           Entrega registrada — revisar e confirmar
@@ -48,18 +50,22 @@ export function RevisaoEntregaEmpresa({
         </p>
       </div>
 
+      <ValorEscrowDestaque valor={valor} status="retido" tamanho="md" />
+
+      <IndicadorProvedorEscrow />
+
       <a
         href={entrega.linkComprovante}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-verde-acao inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
+        className="text-lilas-escuro inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
       >
         Ver conteúdo publicado
         <ExternalLink className="size-3.5" aria-hidden />
       </a>
 
       {printPreview ? (
-        <div className="border-border relative aspect-video max-w-sm overflow-hidden rounded-card border bg-white">
+        <div className="relative aspect-video max-w-sm overflow-hidden rounded-card border border-cinza-200 bg-white">
           <Image
             src={printPreview}
             alt="Print enviado pelo influenciador"
@@ -70,7 +76,7 @@ export function RevisaoEntregaEmpresa({
         </div>
       ) : null}
 
-      <div className="space-y-2 rounded-card border border-lilas/40 bg-lilas-claro p-3">
+      <div className="space-y-2 rounded-card border border-cinza-200 border-l-[3px] border-l-lilas bg-lilas-claro p-3">
         <div className="text-lilas-escuro flex items-center gap-2 text-sm font-medium">
           <Clock className="size-4 shrink-0" aria-hidden />
           <span>
@@ -85,11 +91,7 @@ export function RevisaoEntregaEmpresa({
         </p>
       </div>
 
-      <Button
-        type="button"
-        className={cn(CTA_CONFIRMAR, "w-full")}
-        onClick={onConfirmar}
-      >
+      <Button type="button" variant="cta" className="w-full" onClick={onConfirmar}>
         Confirmar entrega
       </Button>
     </div>
