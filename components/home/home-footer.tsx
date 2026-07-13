@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { PubliLogo } from "@/components/brand/publi-logo";
+
 const LINKS = [
   { href: "/influenciador/demandas", label: "Demandas" },
   { href: "/empresa/demandas", label: "Empresas" },
@@ -9,11 +11,11 @@ const LINKS = [
 
 export function HomeFooter() {
   return (
-    <footer className="border-t border-lilas/20 bg-verde-carvao text-zinc-400">
+    <footer className="border-t border-verde-carvao-claro/40 bg-verde-carvao text-zinc-400">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div>
-          <p className="font-display text-lg font-bold text-white">Publi</p>
-          <p className="mt-1 max-w-xs text-sm leading-relaxed font-normal">
+          <PubliLogo variant="dark" size="md" className="mb-3" />
+          <p className="max-w-xs text-sm leading-relaxed font-normal">
             Marketplace que conecta influenciadores digitais a empresas de
             publicação.
           </p>
@@ -35,7 +37,7 @@ export function HomeFooter() {
         </nav>
       </div>
 
-      <div className="border-t border-lilas/15 px-4 py-4 sm:px-6">
+      <div className="border-t border-white/10 px-4 py-4 sm:px-6">
         <p className="mx-auto max-w-6xl text-center text-xs text-zinc-500">
           © {new Date().getFullYear()} Publi. Todos os direitos reservados.
         </p>

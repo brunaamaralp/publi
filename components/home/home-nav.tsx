@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { PubliLogo } from "@/components/brand/publi-logo";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -11,10 +12,10 @@ const NAV_LINKS = [
 
 export function HomeNav() {
   return (
-    <header className="sticky top-0 z-50 border-b border-lilas/15 bg-verde-carvao/90 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
-        <Link href="/" className="font-display text-lg font-bold text-white">
-          Publi
+    <header className="sticky top-0 z-50 border-b border-cinza-200 bg-fundo-pagina/90 backdrop-blur-md">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6">
+        <Link href="/" className="rounded-button outline-none focus-visible:ring-2 focus-visible:ring-lilas/50">
+          <PubliLogo size="sm" />
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex" aria-label="Principal">
@@ -22,7 +23,7 @@ export function HomeNav() {
             <a
               key={link.href}
               href={link.href}
-              className="text-sm text-zinc-400 transition-colors hover:text-lilas-claro"
+              className="text-texto-secundario text-sm font-normal transition-colors hover:text-lilas-escuro"
             >
               {link.label}
             </a>
@@ -34,7 +35,7 @@ export function HomeNav() {
             href="/login"
             className={cn(
               buttonVariants({ variant: "ghost", size: "sm" }),
-              "text-zinc-300 hover:bg-lilas/10 hover:text-lilas-claro",
+              "text-texto-secundario hover:bg-lilas-claro/80 hover:text-lilas-escuro",
             )}
           >
             Entrar

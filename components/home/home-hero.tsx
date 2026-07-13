@@ -1,56 +1,50 @@
 import Link from "next/link";
 import { ArrowRight, ShieldCheck, Sparkles, TrendingUp } from "lucide-react";
 
-import { HeroMatchPreview } from "@/components/home/hero-match-preview";
+import { PubliLogo } from "@/components/brand/publi-logo";
+import { HeroProductPreview } from "@/components/home/hero-product-preview";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const DESTAQUES = [
-  { icone: Sparkles, texto: "Match por compatibilidade real", cor: "text-verde-neon" },
-  { icone: ShieldCheck, texto: "Pagamento em escrow", cor: "text-lilas" },
-  { icone: TrendingUp, texto: "Resultados mensuráveis", cor: "text-lilas" },
+  { icone: Sparkles, texto: "Match por compatibilidade real" },
+  { icone: ShieldCheck, texto: "Pagamento em escrow" },
+  { icone: TrendingUp, texto: "Resultados mensuráveis" },
 ] as const;
 
 export function HomeHero() {
   return (
-    <section className="relative overflow-hidden bg-verde-carvao text-white">
+    <section className="relative overflow-hidden border-b border-cinza-200 bg-fundo-pagina">
       <div
-        className="pointer-events-none absolute inset-0 opacity-25"
-        style={{
-          backgroundImage:
-            "linear-gradient(color-mix(in srgb, var(--lilas) 6%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--verde-neon) 4%, transparent) 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
-        }}
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute -top-24 right-0 size-96 rounded-full opacity-20 blur-3xl"
+        className="pointer-events-none absolute inset-0 opacity-60"
         style={{
           background:
-            "radial-gradient(circle, var(--lilas) 0%, transparent 70%)",
+            "radial-gradient(ellipse 80% 60% at 100% 0%, color-mix(in srgb, var(--lilas-claro) 90%, transparent), transparent 70%)",
         }}
         aria-hidden
       />
 
-      <div className="relative mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-24">
-        <div>
-          <p className="text-lilas text-xs font-semibold uppercase tracking-widest">
-            Marketplace de influência
-          </p>
-          <h1 className="font-display mt-4 text-4xl font-bold tracking-tight text-balance sm:text-5xl lg:text-[3.5rem] lg:leading-[1.08]">
+      <div className="relative mx-auto grid max-w-6xl gap-12 px-4 py-12 sm:px-6 lg:grid-cols-[1fr_1.05fr] lg:items-center lg:gap-16 lg:py-20">
+        <div className="max-w-xl">
+          <PubliLogo size="lg" className="mb-8" />
+
+          <p className="eyebrow-secao">Marketplace de influência</p>
+          <h1 className="font-display mt-3 text-4xl font-bold tracking-tight text-balance text-foreground sm:text-5xl lg:text-[3.25rem] lg:leading-[1.1]">
             Campanhas certas para criadores.{" "}
-            <span className="destaque-neon-escuro">Parcerias</span> que convertem.
+            <span className="destaque-lilas">Parcerias</span> que convertem.
           </h1>
-          <p className="mt-6 max-w-xl text-base leading-relaxed text-zinc-400 sm:text-lg">
-            Conectamos influenciadores, marcas e agências em um fluxo completo —
-            do match inteligente à negociação, contrato, pagamento seguro e
-            relatório de resultados.
+          <p className="text-texto-secundario mt-6 text-base leading-relaxed font-normal sm:text-lg">
+            Conectamos influenciadores, marcas e agências — do match à
+            negociação, contrato, pagamento seguro e relatório de resultados.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Link
               href="/cadastro"
-              className={cn(buttonVariants({ variant: "cta", size: "lg" }), "h-10 px-5")}
+              className={cn(
+                buttonVariants({ variant: "cta", size: "lg" }),
+                "h-11 px-6",
+              )}
             >
               Sou influenciador
               <ArrowRight className="size-4" aria-hidden />
@@ -59,40 +53,29 @@ export function HomeHero() {
               href="/cadastro"
               className={cn(
                 buttonVariants({ variant: "outline", size: "lg" }),
-                "h-10 border-lilas/35 bg-transparent px-5 text-lilas-claro hover:border-lilas hover:bg-lilas/10 hover:text-white",
+                "h-11 border-cinza-200 bg-white px-6 hover:border-lilas/50 hover:bg-lilas-claro/50",
               )}
             >
               Sou marca / empresa
             </Link>
-            <Link
-              href="/cadastro"
-              className={cn(
-                buttonVariants({ variant: "ghost", size: "lg" }),
-                "h-10 text-zinc-300 hover:bg-lilas/10 hover:text-lilas-claro",
-              )}
-            >
-              Sou agência
-            </Link>
           </div>
 
-          <ul className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-6">
-            {DESTAQUES.map(({ icone: Icone, texto, cor }) => (
+          <ul className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-x-8 sm:gap-y-2">
+            {DESTAQUES.map(({ icone: Icone, texto }) => (
               <li
                 key={texto}
-                className="flex items-center gap-2 text-sm text-zinc-400"
+                className="text-texto-secundario flex items-center gap-2 text-sm font-normal"
               >
-                <Icone className={cn("size-4 shrink-0", cor)} aria-hidden />
+                <span className="icone-marca size-8 shrink-0 rounded-md">
+                  <Icone className="size-3.5" aria-hidden />
+                </span>
                 {texto}
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="flex justify-center lg:justify-end">
-          <div className="rounded-card border border-lilas/20 bg-white/5 p-8 backdrop-blur-sm">
-            <HeroMatchPreview />
-          </div>
-        </div>
+        <HeroProductPreview />
       </div>
     </section>
   );
