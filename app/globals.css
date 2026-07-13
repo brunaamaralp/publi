@@ -29,8 +29,8 @@
   --ambar: #d97706;
   --ambar-escuro: #78350f;
 
-  --radius-card: 8px;
-  --radius-button: 6px;
+  --radius-card: 12px;
+  --radius-button: 8px;
   --radius: var(--radius-card);
 
   /* Semânticos shadcn → tokens da marca */
@@ -253,6 +253,53 @@
     border: 1px solid var(--verde-carvao-claro);
     background: var(--verde-carvao-escuro);
     color: var(--branco);
+  }
+
+  /* Marketing e landing — alinhado à marca */
+  .eyebrow-secao {
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--lilas-escuro);
+  }
+
+  .destaque-neon {
+    border-radius: 0.25rem;
+    background: color-mix(in srgb, var(--verde-neon) 18%, transparent);
+    padding-inline: 0.25rem;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
+  .destaque-neon-escuro {
+    color: var(--verde-neon);
+  }
+
+  .card-marketing {
+    border-radius: var(--radius-card);
+    border: 1px solid var(--cinza-200);
+    background: var(--branco);
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--preto) 4%, transparent);
+  }
+
+  .card-marketing-destaque {
+    border-radius: var(--radius-card);
+    border: 1px solid var(--cinza-200);
+    border-left-width: 3px;
+    border-left-color: var(--verde-neon);
+    background: var(--branco);
+    box-shadow: 0 4px 24px color-mix(in srgb, var(--preto) 6%, transparent);
+  }
+
+  .icone-marca {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-button);
+    border: 1px solid color-mix(in srgb, var(--lilas) 45%, transparent);
+    background: var(--lilas-claro);
+    color: var(--lilas-escuro);
   }
 }
 
