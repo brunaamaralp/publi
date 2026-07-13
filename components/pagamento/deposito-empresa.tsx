@@ -62,7 +62,7 @@ export function DepositoEmpresa({
           aberto={checkoutAberto}
           onOpenChange={setCheckoutAberto}
           titulo="Depósito confirmado"
-          descricao="Registrando o valor em escrow na plataforma…"
+          descricao="Registrando o valor com proteção na plataforma…"
           valor={contrato.valor}
           onSucesso={handleSucessoCheckout}
         />
@@ -76,7 +76,7 @@ export function DepositoEmpresa({
         <ResumoContratoDeposito contexto={contexto} />
         <div className="rounded-card border border-cinza-200 border-l-[3px] border-l-lilas bg-lilas-claro p-4 text-sm text-lilas-escuro">
           O valor ficará{" "}
-          <span className="font-semibold">retido no escrow parceiro</span> até a
+          <span className="font-semibold">reservado em garantia</span> até a
           entrega ser confirmada. Nem você nem o influenciador terão acesso
           direto ao dinheiro antes disso.
         </div>
@@ -94,7 +94,7 @@ export function DepositoEmpresa({
         aberto={checkoutAberto}
         onOpenChange={setCheckoutAberto}
         titulo="Depósito confirmado"
-        descricao="Registrando o valor em escrow na plataforma…"
+        descricao="Registrando o valor com proteção na plataforma…"
         valor={contrato.valor}
         onSucesso={handleSucessoCheckout}
       />

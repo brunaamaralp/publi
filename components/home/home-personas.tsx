@@ -11,7 +11,7 @@ const PERSONAS = [
     descricao:
       "Receba demandas compatíveis com seu perfil, evolua com trilhas de treinamento e acompanhe sua receita em um painel dedicado.",
     beneficios: [
-      "Feed com score de match",
+      "Oportunidades com score de compatibilidade",
       "Treinamentos e níveis Pro / Elite",
       "Financeiro e resultados de campanha",
     ],
@@ -24,11 +24,11 @@ const PERSONAS = [
   {
     titulo: "Marcas e empresas",
     descricao:
-      "Publique campanhas com briefing claro, receba matches qualificados e feche parcerias com contrato e pagamento protegido.",
+      "Publique campanhas com orientações claras, receba sugestões qualificadas e feche parcerias com contrato e pagamento protegido.",
     beneficios: [
       "Publicação de demandas",
       "Negociação e contrato digital",
-      "Escrow e solicitação de resultados",
+      "Pagamento protegido e solicitação de resultados",
     ],
     href: "/cadastro",
     cta: "Cadastrar empresa",
@@ -41,13 +41,13 @@ const PERSONAS = [
     descricao:
       "Gerencie várias empresas-clientes com visão consolidada — demandas, contratos e investimento sem trocar de conta o tempo todo.",
     beneficios: [
-      "Dashboard multi-cliente",
+      "Painel multi-cliente",
       "Seletor de contexto por marca",
       "Resultados consolidados por cliente",
     ],
     href: "/cadastro",
     cta: "Cadastrar agência",
-    secundario: { href: "/agencia/dashboard", label: "Ver dashboard" },
+    secundario: { href: "/agencia/dashboard", label: "Ver painel" },
     icone: LayoutDashboard,
     destaque: false,
   },

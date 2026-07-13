@@ -171,13 +171,13 @@ export function PassoDadosBasicos({
               <span className="text-verde-neon font-medium">
                 Dados essenciais preenchidos
               </span>{" "}
-              — perfis completos e verificados recebem prioridade no match com
+              — perfis completos e verificados recebem prioridade nas sugestões para
               empresas.
             </>
           ) : (
             <>
               <span className="text-verde-neon font-medium">Perfis completos</span>{" "}
-              e verificados recebem prioridade no match com empresas. Dedique
+              e verificados recebem prioridade nas sugestões para empresas. Dedique
               alguns minutos para preencher com atenção.
             </>
           )}

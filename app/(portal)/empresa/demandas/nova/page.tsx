@@ -28,7 +28,7 @@ export default function NovaDemandaPage() {
           </h1>
           <p className="text-muted-foreground mt-2 text-sm">
             Preencha os detalhes da campanha. Após publicar, ela ficará
-            disponível para match com influenciadores compatíveis.
+            disponível para criadores compatíveis com o perfil da campanha.
           </p>
         </div>
       </header>

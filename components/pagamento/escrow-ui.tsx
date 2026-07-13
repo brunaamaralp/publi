@@ -165,7 +165,7 @@ export function IndicadorProvedorEscrow({
       )}
     >
       <Link2 className="mt-0.5 size-3.5 shrink-0" aria-hidden />
-      Custódia via provedor de escrow parceiro — a Publi não retém o valor
+      Custódia via parceiro de pagamento seguro — a Publi não retém o valor
       diretamente
     </p>
   );

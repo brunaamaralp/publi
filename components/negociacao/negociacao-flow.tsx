@@ -54,7 +54,7 @@ export function NegociacaoFlow({ matchId }: NegociacaoFlowProps) {
   if (!contexto) {
     return (
       <div className="mx-auto max-w-lg px-4 py-16 text-center sm:px-6">
-        <h1 className="font-display text-xl font-semibold">Match não encontrado</h1>
+        <h1 className="font-display text-xl font-semibold">Negociação não encontrada</h1>
         <p className="text-muted-foreground mt-2 text-sm">
           O identificador <span className="font-data">{matchId}</span> não
           corresponde a uma negociação disponível.
@@ -63,7 +63,7 @@ export function NegociacaoFlow({ matchId }: NegociacaoFlowProps) {
           href="/influenciador/demandas"
           className={cn(buttonVariants({ variant: "outline" }), "mt-6")}
         >
-          Voltar ao feed
+          Voltar às oportunidades
         </Link>
       </div>
     );

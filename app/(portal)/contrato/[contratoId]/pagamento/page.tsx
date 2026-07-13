@@ -2,7 +2,7 @@ import { PagamentoFlow } from "@/components/pagamento/pagamento-flow";
 
 export const metadata = {
   title: "Pagamento e entrega",
-  description: "Depósito em escrow, entrega e liberação de pagamento.",
+  description: "Depósito protegido, entrega e liberação de pagamento.",
 };
 
 type PagamentoContratoPageProps = {

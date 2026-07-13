@@ -32,6 +32,7 @@ const CONTAS_DEMO: Record<
   "influenciador@publi.app": { tipo: "influenciador", status: "ativo" },
   "empresa@publi.app": { tipo: "empresa", status: "ativo" },
   "agencia@publi.app": { tipo: "agencia", status: "ativo" },
+  "admin@publi.app": { tipo: "admin", status: "ativo" },
 };
 
 function persistir(usuario: Usuario | null) {

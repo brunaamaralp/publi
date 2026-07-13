@@ -9,23 +9,23 @@ import { cn } from "@/lib/utils";
 
 const RECURSOS = [
   {
-    titulo: "Match Ring",
+    titulo: "Compatibilidade visual",
     descricao:
-      "Visualize em segundos o quanto um criador combina com sua campanha — audiência, formato e orçamento alinhados.",
+      "Veja em segundos o quanto um criador combina com sua campanha — audiência, formato e orçamento alinhados.",
     icone: Handshake,
     borda: "border-l-verde-neon",
   },
   {
-    titulo: "Escrow e RPA",
+    titulo: "Pagamento seguro e recibo",
     descricao:
-      "Valor retido até a entrega ser confirmada. Para influenciadores CPF, cálculo assistido de RPA integrado ao fluxo.",
+      "O valor fica reservado até a entrega ser confirmada. Para quem trabalha com CPF, a plataforma ajuda no cálculo do recibo de pagamento.",
     icone: Shield,
     borda: "border-l-lilas-escuro",
   },
   {
     titulo: "Treinamentos",
     descricao:
-      "Trilhas de precificação, negociação e storytelling que elevam o nível do criador e sua visibilidade no match.",
+      "Trilhas de precificação, negociação e storytelling que elevam o nível do criador e sua visibilidade nas oportunidades.",
     icone: GraduationCap,
     borda: "border-l-lilas-escuro",
   },
@@ -52,7 +52,7 @@ export function HomeFeatures() {
             <span className="destaque-neon">influência a sério</span>
           </h2>
           <p className="text-texto-secundario mt-4 text-base font-normal leading-relaxed">
-            Match, pagamento protegido e métricas — com a mesma linguagem visual
+            Compatibilidade, pagamento protegido e métricas — com a mesma linguagem visual
             em todo o produto.
           </p>
         </div>

@@ -18,7 +18,7 @@ export function ResumoContratoDeposito({ contexto }: ResumoContratoDepositoProps
       <div>
         <h2 className="font-display text-lg font-bold">{demandaTitulo}</h2>
         <p className="text-texto-secundario text-sm font-normal">
-          Contrato assinado — pronto para depósito em escrow
+          Contrato assinado — pronto para depósito protegido
         </p>
       </div>
 

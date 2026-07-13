@@ -21,6 +21,11 @@ const TIPO_STYLES: Record<
     className:
       "border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200",
   },
+  admin: {
+    label: "Admin",
+    className:
+      "border-zinc-300 bg-zinc-100 text-zinc-800 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200",
+  },
 };
 
 type BadgeTipoUsuarioProps = {

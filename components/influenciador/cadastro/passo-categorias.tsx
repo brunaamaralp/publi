@@ -21,7 +21,7 @@ export function PassoCategorias({
           Áreas de domínio e interesse
         </h2>
         <p className="text-texto-secundario text-sm font-normal">
-          O algoritmo de match usa essas categorias para conectar você às
+          Usamos essas categorias para conectar você às
           campanhas certas.
         </p>
       </div>

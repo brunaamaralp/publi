@@ -53,7 +53,7 @@ export function MatchRing({
   score,
   size = "md",
   showLabel = false,
-  label = "match",
+  label = "compatível",
   className,
   centerValue,
   ariaLabel,

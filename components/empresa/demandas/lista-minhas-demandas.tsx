@@ -67,7 +67,7 @@ export function ListaMinhasDemandas() {
       <div className="mx-auto max-w-5xl space-y-8 px-4 py-8 sm:px-6">
       <CabecalhoDemandasEmpresa
         titulo="Minhas demandas"
-        descricao="Gerencie as campanhas publicadas para influenciadores. Cada demanda aberta alimenta o feed de match do outro lado da plataforma."
+        descricao="Gerencie as campanhas publicadas para influenciadores. Cada demanda aberta vira oportunidade para criadores compatíveis."
       />
 
       {itens.length === 0 ? (
@@ -94,7 +94,7 @@ export function ListaMinhasDemandas() {
                 <tr className="border-border border-b bg-muted/40">
                   <th className="px-4 py-3 font-medium">Título</th>
                   <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium">Matches</th>
+                  <th className="px-4 py-3 font-medium">Sugestões</th>
                   <th className="px-4 py-3 font-medium">Orçamento</th>
                   <th className="px-4 py-3 font-medium">Prazo</th>
                   <th className="px-4 py-3 font-medium">
@@ -173,7 +173,7 @@ export function ListaMinhasDemandas() {
                   <CardContent className="space-y-2 text-sm">
                     <div className="text-texto-secundario flex flex-wrap gap-x-4 gap-y-1 font-normal">
                       <span>
-                        Matches:{" "}
+                        Sugestões:{" "}
                         <span className="text-foreground font-data font-medium">
                           {item.matchesGerados}
                         </span>
@@ -225,7 +225,7 @@ export function ListaMinhasDemandas() {
             <DialogDescription>
               Tem certeza que deseja cancelar{" "}
               <strong>{itemCancelar?.demanda.titulo}</strong>? Influenciadores não
-              verão mais esta oportunidade no feed.
+              verão mais esta oportunidade entre as sugestões.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

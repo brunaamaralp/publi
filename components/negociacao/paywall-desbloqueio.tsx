@@ -69,7 +69,7 @@ export function PaywallDesbloqueio({
           <span className="text-foreground font-medium">
             {contexto.influenciador.nome}
           </span>
-          , pague a taxa de desbloqueio deste match.
+          , pague a taxa de desbloqueio desta conversa.
         </p>
       </div>
 

@@ -27,7 +27,7 @@ export function PagamentoGarantidoCard({
             Pagamento garantido
           </p>
           <p className="text-texto-secundario text-sm font-normal">
-            Valor reservado em escrow até a entrega ser confirmada
+            Valor reservado em garantia até a entrega ser confirmada
           </p>
         </div>
       </div>

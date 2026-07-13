@@ -14,7 +14,7 @@ export type OrdenacaoDemanda =
   | "mais_recente";
 
 export const LABELS_ORDENACAO: Record<OrdenacaoDemanda, string> = {
-  melhor_match: "Melhor match",
+  melhor_match: "Maior compatibilidade",
   maior_orcamento: "Maior orçamento",
   mais_recente: "Mais recente",
 };

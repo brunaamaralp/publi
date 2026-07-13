@@ -188,7 +188,7 @@ export function CadastroWizard() {
                 Monte seu perfil profissional
               </h1>
               <p className="text-texto-secundario mt-2 text-sm font-normal">
-                Quanto mais completo, melhores oportunidades você recebe no match
+                Quanto mais completo, melhores oportunidades compatíveis você recebe
                 com empresas.
               </p>
             </div>

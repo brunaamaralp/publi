@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 const DEPOIMENTOS = [
   {
     texto:
-      "O score de match mudou o jogo. Paro de perder tempo com propostas que não combinam com minha audiência — só abro o que faz sentido.",
+      "O score de compatibilidade mudou o jogo. Paro de perder tempo com propostas que não combinam com minha audiência — só abro o que faz sentido.",
     nome: "Ana Beatriz Silva",
     papel: "Influenciadora · Beleza & lifestyle",
     borda: "border-l-verde-neon",
@@ -13,7 +13,7 @@ const DEPOIMENTOS = [
   },
   {
     texto:
-      "Publicamos a campanha numa tarde e em dois dias tínhamos criadores qualificados negociando. O escrow dá segurança para a marca e para o criador.",
+      "Publicamos a campanha numa tarde e em dois dias tínhamos criadores qualificados negociando. O pagamento protegido dá segurança para a marca e para o criador.",
     nome: "Glow Cosmetics",
     papel: "Marca de skincare",
     borda: "border-l-lilas-escuro",
@@ -21,7 +21,7 @@ const DEPOIMENTOS = [
   },
   {
     texto:
-      "Gerencio quatro clientes sem ficar trocando de login. O dashboard consolidado é exatamente o que a agência precisa para justificar a parceria.",
+      "Gerencio quatro clientes sem ficar trocando de login. O painel consolidado é exatamente o que a agência precisa para justificar a parceria.",
     nome: "Pulse Media",
     papel: "Agência de influência",
     borda: "border-l-lilas-escuro",

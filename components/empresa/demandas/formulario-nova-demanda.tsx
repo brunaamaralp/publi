@@ -97,7 +97,7 @@ export function FormularioNovaDemanda() {
 
         <div className="space-y-2">
           <Label htmlFor="briefing">
-            Briefing <span className="text-destructive">*</span>
+            Descrição da campanha <span className="text-destructive">*</span>
           </Label>
           <Textarea
             id="briefing"
@@ -223,7 +223,7 @@ export function FormularioNovaDemanda() {
           </h2>
           <p className="text-muted-foreground text-sm">
             Defina quem a empresa quer atingir com esta campanha. Opcional, mas
-            melhora o match com influenciadores compatíveis.
+            melhora a compatibilidade com influenciadores adequados.
           </p>
         </div>
 

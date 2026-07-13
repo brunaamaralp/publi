@@ -108,7 +108,7 @@ export function ResultadosEmpresaFlow({ contratoId }: ResultadosEmpresaFlowProps
     <div className="mx-auto max-w-4xl space-y-8 px-4 py-8 sm:px-6">
       <header className="space-y-4">
         <Link
-          href="/empresa/demandas"
+          href="/empresa/resultados"
           className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "-ml-2 w-fit")}
         >
           <ArrowLeft className="size-4" aria-hidden />

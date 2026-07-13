@@ -41,7 +41,7 @@ export function DashboardAgenciaFlow() {
   if (!pronto) {
     return (
       <div className="text-muted-foreground flex min-h-[40vh] items-center justify-center text-sm">
-        Carregando dashboard…
+        Carregando painel…
       </div>
     );
   }

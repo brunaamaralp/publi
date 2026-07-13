@@ -107,7 +107,8 @@ export function LoginForm() {
           Qualquer e-mail e senha funcionam. Contas demo:{" "}
           <span className="font-data">influenciador@publi.app</span>,{" "}
           <span className="font-data">empresa@publi.app</span>,{" "}
-          <span className="font-data">agencia@publi.app</span>.
+          <span className="font-data">agencia@publi.app</span>,{" "}
+          <span className="font-data">admin@publi.app</span>.
         </p>
       </div>
     </div>

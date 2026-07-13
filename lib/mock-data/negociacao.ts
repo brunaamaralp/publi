@@ -101,7 +101,7 @@ export function criarMensagensIniciais(
       conversaId,
       remetenteId: empresa.usuarioId,
       texto:
-        "Seria 1 reels + 2 stories, com roteiro livre dentro do briefing que enviamos na demanda.",
+        "Seria 1 reels + 2 stories, com roteiro livre dentro das orientações que enviamos na demanda.",
       enviadoEm: "2026-07-10T10:18:00.000Z",
       flagContatoExterno: "nenhum",
     },

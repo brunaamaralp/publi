@@ -12,7 +12,7 @@ export const demandaSchema = z.object({
   id: z.string(),
   empresaId: z.string(),
   titulo: z.string().min(1, "Título é obrigatório"),
-  briefing: z.string().min(1, "Briefing é obrigatório"),
+  briefing: z.string().min(1, "Descrição da campanha é obrigatória"),
   orcamento: z.number().positive("Orçamento deve ser um valor positivo"),
   formatoEntrega: formatoEntregaSchema,
   prazo: z.string().min(1, "Prazo é obrigatório"),

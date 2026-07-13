@@ -166,12 +166,12 @@ export function FeedDemandas() {
             Demandas para você
           </h1>
           <p className="text-texto-secundario mt-2 text-sm font-normal">
-            Ordenadas por compatibilidade com seu perfil — quanto maior o match,
+            Ordenadas por compatibilidade com seu perfil — quanto maior a aderência,
             melhor a oportunidade.
           </p>
           {filtros.ordenacao === "melhor_match" && sugeridos.length > 0 ? (
             <p className="text-lilas-escuro mt-3 text-xs font-medium">
-              Exibindo do maior para o menor score de match
+              Exibindo da maior para a menor compatibilidade
             </p>
           ) : null}
         </header>

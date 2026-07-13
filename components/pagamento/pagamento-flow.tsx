@@ -70,7 +70,7 @@ export function PagamentoFlow({ contratoId }: PagamentoFlowProps) {
             <Link href={`/contrato/${CONTRATO_CPF_ID}/pagamento`} className="text-verde-acao font-data hover:underline">
               {CONTRATO_CPF_ID}
             </Link>{" "}
-            (CPF + RPA) ou{" "}
+            (CPF + recibo) ou{" "}
             <Link href={`/contrato/${CONTRATO_CNPJ_ID}/pagamento`} className="text-verde-acao font-data hover:underline">
               {CONTRATO_CNPJ_ID}
             </Link>{" "}
@@ -110,7 +110,7 @@ export function PagamentoFlow({ contratoId }: PagamentoFlowProps) {
             Voltar
           </Link>
           <div>
-            <p className="text-texto-secundario text-sm font-medium">Escrow</p>
+            <p className="text-texto-secundario text-sm font-medium">Pagamento protegido</p>
             <h1 className="font-display mt-1 text-2xl font-bold tracking-tight">
               Pagamento e entrega
             </h1>
@@ -132,8 +132,8 @@ export function PagamentoFlow({ contratoId }: PagamentoFlowProps) {
             </div>
             <ValorEscrowDestaque valor={valor} status="em_disputa" tamanho="md" />
             <p className="text-ambar-escuro/90 text-sm leading-relaxed font-normal">
-              Uma das partes contestou a entrega. O valor permanece retido no
-              escrow parceiro enquanto a plataforma media o caso — isso não
+              Uma das partes contestou a entrega. O valor permanece reservado em
+              garantia enquanto a plataforma media o caso — isso não
               indica culpa automática de influenciador ou empresa.
             </p>
             <IndicadorProvedorEscrow className="text-cinza-500" />
@@ -151,12 +151,12 @@ export function PagamentoFlow({ contratoId }: PagamentoFlowProps) {
             contexto={contexto}
             onDepositoConfirmado={(municipioRpa) => {
               persistir((prev) => registrarDeposito(prev, contexto, municipioRpa));
-              toast.success("Valor depositado em escrow!");
+              toast.success("Valor depositado com proteção!");
             }}
           />
         ) : !estado.pagamento && papel === "influenciador" ? (
           <p className="text-texto-secundario secao-editavel border-dashed p-8 text-center text-sm font-normal">
-            Aguardando a empresa depositar o valor do contrato no escrow parceiro.
+            Aguardando a empresa depositar o valor do contrato na conta de garantia.
           </p>
         ) : pagamentoRetido && papel === "influenciador" && !estado.entrega ? (
           <div className="space-y-4">
@@ -194,7 +194,7 @@ export function PagamentoFlow({ contratoId }: PagamentoFlowProps) {
           <CardEscrow status="retido" className="space-y-3 p-4">
             <ValorEscrowDestaque valor={valor} status="retido" tamanho="md" />
             <p className="text-texto-secundario text-center text-sm font-normal">
-              Pagamento retido no escrow — aguardando o influenciador registrar a
+              Pagamento reservado em garantia — aguardando o influenciador registrar a
               entrega.
             </p>
             <IndicadorProvedorEscrow />

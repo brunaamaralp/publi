@@ -35,7 +35,7 @@ export function CalculoRpaPainel({
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="font-display text-lg font-bold">Cálculo de RPA</h2>
+        <h2 className="font-display text-lg font-bold">Recibo de pagamento</h2>
         <p className="text-texto-secundario mt-1 text-sm font-normal">
           O influenciador é pessoa física (CPF). A plataforma calcula os descontos
           para auxiliar na emissão do recibo.
@@ -77,7 +77,7 @@ export function CalculoRpaPainel({
       <div className="flex gap-3 rounded-card border border-ambar/35 bg-ambar-claro p-4 text-sm text-ambar-escuro">
         <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
         <p className="font-normal">
-          Este RPA é emitido em nome de{" "}
+          Este recibo é emitido em nome de{" "}
           <strong className="font-semibold">{empresaNome}</strong> — a
           responsabilidade pelo recolhimento é da empresa contratante.
         </p>
@@ -93,7 +93,7 @@ export function CalculoRpaPainel({
           onClick={onConfirmar}
           disabled={!municipio}
         >
-          Confirmar RPA e depositar
+          Confirmar recibo e depositar
         </Button>
       </div>
     </div>

@@ -1,12 +1,10 @@
-"use client";
-
 import { GuardTipo } from "@/components/auth/guard-tipo";
 
-type GuardInfluenciadorProps = {
+export default function InfluenciadorPortalLayout({
+  children,
+}: {
   children: React.ReactNode;
-};
-
-export function GuardInfluenciador({ children }: GuardInfluenciadorProps) {
+}) {
   return (
     <GuardTipo
       permitidos={["influenciador"]}

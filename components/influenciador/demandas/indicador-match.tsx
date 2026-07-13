@@ -35,7 +35,7 @@ export function IndicadorMatch({
       )}
       aria-label={
         nivel === "baixo"
-          ? `${score}% de match estimado — score inicial sem histórico na plataforma`
+          ? `${score}% de compatibilidade estimada — ainda sem histórico na plataforma`
           : `${score}% de compatibilidade com seu perfil`
       }
     >
@@ -67,7 +67,7 @@ export function IndicadorMatch({
             nivel === "baixo" && "text-cinza-500",
           )}
         >
-          match
+          compatível
         </span>
       </div>
       {nivel === "baixo" ? (

@@ -1,14 +1,13 @@
 import Link from "next/link";
 import { ArrowRight, ShieldCheck, Sparkles, TrendingUp } from "lucide-react";
 
-import { PubliLogo } from "@/components/brand/publi-logo";
 import { HeroProductPreview } from "@/components/home/hero-product-preview";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const DESTAQUES = [
-  { icone: Sparkles, texto: "Match por compatibilidade real" },
-  { icone: ShieldCheck, texto: "Pagamento em escrow" },
+  { icone: Sparkles, texto: "Sugestões por compatibilidade real" },
+  { icone: ShieldCheck, texto: "Pagamento protegido" },
   { icone: TrendingUp, texto: "Resultados mensuráveis" },
 ] as const;
 
@@ -26,15 +25,13 @@ export function HomeHero() {
 
       <div className="relative mx-auto grid max-w-6xl gap-12 px-4 py-12 sm:px-6 lg:grid-cols-[1fr_1.05fr] lg:items-center lg:gap-16 lg:py-20">
         <div className="max-w-xl">
-          <PubliLogo size="lg" className="mb-8" />
-
           <p className="eyebrow-secao">Marketplace de influência</p>
           <h1 className="font-display mt-3 text-4xl font-bold tracking-tight text-balance text-foreground sm:text-5xl lg:text-[3.25rem] lg:leading-[1.1]">
             Campanhas certas para criadores.{" "}
             <span className="destaque-lilas">Parcerias</span> que convertem.
           </h1>
           <p className="text-texto-secundario mt-6 text-base leading-relaxed font-normal sm:text-lg">
-            Conectamos influenciadores, marcas e agências — do match à
+            Conectamos influenciadores, marcas e agências — da sugestão à
             negociação, contrato, pagamento seguro e relatório de resultados.
           </p>
 

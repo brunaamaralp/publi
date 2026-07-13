@@ -29,7 +29,7 @@ export function HeaderNivelXp({ influenciador }: HeaderNivelXpProps) {
         </h1>
         <p className="text-muted-foreground max-w-md text-sm leading-relaxed">
           Complete trilhas para ganhar XP, subir de nível e melhorar sua
-          visibilidade no match com marcas.
+          visibilidade nas oportunidades com marcas.
         </p>
         <p className="text-sm">
           <span className="font-data font-semibold">{pontosXp}</span>{" "}

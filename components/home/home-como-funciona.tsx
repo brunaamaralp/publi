@@ -7,15 +7,15 @@ const PASSOS = [
     numero: "01",
     titulo: "Cadastro rápido",
     descricao:
-      "Influenciadores e empresas criam a conta e já começam a usar a plataforma — match, negociação e pagamento em um só lugar.",
+      "Influenciadores e empresas criam a conta e já começam a usar a plataforma — oportunidades, negociação e pagamento em um só lugar.",
     icone: Search,
     destaque: true,
   },
   {
     numero: "02",
-    titulo: "Match inteligente",
+    titulo: "Sugestões inteligentes",
     descricao:
-      "Demandas são cruzadas com audiência, nicho e engajamento. Você vê o score de compatibilidade antes de investir tempo.",
+      "Demandas são cruzadas com audiência, nicho e engajamento. Você vê o nível de compatibilidade antes de investir tempo.",
     icone: FileCheck,
     destaque: false,
   },
@@ -23,7 +23,7 @@ const PASSOS = [
     numero: "03",
     titulo: "Negociação e pagamento seguro",
     descricao:
-      "Chat na plataforma, contrato digital e valor retido em escrow até a entrega ser confirmada.",
+      "Chat na plataforma, contrato digital e valor reservado em garantia até a entrega ser confirmada.",
     icone: Wallet,
     destaque: false,
   },
@@ -39,7 +39,7 @@ export function HomeComoFunciona() {
         <div className="max-w-2xl">
           <p className="eyebrow-secao">Como funciona</p>
           <h2 className="font-display mt-2 text-3xl font-bold tracking-tight text-balance sm:text-4xl">
-            Do briefing ao resultado,{" "}
+            Da publicação ao resultado,{" "}
             <span className="destaque-lilas">tudo em um só lugar</span>
           </h2>
           <p className="text-texto-secundario mt-4 text-base leading-relaxed font-normal">

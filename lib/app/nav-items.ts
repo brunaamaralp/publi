@@ -6,7 +6,6 @@ import {
   GraduationCap,
   Home,
   LayoutDashboard,
-  MessageSquare,
   PlusCircle,
   ShieldCheck,
   Wallet,
@@ -19,6 +18,11 @@ export type NavItem = {
   label: string;
   icone: LucideIcon;
   descricao?: string;
+  /** Visualmente indentado dentro do grupo */
+  aninhado?: boolean;
+  /** Rotas extras que mantêm o item ativo (ex.: detalhe fora do prefixo) */
+  rotasRelacionadas?: string[];
+  filhos?: NavItem[];
 };
 
 export type NavGrupo = {
@@ -29,18 +33,17 @@ export type NavGrupo = {
 export const NAV_GRUPOS: NavGrupo[] = [
   {
     titulo: "Geral",
-    itens: [
-      { href: "/inicio", label: "Início", icone: Home },
-    ],
+    itens: [{ href: "/inicio", label: "Início", icone: Home }],
   },
   {
     titulo: "Influenciador",
     itens: [
       {
         href: "/influenciador/demandas",
-        label: "Demandas",
+        label: "Oportunidades",
         icone: FileText,
-        descricao: "Feed e matches",
+        descricao: "Campanhas compatíveis com seu perfil",
+        rotasRelacionadas: ["/negociacao"],
       },
       {
         href: "/influenciador/treinamentos",
@@ -51,6 +54,7 @@ export const NAV_GRUPOS: NavGrupo[] = [
         href: "/influenciador/financeiro",
         label: "Financeiro",
         icone: Wallet,
+        rotasRelacionadas: ["/contrato"],
       },
       {
         href: "/influenciador/resultados",
@@ -60,22 +64,25 @@ export const NAV_GRUPOS: NavGrupo[] = [
     ],
   },
   {
-    titulo: "Empresa",
+    titulo: "Campanhas",
     itens: [
       {
         href: "/empresa/demandas",
-        label: "Minhas demandas",
+        label: "Minhas campanhas",
         icone: Building2,
+        rotasRelacionadas: ["/negociacao"],
       },
       {
         href: "/empresa/demandas/nova",
-        label: "Nova demanda",
+        label: "Nova campanha",
         icone: PlusCircle,
+        aninhado: true,
       },
       {
-        href: "/resultados/ctr-cpf-001",
-        label: "Resultados de campanha",
+        href: "/empresa/resultados",
+        label: "Resultados",
         icone: BarChart3,
+        rotasRelacionadas: ["/resultados"],
       },
     ],
   },
@@ -84,25 +91,37 @@ export const NAV_GRUPOS: NavGrupo[] = [
     itens: [
       {
         href: "/agencia/dashboard",
-        label: "Dashboard",
+        label: "Painel consolidado",
         icone: LayoutDashboard,
       },
     ],
   },
   {
-    titulo: "Operação",
+    titulo: "Cliente ativo",
     itens: [
       {
-        href: "/negociacao/match-001",
-        label: "Negociação",
-        icone: MessageSquare,
-        descricao: "Exemplo match-001",
+        href: "/empresa/demandas",
+        label: "Campanhas do cliente",
+        icone: Building2,
+        rotasRelacionadas: ["/negociacao"],
       },
       {
-        href: "/contrato/ctr-cpf-001/pagamento",
-        label: "Pagamento / escrow",
-        icone: Wallet,
+        href: "/empresa/demandas/nova",
+        label: "Nova campanha",
+        icone: PlusCircle,
+        aninhado: true,
       },
+      {
+        href: "/empresa/resultados",
+        label: "Resultados",
+        icone: BarChart3,
+        rotasRelacionadas: ["/resultados"],
+      },
+    ],
+  },
+  {
+    titulo: "Administração",
+    itens: [
       {
         href: "/admin/moderacao",
         label: "Moderação",
@@ -120,9 +139,10 @@ export const SESSAO_MOCK = {
 };
 
 const GRUPOS_POR_TIPO: Record<Usuario["tipo"], string[]> = {
-  influenciador: ["Geral", "Influenciador", "Operação"],
-  empresa: ["Geral", "Empresa", "Operação"],
-  agencia: ["Geral", "Agência", "Empresa", "Operação"],
+  influenciador: ["Geral", "Influenciador"],
+  empresa: ["Geral", "Campanhas"],
+  agencia: ["Geral", "Agência", "Cliente ativo"],
+  admin: ["Geral", "Administração"],
 };
 
 export function navGruposParaUsuario(tipo: Usuario["tipo"]): NavGrupo[] {

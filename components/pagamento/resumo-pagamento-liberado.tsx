@@ -38,7 +38,7 @@ export function ResumoPagamentoLiberado({
         <p className="text-texto-secundario text-sm font-normal">
           {papel === "influenciador"
             ? "O valor foi transferido após a confirmação da entrega pela empresa."
-            : "A entrega foi confirmada e o escrow foi liberado para o influenciador."}
+            : "A entrega foi confirmada e o pagamento foi liberado para o influenciador."}
         </p>
       </div>
 

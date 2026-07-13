@@ -133,7 +133,7 @@ export const CONTEUDO_TREINAMENTO_MOCK: Record<string, string> = {
   "tr-006":
     "Campanhas com múltiplas entregas exigem clareza de escopo. Aprenda a negociar revisões, prazos e aditivos de forma documentada.",
   "tr-007":
-    "Storytelling não é roteiro engessado — é conectar sua narrativa pessoal ao briefing da marca. Exercícios de gancho nos primeiros 3 segundos.",
+    "Storytelling não é roteiro engessado — é conectar sua narrativa pessoal às orientações da marca. Exercícios de gancho nos primeiros 3 segundos.",
   "tr-008":
     "Estrutura problema → solução → prova social para Reels patrocinados. Modelos de CTA que não soam forçados.",
   "tr-009":

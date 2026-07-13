@@ -65,7 +65,7 @@ export function TreinamentosFlow() {
         : `Treinamento concluído! +${XP_POR_TREINAMENTO} XP`,
       {
         description: subiuNivel
-          ? `Agora você tem ${next.influenciador.pontosXp} XP e maior visibilidade no match.`
+          ? `Agora você tem ${next.influenciador.pontosXp} XP e maior visibilidade nas oportunidades.`
           : `Total: ${next.influenciador.pontosXp} XP (${xpAnterior} → ${next.influenciador.pontosXp})`,
         duration: 5000,
       },

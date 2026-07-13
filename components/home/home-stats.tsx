@@ -2,7 +2,7 @@ const STATS = [
   { valor: "2.400+", label: "criadores verificados", destaque: true },
   { valor: "R$ 12M+", label: "em campanhas negociadas", destaque: false },
   { valor: "94%", label: "satisfação nas parcerias", destaque: false },
-  { valor: "< 48h", label: "para primeiro match", destaque: false },
+  { valor: "< 48h", label: "para primeira sugestão", destaque: false },
 ] as const;
 
 export function HomeStats() {

@@ -33,7 +33,7 @@ const PLANOS = [
     preco: 19.9,
     recomendado: true,
     beneficios: [
-      "Prioridade no match",
+      "Prioridade nas sugestões",
       "Acesso a treinamentos",
       "Destaque moderado nas buscas",
     ],
@@ -45,7 +45,7 @@ const PLANOS = [
     beneficios: [
       "Selo de destaque no perfil",
       "Suporte prioritário",
-      "Máxima visibilidade no match",
+      "Máxima visibilidade nas oportunidades",
     ],
   },
 ];

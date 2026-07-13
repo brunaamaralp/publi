@@ -95,7 +95,7 @@ export function FormularioCadastroEmpresa({
           </h3>
           <p className="text-muted-foreground text-sm">
             Descreva o público que sua marca quer atingir nas campanhas — não são
-            métricas reais, apenas preferências para o match.
+            métricas reais, apenas preferências para encontrar criadores adequados.
           </p>
         </div>
 

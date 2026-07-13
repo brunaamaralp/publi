@@ -25,7 +25,7 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   title: "Publi — Marketplace de influenciadores",
   description:
-    "Conecte criadores, marcas e agências com match inteligente, negociação, contrato, pagamento seguro e resultados mensuráveis.",
+    "Conecte criadores, marcas e agências com sugestões inteligentes, negociação, contrato, pagamento seguro e resultados mensuráveis.",
 };
 
 export default function RootLayout({

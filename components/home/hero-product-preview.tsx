@@ -31,7 +31,7 @@ export function HeroProductPreview() {
                 92
               </p>
               <p className="text-texto-secundario text-[10px] font-normal uppercase tracking-wide">
-                match
+                compatível
               </p>
             </div>
           </div>
@@ -50,7 +50,7 @@ export function HeroProductPreview() {
             <p className="text-texto-secundario text-xs font-normal">
               Pagamento
             </p>
-            <p className="font-display mt-1 text-sm font-bold">Em escrow</p>
+            <p className="font-display mt-1 text-sm font-bold">Protegido</p>
             <p className="text-lilas-escuro mt-2 text-xs font-normal">
               Liberado após entrega
             </p>
