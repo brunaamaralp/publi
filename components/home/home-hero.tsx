@@ -26,12 +26,12 @@ export function HomeHero() {
 
       <div className="relative mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:items-center lg:py-24">
         <div>
-          <p className="text-verde-acao text-xs font-semibold uppercase tracking-widest">
+          <p className="text-verde-neon text-xs font-semibold uppercase tracking-widest">
             Marketplace de influência
           </p>
-          <h1 className="font-display mt-4 text-4xl font-semibold tracking-tight text-balance sm:text-5xl lg:text-[3.25rem] lg:leading-[1.1]">
+          <h1 className="font-display mt-4 text-4xl font-bold tracking-tight text-balance sm:text-5xl lg:text-[3.5rem] lg:leading-[1.08]">
             Campanhas certas para criadores.{" "}
-            <span className="text-white">Parcerias</span> que convertem.
+            <span className="destaque-neon-escuro">Parcerias</span> que convertem.
           </h1>
           <p className="mt-6 max-w-xl text-base leading-relaxed text-zinc-400 sm:text-lg">
             Conectamos influenciadores, marcas e agências em um fluxo completo —
@@ -42,7 +42,7 @@ export function HomeHero() {
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Link
               href="/cadastro"
-              className={cn(buttonVariants({ size: "lg" }), "h-10 px-5")}
+              className={cn(buttonVariants({ variant: "cta", size: "lg" }), "h-10 px-5")}
             >
               Sou influenciador
               <ArrowRight className="size-4" aria-hidden />
@@ -84,7 +84,7 @@ export function HomeHero() {
         </div>
 
         <div className="flex justify-center lg:justify-end">
-          <div className="rounded-card border border-white/10 bg-white/5 p-8 backdrop-blur-sm">
+          <div className="card-marketing-destaque rounded-card border-white/10 bg-white/5 p-8 backdrop-blur-sm">
             <HeroMatchPreview />
           </div>
         </div>

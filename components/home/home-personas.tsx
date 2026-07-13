@@ -1,14 +1,8 @@
 import Link from "next/link";
 import { ArrowRight, Building2, LayoutDashboard, Sparkles } from "lucide-react";
 
+import { BadgeSemantico } from "@/components/ui/badge-semantico";
 import { buttonVariants } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 const PERSONAS = [
@@ -61,14 +55,14 @@ const PERSONAS = [
 
 export function HomePersonas() {
   return (
-    <section id="para-quem" className="py-16 sm:py-20">
+    <section id="para-quem" className="border-t border-cinza-200 py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-primary text-sm font-medium">Para quem</p>
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+          <p className="eyebrow-secao">Para quem</p>
+          <h2 className="font-display mt-2 text-3xl font-bold tracking-tight text-balance sm:text-4xl">
             Uma plataforma, três formas de participar
           </h2>
-          <p className="text-muted-foreground mt-4 text-base leading-relaxed">
+          <p className="text-texto-secundario mt-4 text-base leading-relaxed font-normal">
             Cada perfil tem ferramentas específicas, mas todos compartilham o
             mesmo ecossistema de confiança e transparência.
           </p>
@@ -76,48 +70,58 @@ export function HomePersonas() {
 
         <div className="mt-12 grid gap-6 lg:grid-cols-3">
           {PERSONAS.map((persona) => (
-            <Card
+            <article
               key={persona.titulo}
               className={cn(
-                "flex flex-col",
-                persona.destaque && "border-primary/30 ring-1 ring-primary/10",
+                "card-marketing flex flex-col p-6",
+                persona.destaque && "card-marketing-destaque",
               )}
             >
-              <CardHeader>
-                <div className="bg-accent text-primary mb-2 flex size-10 items-center justify-center rounded-button">
+              <div className="flex items-start justify-between gap-2">
+                <div className="icone-marca size-10">
                   <persona.icone className="size-5" aria-hidden />
                 </div>
-                <CardTitle className="text-xl">{persona.titulo}</CardTitle>
-                <CardDescription className="text-sm leading-relaxed">
-                  {persona.descricao}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="mt-auto space-y-6">
-                <ul className="space-y-2 text-sm">
-                  {persona.beneficios.map((item) => (
-                    <li key={item} className="flex items-start gap-2">
-                      <span
-                        className="bg-primary mt-1.5 size-1.5 shrink-0 rounded-full"
-                        aria-hidden
-                      />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="flex flex-col gap-2">
-                  <Link href={persona.href} className={cn(buttonVariants())}>
-                    {persona.cta}
-                    <ArrowRight className="size-4" aria-hidden />
-                  </Link>
-                  <Link
-                    href={persona.secundario.href}
-                    className={cn(buttonVariants({ variant: "ghost" }))}
-                  >
-                    {persona.secundario.label}
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
+                {persona.destaque ? (
+                  <BadgeSemantico variante="sucesso">Mais popular</BadgeSemantico>
+                ) : null}
+              </div>
+              <h3 className="font-display mt-4 text-xl font-bold">
+                {persona.titulo}
+              </h3>
+              <p className="text-texto-secundario mt-2 text-sm leading-relaxed font-normal">
+                {persona.descricao}
+              </p>
+              <ul className="mt-6 space-y-2 text-sm">
+                {persona.beneficios.map((item) => (
+                  <li key={item} className="flex items-start gap-2">
+                    <span
+                      className="bg-verde-neon mt-1.5 size-1.5 shrink-0 rounded-full"
+                      aria-hidden
+                    />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-auto flex flex-col gap-2 pt-6">
+                <Link
+                  href={persona.href}
+                  className={cn(
+                    buttonVariants({
+                      variant: persona.destaque ? "cta" : "outline",
+                    }),
+                  )}
+                >
+                  {persona.cta}
+                  <ArrowRight className="size-4" aria-hidden />
+                </Link>
+                <Link
+                  href={persona.secundario.href}
+                  className={cn(buttonVariants({ variant: "ghost" }))}
+                >
+                  {persona.secundario.label}
+                </Link>
+              </div>
+            </article>
           ))}
         </div>
       </div>

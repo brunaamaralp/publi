@@ -17,23 +17,26 @@ export default function EsqueciSenhaPage() {
       subtitulo="Em produção, enviaríamos um link seguro para o seu e-mail."
     >
       <div className="space-y-6 text-center">
-        <div className="bg-accent text-primary mx-auto flex size-14 items-center justify-center rounded-card">
+        <div className="icone-marca mx-auto size-14">
           <Mail className="size-6" aria-hidden />
         </div>
         <div className="space-y-2">
-          <h1 className="font-display text-xl font-semibold lg:hidden">
+          <h1 className="font-display text-xl font-bold lg:hidden">
             Verifique seu e-mail
           </h1>
-          <p className="text-muted-foreground text-sm leading-relaxed">
+          <p className="text-texto-secundario text-sm leading-relaxed font-normal">
             Se existir uma conta com o endereço informado, você receberá
             instruções para redefinir a senha em alguns minutos.
           </p>
-          <p className="text-muted-foreground text-xs">
+          <p className="text-texto-secundario text-xs font-normal">
             Esta é uma tela estática de simulação — nenhum e-mail é enviado
             nesta fase.
           </p>
         </div>
-        <Link href="/login" className={cn(buttonVariants({ variant: "outline" }), "w-full")}>
+        <Link
+          href="/login"
+          className={cn(buttonVariants({ variant: "outline" }), "w-full")}
+        >
           Voltar ao login
         </Link>
       </div>

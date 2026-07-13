@@ -4,12 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Building2, LayoutDashboard, Sparkles } from "lucide-react";
 import { toast } from "sonner";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+
 import { useAuth } from "@/lib/auth-context";
 import type { Usuario } from "@/lib/types/usuario";
 import { cn } from "@/lib/utils";
@@ -54,10 +49,10 @@ export function CadastroTipoSelector() {
   return (
     <div className="space-y-6">
       <div className="space-y-1 lg:hidden">
-        <h1 className="font-display text-2xl font-semibold tracking-tight">
+        <h1 className="font-display text-2xl font-bold tracking-tight">
           Criar conta
         </h1>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-texto-secundario text-sm font-normal">
           Escolha o tipo de conta. Você completará o perfil na próxima etapa.
         </p>
       </div>
@@ -70,32 +65,33 @@ export function CadastroTipoSelector() {
               onClick={() => escolher(item.tipo, item.href)}
               className="w-full text-left"
             >
-              <Card
+              <div
                 className={cn(
-                  "transition-colors hover:border-primary/40 hover:bg-accent/40",
-                  "focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20",
+                  "card-marketing flex items-start gap-4 p-4 transition-colors",
+                  "hover:border-verde-neon/50 focus-visible:border-verde-neon focus-visible:ring-2 focus-visible:ring-verde-neon/20 focus-visible:outline-none",
                 )}
               >
-                <CardHeader className="flex-row items-start gap-4">
-                  <div className="bg-accent text-primary flex size-11 shrink-0 items-center justify-center rounded-button">
-                    <item.icone className="size-5" aria-hidden />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <CardTitle className="text-base">{item.titulo}</CardTitle>
-                    <CardDescription className="mt-1 leading-relaxed">
-                      {item.descricao}
-                    </CardDescription>
-                  </div>
-                </CardHeader>
-              </Card>
+                <div className="icone-marca size-11 shrink-0">
+                  <item.icone className="size-5" aria-hidden />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-display font-bold">{item.titulo}</p>
+                  <p className="text-texto-secundario mt-1 text-sm leading-relaxed font-normal">
+                    {item.descricao}
+                  </p>
+                </div>
+              </div>
             </button>
           </li>
         ))}
       </ul>
 
-      <p className="text-muted-foreground text-center text-sm">
+      <p className="text-texto-secundario text-center text-sm font-normal">
         Já tem conta?{" "}
-        <Link href="/login" className="text-primary font-medium hover:underline">
+        <Link
+          href="/login"
+          className="text-lilas-escuro font-medium hover:text-verde-neon hover:underline"
+        >
           Entrar
         </Link>
       </p>

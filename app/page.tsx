@@ -11,7 +11,7 @@ import { HomeStats } from "@/components/home/home-stats";
 
 export default function Home() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-fundo-pagina">
       <HomeNav />
       <HomeHero />
       <HomeStats />

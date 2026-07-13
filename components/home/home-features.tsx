@@ -34,27 +34,26 @@ const RECURSOS = [
 
 export function HomeFeatures() {
   return (
-    <section id="recursos" className="border-t bg-muted/30 py-16 sm:py-20">
+    <section id="recursos" className="border-t border-cinza-200 py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="max-w-2xl">
-          <p className="text-primary text-sm font-medium">Recursos</p>
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
-            Feito para quem leva influência a sério
+          <p className="eyebrow-secao">Recursos</p>
+          <h2 className="font-display mt-2 text-3xl font-bold tracking-tight text-balance sm:text-4xl">
+            Feito para quem leva{" "}
+            <span className="destaque-neon">influência a sério</span>
           </h2>
         </div>
 
         <div className="mt-12 grid gap-6 sm:grid-cols-2">
           {RECURSOS.map((recurso) => (
-            <article
-              key={recurso.titulo}
-              className="banner-informativo rounded-card p-6"
-            >
-              <recurso.icone
-                className="text-primary size-5"
-                aria-hidden
-              />
-              <h3 className="mt-4 text-lg font-semibold">{recurso.titulo}</h3>
-              <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+            <article key={recurso.titulo} className="card-marketing p-6">
+              <div className="icone-marca size-10">
+                <recurso.icone className="size-5" aria-hidden />
+              </div>
+              <h3 className="font-display mt-4 text-lg font-bold">
+                {recurso.titulo}
+              </h3>
+              <p className="text-texto-secundario mt-2 text-sm leading-relaxed font-normal">
                 {recurso.descricao}
               </p>
             </article>

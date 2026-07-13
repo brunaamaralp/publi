@@ -39,17 +39,19 @@ export function LoginForm() {
   return (
     <div className="space-y-6">
       <div className="space-y-1 lg:hidden">
-        <h1 className="font-display text-2xl font-semibold tracking-tight">
+        <h1 className="font-display text-2xl font-bold tracking-tight">
           Entrar na Publi
         </h1>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-texto-secundario text-sm font-normal">
           Acesse sua conta para gerenciar campanhas e parcerias.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="secao-editavel space-y-4 ring-0">
         <div className="space-y-2">
-          <Label htmlFor="login-email">E-mail</Label>
+          <Label htmlFor="login-email" className="font-normal">
+            E-mail
+          </Label>
           <Input
             id="login-email"
             type="email"
@@ -57,15 +59,18 @@ export function LoginForm() {
             placeholder="voce@exemplo.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            className="border-cinza-200 bg-white"
             required
           />
         </div>
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-2">
-            <Label htmlFor="login-senha">Senha</Label>
+            <Label htmlFor="login-senha" className="font-normal">
+              Senha
+            </Label>
             <Link
               href="/login/esqueci-senha"
-              className="text-primary text-xs hover:underline"
+              className="text-lilas-escuro text-xs font-medium hover:text-verde-neon hover:underline"
             >
               Esqueci minha senha
             </Link>
@@ -77,24 +82,28 @@ export function LoginForm() {
             placeholder="••••••••"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
+            className="border-cinza-200 bg-white"
             required
           />
         </div>
-        <Button type="submit" className="w-full" disabled={enviando}>
+        <Button type="submit" variant="cta" className="w-full" disabled={enviando}>
           Entrar
         </Button>
       </form>
 
-      <p className="text-muted-foreground text-center text-sm">
+      <p className="text-texto-secundario text-center text-sm font-normal">
         Não tem conta?{" "}
-        <Link href="/cadastro" className="text-primary font-medium hover:underline">
+        <Link
+          href="/cadastro"
+          className="text-lilas-escuro font-medium hover:text-verde-neon hover:underline"
+        >
           Cadastre-se
         </Link>
       </p>
 
-      <div className="banner-informativo rounded-card p-3 text-xs leading-relaxed">
-        <p className="font-medium">Simulação</p>
-        <p className="text-muted-foreground mt-1">
+      <div className="rounded-card border border-lilas/40 bg-lilas-claro p-3 text-xs leading-relaxed">
+        <p className="text-lilas-escuro font-semibold">Simulação</p>
+        <p className="text-lilas-escuro/90 mt-1 font-normal">
           Qualquer e-mail e senha funcionam. Contas demo:{" "}
           <span className="font-data">influenciador@publi.app</span>,{" "}
           <span className="font-data">empresa@publi.app</span>,{" "}

@@ -20,7 +20,7 @@ export function HeroMatchPreview() {
         showLabel
         label="compatível"
       />
-      <p className="text-muted-foreground mt-4 max-w-[200px] text-center text-xs leading-relaxed">
+      <p className="text-texto-secundario mt-4 max-w-[200px] text-center text-xs leading-relaxed font-normal">
         Score de match entre perfil do criador e briefing da campanha
       </p>
     </div>
