@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import {
@@ -22,11 +22,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/lib/auth-context";
 import type { OrdenacaoDemanda } from "@/lib/demandas/utils";
 import {
   DEMANDAS_FEED_MOCK,
   type DemandaFeedItem,
 } from "@/lib/mock-data/demandas";
+import { perfilInfluenciadorConcluido } from "@/lib/influenciador/perfil-storage";
 
 function ordenarItens(
   itens: DemandaFeedItem[],
@@ -69,10 +71,23 @@ function aplicarFiltros(
 }
 
 export function FeedDemandas() {
-  const [itens, setItens] = useState<DemandaFeedItem[]>(DEMANDAS_FEED_MOCK);
+  const { usuario } = useAuth();
+  const [perfilPronto, setPerfilPronto] = useState(false);
+  const [itens, setItens] = useState<DemandaFeedItem[]>([]);
   const [filtros, setFiltros] = useState<FiltrosDemanda>(FILTROS_INICIAIS);
   const [recusarMatchId, setRecusarMatchId] = useState<string | null>(null);
   const [abaAtiva, setAbaAtiva] = useState("para-voce");
+
+  useEffect(() => {
+    if (!usuario) {
+      setPerfilPronto(false);
+      setItens([]);
+      return;
+    }
+    const concluido = perfilInfluenciadorConcluido(usuario.id);
+    setPerfilPronto(concluido);
+    setItens(concluido ? DEMANDAS_FEED_MOCK : []);
+  }, [usuario]);
 
   const sugeridos = useMemo(() => {
     const base = itens.filter((i) => i.match.status === "sugerido");
@@ -108,6 +123,27 @@ export function FeedDemandas() {
   }
 
   const totalDisponiveis = sugeridos.length + enviados.length;
+
+  if (!perfilPronto) {
+    return (
+      <div className="min-h-full bg-fundo-pagina">
+        <div className="mx-auto max-w-lg px-4 py-8">
+          <header className="mb-6">
+            <p className="text-texto-secundario text-sm font-medium">
+              Oportunidades
+            </p>
+            <h1 className="font-display mt-1 text-2xl font-bold tracking-tight">
+              Demandas para você
+            </h1>
+          </header>
+          <DemandaListaVazia
+            mensagem="Complete seu perfil de influenciador para ver oportunidades compatíveis com você."
+            mostrarLinkPerfil
+          />
+        </div>
+      </div>
+    );
+  }
 
   if (itens.length === 0) {
     return (

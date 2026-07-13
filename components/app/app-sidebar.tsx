@@ -19,7 +19,6 @@ const LABEL_TIPO: Record<string, string> = {
 
 const LABEL_STATUS: Record<string, string> = {
   ativo: "Ativo",
-  pendente_verificacao: "Em análise",
   suspenso: "Suspenso",
 };
 
@@ -67,12 +66,7 @@ export function AppSidebar({ onNavigate, className }: AppSidebarProps) {
             <p className="mt-3 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
               {LABEL_TIPO[usuario.tipo] ?? usuario.tipo}
               <span className="text-zinc-600"> · </span>
-              <span
-                className={cn(
-                  usuario.status === "ativo" && "text-zinc-400",
-                  usuario.status === "pendente_verificacao" && "text-lilas",
-                )}
-              >
+              <span className="text-zinc-400">
                 {LABEL_STATUS[usuario.status] ?? usuario.status}
               </span>
             </p>

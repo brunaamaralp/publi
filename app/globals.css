@@ -292,6 +292,36 @@
     box-shadow: 0 4px 24px color-mix(in srgb, var(--preto) 6%, transparent);
   }
 
+  .card-marketing-lilas {
+    border-radius: var(--radius-card);
+    border: 1px solid color-mix(in srgb, var(--lilas) 40%, transparent);
+    border-left-width: 3px;
+    border-left-color: var(--lilas-escuro);
+    background: var(--branco);
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--lilas-escuro) 6%, transparent);
+  }
+
+  .secao-lilas {
+    background: var(--lilas-claro);
+    border-color: color-mix(in srgb, var(--lilas) 35%, transparent);
+  }
+
+  .faixa-marcas {
+    background: color-mix(in srgb, var(--lilas-claro) 55%, var(--branco));
+    border-color: color-mix(in srgb, var(--lilas) 30%, transparent);
+  }
+
+  .destaque-lilas {
+    color: var(--lilas-escuro);
+  }
+
+  .stat-landing {
+    border-radius: var(--radius-card);
+    border: 1px solid color-mix(in srgb, var(--lilas) 35%, transparent);
+    background: var(--branco);
+    padding: 1rem 1.25rem;
+  }
+
   .icone-marca {
     display: flex;
     align-items: center;

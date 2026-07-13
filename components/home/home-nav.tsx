@@ -11,7 +11,7 @@ const NAV_LINKS = [
 
 export function HomeNav() {
   return (
-    <header className="border-b border-white/10 bg-verde-carvao/80 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-lilas/15 bg-verde-carvao/90 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
         <Link href="/" className="font-display text-lg font-bold text-white">
           Publi
@@ -22,7 +22,7 @@ export function HomeNav() {
             <a
               key={link.href}
               href={link.href}
-              className="text-sm text-zinc-400 transition-colors hover:text-white"
+              className="text-sm text-zinc-400 transition-colors hover:text-lilas-claro"
             >
               {link.label}
             </a>
@@ -34,7 +34,7 @@ export function HomeNav() {
             href="/login"
             className={cn(
               buttonVariants({ variant: "ghost", size: "sm" }),
-              "text-zinc-300 hover:bg-white/10 hover:text-white",
+              "text-zinc-300 hover:bg-lilas/10 hover:text-lilas-claro",
             )}
           >
             Entrar

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { BadgeCheck } from "lucide-react";
 import { toast } from "sonner";
 
@@ -9,7 +10,6 @@ import { PassoDadosBasicos } from "@/components/influenciador/cadastro/passo-dad
 import { PassoEquipamentosMetricas } from "@/components/influenciador/cadastro/passo-equipamentos-metricas";
 import { PassoPacotesPrecificacao } from "@/components/influenciador/cadastro/passo-pacotes-precificacao";
 import { PassoRevisaoPlano } from "@/components/influenciador/cadastro/passo-revisao-plano";
-import { PerfilEmAnalise } from "@/components/influenciador/cadastro/perfil-em-analise";
 import { Button } from "@/components/ui/button";
 import { Progress, ProgressLabel } from "@/components/ui/progress";
 import { Stepper } from "@/components/ui/stepper";
@@ -18,12 +18,14 @@ import {
   dadosDoPasso,
   type CadastroDraft,
 } from "@/lib/influenciador/cadastro-types";
+import { useAuth } from "@/lib/auth-context";
 import {
   atualizarPrecosBase,
   calcularCompletudePerfil,
   criarEstadoInicial,
   montarPayload,
 } from "@/lib/influenciador/cadastro-utils";
+import { salvarPerfilInfluenciador } from "@/lib/influenciador/perfil-storage";
 import { validarPassoCadastro } from "@/lib/schemas/influenciador-cadastro";
 import { cn } from "@/lib/utils";
 
@@ -48,10 +50,11 @@ function filtrarPacotesParaValidacao(draft: CadastroDraft): CadastroDraft {
 }
 
 export function CadastroWizard() {
+  const router = useRouter();
+  const { usuario } = useAuth();
   const [draft, setDraft] = useState<CadastroDraft>(criarEstadoInicial);
   const [currentStep, setCurrentStep] = useState(0);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [concluido, setConcluido] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const stepRef = useRef<HTMLDivElement>(null);
 
@@ -137,6 +140,8 @@ export function CadastroWizard() {
   );
 
   const concluir = useCallback(() => {
+    if (!usuario) return;
+
     const draftValidacao = filtrarPacotesParaValidacao(draft);
     const result = validarPassoCadastro(
       4,
@@ -149,26 +154,18 @@ export function CadastroWizard() {
       return;
     }
 
-    const payload = montarPayload(draftValidacao);
-    console.log("Cadastro influenciador concluído:", payload);
+    const payload = montarPayload(draftValidacao, usuario);
+    salvarPerfilInfluenciador(usuario.id, payload);
 
     localStorage.removeItem(STORAGE_KEY);
-    toast.success("Cadastro enviado com sucesso! Seu perfil está em análise.");
-    setConcluido(true);
-  }, [draft]);
+    toast.success("Cadastro concluído! Bem-vindo à plataforma.");
+    router.push("/inicio");
+  }, [draft, router, usuario]);
 
   if (!hydrated) {
     return (
       <div className="text-muted-foreground flex min-h-[40vh] items-center justify-center bg-fundo-pagina text-sm">
         Carregando rascunho...
-      </div>
-    );
-  }
-
-  if (concluido) {
-    return (
-      <div className="min-h-full bg-fundo-pagina">
-        <PerfilEmAnalise />
       </div>
     );
   }

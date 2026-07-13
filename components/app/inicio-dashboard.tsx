@@ -10,8 +10,9 @@ import {
 } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
-import { useAuth } from "@/lib/auth-context";
 import { formatarNomeExibicao } from "@/lib/app/formatar-nome-exibicao";
+import { useAuth } from "@/lib/auth-context";
+import { nomeExibicaoPerfil } from "@/lib/influenciador/perfil-storage";
 import { cn } from "@/lib/utils";
 
 const ATALHOS = [
@@ -54,7 +55,8 @@ const RESUMO = [
 
 export function InicioDashboard() {
   const { usuario } = useAuth();
-  const nomeExibicao = formatarNomeExibicao(usuario?.email);
+  const nomePerfil = usuario ? nomeExibicaoPerfil(usuario.id) : null;
+  const nomeExibicao = nomePerfil ?? formatarNomeExibicao(usuario?.email);
 
   return (
     <div className="mx-auto max-w-5xl space-y-8 px-4 py-8 sm:px-6">
@@ -64,9 +66,7 @@ export function InicioDashboard() {
           Olá, {nomeExibicao}
         </h1>
         <p className="text-texto-secundario max-w-2xl text-sm font-normal leading-relaxed">
-          {usuario?.status === "pendente_verificacao"
-            ? "Seu perfil está em análise — você já pode explorar a plataforma."
-            : "Acompanhe matches, campanhas e ganhos pelo menu lateral."}
+          Acompanhe matches, campanhas e ganhos pelo menu lateral.
         </p>
       </header>
 

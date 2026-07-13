@@ -10,7 +10,7 @@ export default function CadastroPage() {
   return (
     <AuthLayout
       titulo="Comece gratuitamente"
-      subtitulo="Selecione como você vai usar a plataforma. Seu perfil passará por verificação antes de ficar visível."
+      subtitulo="Selecione como você vai usar a plataforma. Em seguida, complete seu perfil para começar."
     >
       <CadastroTipoSelector />
     </AuthLayout>

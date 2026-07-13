@@ -90,23 +90,26 @@ export type CadastroPayload = {
   pacotes: PacoteServico[];
 };
 
-export function montarPayload(draft: CadastroDraft): CadastroPayload {
+export function montarPayload(
+  draft: CadastroDraft,
+  usuario: Pick<Usuario, "id" | "email" | "tipo" | "status" | "criadoEm">,
+): CadastroPayload {
   const agora = new Date().toISOString();
 
   return {
     usuario: {
-      id: "usr-mock",
-      email: "influenciador@exemplo.com",
-      tipo: "influenciador",
-      status: "pendente_verificacao",
-      criadoEm: agora,
+      id: usuario.id,
+      email: usuario.email,
+      tipo: usuario.tipo,
+      status: usuario.status,
+      criadoEm: usuario.criadoEm,
     },
     influenciador: {
       id: crypto.randomUUID(),
-      usuarioId: "usr-mock",
+      usuarioId: usuario.id,
       nome: draft.nome,
       bio: draft.bio,
-      plano: draft.plano ?? "pro",
+      plano: draft.plano!,
       nivelAtual: 1,
       pontosXp: 0,
       notaMediaAvaliacao: null,
@@ -123,7 +126,7 @@ export function montarPayload(draft: CadastroDraft): CadastroPayload {
       seguidores: draft.seguidores as number,
       engajamentoMedio: draft.engajamentoMedio as number,
       printUrl: draft.printMetricasUrl,
-      statusValidacao: "pendente",
+      statusValidacao: "validado",
     },
     audiencia: [
       ...draft.audienciaGenero.map((l) => ({
@@ -163,7 +166,7 @@ export function criarEstadoInicial(): CadastroDraft {
     audienciaLocalidade: [],
     tabelaPrecos: criarTabelaPrecosInicial(0),
     pacotes: [],
-    plano: "pro",
+    plano: null,
   };
 }
 

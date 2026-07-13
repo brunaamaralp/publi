@@ -55,7 +55,13 @@ function carregar(): Usuario | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    return JSON.parse(raw) as Usuario;
+    const usuario = JSON.parse(raw) as Usuario;
+    if (usuario.status === "pendente_verificacao") {
+      const ativo = { ...usuario, status: "ativo" as const };
+      persistir(ativo);
+      return ativo;
+    }
+    return usuario;
   } catch {
     return null;
   }
@@ -92,7 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         id: novoId(),
         email: email.trim().toLowerCase(),
         tipo,
-        status: "pendente_verificacao",
+        status: "ativo",
         criadoEm: new Date().toISOString(),
       };
       flushSync(() => setUsuario(next));

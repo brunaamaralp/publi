@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { FormularioCadastroEmpresa } from "@/components/empresa/formulario-cadastro";
-import { PerfilEmAnalise } from "@/components/shared/perfil-em-analise";
 import { Button } from "@/components/ui/button";
 import {
   criarEmpresaCadastroInicial,
@@ -34,11 +34,11 @@ function montarPublicoAlvo(draft: EmpresaCadastroDraft): PublicoAlvoDemanda[] {
 }
 
 export function CadastroEmpresa() {
+  const router = useRouter();
   const [draft, setDraft] = useState<EmpresaCadastroDraft>(
     criarEmpresaCadastroInicial,
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [concluido, setConcluido] = useState(false);
 
   function updateDraft(partial: Partial<EmpresaCadastroDraft>) {
     setDraft((prev) => ({ ...prev, ...partial }));
@@ -71,7 +71,7 @@ export function CadastroEmpresa() {
         id: crypto.randomUUID(),
         email: "empresa@exemplo.com",
         tipo: "empresa" as const,
-        status: "pendente_verificacao" as const,
+        status: "ativo" as const,
         criadoEm: new Date().toISOString(),
       } satisfies Usuario,
       empresa: {
@@ -85,12 +85,8 @@ export function CadastroEmpresa() {
     };
 
     console.log("Cadastro empresa concluído:", payload);
-    toast.success("Cadastro enviado com sucesso!");
-    setConcluido(true);
-  }
-
-  if (concluido) {
-    return <PerfilEmAnalise tipoConta="empresa" />;
+    toast.success("Cadastro concluído! Bem-vindo à plataforma.");
+    router.push("/inicio");
   }
 
   return (

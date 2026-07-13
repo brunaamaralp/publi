@@ -1,12 +1,8 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useState } from "react";
 import { CheckCircle2, Pencil, ShieldCheck } from "lucide-react";
 
-import { AvaliacaoDialog } from "@/components/avaliacao/avaliacao-dialog";
-import { ListaAvaliacoes } from "@/components/avaliacao/lista-avaliacoes";
-import { ResumoReputacao } from "@/components/avaliacao/resumo-reputacao";
 import { CardMetricaValor } from "@/components/influenciador/cadastro/card-metrica-valor";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,18 +13,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { CadastroDraft } from "@/lib/influenciador/cadastro-types";
 import {
   formatarMoeda,
   LABELS_TIPO_SERVICO,
 } from "@/lib/influenciador/cadastro-utils";
-import {
-  avaliacoesRecebidasMock,
-  CONTRATO_MOCK_CUMPRIDO,
-  INFLUENCIADOR_MOCK_ID,
-} from "@/lib/mock-data/avaliacoes";
-import type { Avaliacao } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const PLANOS = [
@@ -74,121 +63,20 @@ export function PassoRevisaoPlano({
   onEditarPasso,
   errors,
 }: PassoRevisaoPlanoProps) {
-  const [avaliacoesRecebidas] = useState<Avaliacao[]>(avaliacoesRecebidasMock);
-  const [avaliacoesEnviadas, setAvaliacoesEnviadas] = useState<Avaliacao[]>(
-    [],
-  );
-
-  const todasAvaliacoes = [...avaliacoesRecebidas, ...avaliacoesEnviadas];
-
   return (
-    <div className="space-y-6">
-      <header className="border-border flex flex-col gap-3 border-b pb-6 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="font-display text-lg font-bold">
-            {draft.nome || "Seu perfil"}
-          </h2>
-          <p className="text-texto-secundario text-sm font-normal">
-            Revise seus dados e acompanhe sua reputação na plataforma.
-          </p>
-        </div>
-        <ResumoReputacao
-          avaliacoes={avaliacoesRecebidas}
-          variante="compacta"
-        />
+    <div className="space-y-8">
+      <header className="space-y-1">
+        <h2 className="font-display text-lg font-bold">
+          {draft.nome || "Revisão do perfil"}
+        </h2>
+        <p className="text-texto-secundario text-sm font-normal">
+          Confira seus dados e escolha o plano antes de concluir.
+        </p>
       </header>
 
-      <Tabs defaultValue="revisao">
-        <TabsList className="w-full sm:w-auto">
-          <TabsTrigger value="revisao">Revisão</TabsTrigger>
-          <TabsTrigger value="avaliacoes">Avaliações</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="revisao" className="mt-6 space-y-8">
-          <RevisaoConteudo
-            draft={draft}
-            onChange={onChange}
-            onEditarPasso={onEditarPasso}
-            errors={errors}
-          />
-        </TabsContent>
-
-        <TabsContent value="avaliacoes" className="mt-6 space-y-8">
-          <section className="space-y-4" aria-labelledby="avaliacoes-recebidas">
-            <div>
-              <h3 id="avaliacoes-recebidas" className="text-sm font-medium">
-                Avaliações recebidas
-              </h3>
-              <ResumoReputacao
-                avaliacoes={avaliacoesRecebidas}
-                variante="expandida"
-                className="mt-2"
-              />
-            </div>
-            <ListaAvaliacoes avaliacoes={avaliacoesRecebidas} />
-          </section>
-
-          <section
-            className="border-border space-y-4 rounded-card border p-4"
-            aria-labelledby="avaliar-contraparte"
-          >
-            <div>
-              <h3 id="avaliar-contraparte" className="text-sm font-medium">
-                Avaliar contraparte
-              </h3>
-              <p className="text-muted-foreground mt-1 text-sm">
-                Disponível apenas após a entrega confirmada (contrato{" "}
-                <strong>cumprido</strong>). Cada parte avalia a outra uma única
-                vez por contrato.
-              </p>
-            </div>
-
-            <Card size="sm">
-              <CardHeader>
-                <CardTitle className="text-sm">
-                  {CONTRATO_MOCK_CUMPRIDO.escopo}
-                </CardTitle>
-                <CardDescription>
-                  Contrato #{CONTRATO_MOCK_CUMPRIDO.id} · Status:{" "}
-                  <Badge variant="secondary">cumprido</Badge>
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <AvaliacaoDialog
-                  contrato={CONTRATO_MOCK_CUMPRIDO}
-                  avaliadorId={INFLUENCIADOR_MOCK_ID}
-                  avaliadoId={CONTRATO_MOCK_CUMPRIDO.empresaId}
-                  nomeContraparte={CONTRATO_MOCK_CUMPRIDO.empresaNome}
-                  avaliacoesExistentes={todasAvaliacoes}
-                  onAvaliacaoEnviada={(avaliacao) =>
-                    setAvaliacoesEnviadas((prev) => [...prev, avaliacao])
-                  }
-                />
-              </CardContent>
-            </Card>
-          </section>
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
-}
-
-function RevisaoConteudo({
-  draft,
-  onChange,
-  onEditarPasso,
-  errors,
-}: {
-  draft: CadastroDraft;
-  onChange: (partial: Partial<CadastroDraft>) => void;
-  onEditarPasso: (passo: number) => void;
-  errors: Record<string, string>;
-}) {
-  return (
-    <>
       <div>
-        <p className="text-muted-foreground text-sm">
-          Confira seus dados antes de enviar para análise.
+        <p className="text-texto-secundario text-sm font-normal">
+          Confira seus dados antes de concluir o cadastro.
         </p>
       </div>
 
@@ -277,10 +165,10 @@ function RevisaoConteudo({
 
       <section className="space-y-4" aria-labelledby="planos-titulo">
         <div>
-          <h3 id="planos-titulo" className="text-sm font-medium">
+          <h3 id="planos-titulo" className="font-display text-sm font-bold">
             Plano de assinatura
           </h3>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-texto-secundario text-sm font-normal">
             Escolha o plano que melhor se encaixa no seu momento.
           </p>
           {errors.plano ? (
@@ -346,11 +234,11 @@ function RevisaoConteudo({
       >
         <ShieldCheck className="text-verde-neon mt-0.5 size-4 shrink-0" aria-hidden />
         <p className="text-sm">
-          Após concluir, seu perfil entrará em análise antes de ficar visível
-          para empresas. Você pode continuar navegando normalmente.
+          Ao concluir, seu perfil ficará ativo e visível para empresas na
+          plataforma.
         </p>
       </div>
-    </>
+    </div>
   );
 }
 
