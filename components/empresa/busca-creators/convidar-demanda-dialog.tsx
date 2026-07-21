@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -40,11 +40,19 @@ export function ConvidarDemandaDialog({
   const publicador = useEmpresaPublicadora();
   const [demandaId, setDemandaId] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
+  const [demandas, setDemandas] = useState<MinhaDemandaItem[]>([]);
 
-  const demandas = useMemo(() => {
-    if (!publicador.empresaId) return [];
-    return listarDemandasAtivasParaConvite(publicador.empresaId);
-  }, [publicador.empresaId, open]);
+  useEffect(() => {
+    if (!open) {
+      setDemandaId(null);
+      return;
+    }
+    if (!publicador.empresaId) {
+      setDemandas([]);
+      return;
+    }
+    setDemandas(listarDemandasAtivasParaConvite(publicador.empresaId));
+  }, [open, publicador.empresaId]);
 
   function fechar() {
     setDemandaId(null);

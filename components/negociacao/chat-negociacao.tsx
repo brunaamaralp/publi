@@ -234,6 +234,7 @@ export function ChatNegociacao({
           }
         }}
         contexto={contexto}
+        estado={estado}
         onGerar={(dados) => {
           onGerarContrato(dados);
           setFormContratoAberto(false);
