@@ -78,6 +78,7 @@ export const USUARIOS_PENDENTES_MODERACAO_MOCK: UsuarioPendenteModeracao[] = [
         pontosXp: 0,
         notaMediaAvaliacao: null,
         totalAvaliacoes: 0,
+        tiposAtuacao: ["influenciador"],
       },
       categorias: [
         { id: "cat-1", nome: "Beleza", tipo: "dominio" },
@@ -149,6 +150,7 @@ export const USUARIOS_PENDENTES_MODERACAO_MOCK: UsuarioPendenteModeracao[] = [
         pontosXp: 0,
         notaMediaAvaliacao: null,
         totalAvaliacoes: 0,
+        tiposAtuacao: ["influenciador"],
       },
       categorias: [
         { id: "cat-4", nome: "Tecnologia", tipo: "dominio" },
@@ -246,6 +248,7 @@ export const USUARIOS_PENDENTES_MODERACAO_MOCK: UsuarioPendenteModeracao[] = [
         pontosXp: 340,
         notaMediaAvaliacao: null,
         totalAvaliacoes: 0,
+        tiposAtuacao: ["influenciador"],
       },
       categorias: [
         { id: "cat-6", nome: "Fitness", tipo: "dominio" },
@@ -337,6 +340,7 @@ export const USUARIOS_PENDENTES_MODERACAO_MOCK: UsuarioPendenteModeracao[] = [
         pontosXp: 0,
         notaMediaAvaliacao: null,
         totalAvaliacoes: 0,
+        tiposAtuacao: ["influenciador"],
       },
       categorias: [
         { id: "cat-8", nome: "Viagens", tipo: "dominio" },

@@ -1,5 +1,9 @@
 import type { PacoteServico } from "@/lib/types";
-import type { Influenciador } from "@/lib/types/influenciador";
+import type {
+  DisponibilidadeInfluenciador,
+  Influenciador,
+  TipoAtuacao,
+} from "@/lib/types/influenciador";
 
 export type RedeSocialPortfolio = {
   id: string;
@@ -39,6 +43,8 @@ export type PortfolioInfluenciador = {
   notaMediaAvaliacao: number | null;
   totalAvaliacoes: number;
   plano: Influenciador["plano"];
+  tiposAtuacao: TipoAtuacao[];
+  disponibilidade?: DisponibilidadeInfluenciador;
   atualizadoEm: string;
 };
 

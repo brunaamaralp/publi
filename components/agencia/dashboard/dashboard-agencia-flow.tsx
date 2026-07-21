@@ -9,7 +9,11 @@ import { CardsResumoAgencia } from "@/components/agencia/dashboard/cards-resumo-
 import { ListaEmpresasClientes } from "@/components/agencia/dashboard/lista-empresas-clientes";
 import { buttonVariants } from "@/components/ui/button";
 import { useAgencia } from "@/lib/contexts/agencia-context";
-import { obterResumoConsolidado } from "@/lib/agencia/dashboard-utils";
+import {
+  obterResumoConsolidado,
+  obterResumoEmpresaCliente,
+  type ResumoConsolidadoAgencia,
+} from "@/lib/agencia/dashboard-utils";
 import {
   AGENCIA_DEMO,
   EMPRESAS_CLIENTES_DEMO,
@@ -21,6 +25,7 @@ export function DashboardAgenciaFlow() {
     agencia,
     empresasClientes,
     empresaAtivaId,
+    empresaAtiva,
     setEmpresaAtivaId,
     inicializarAgencia,
   } = useAgencia();
@@ -33,10 +38,21 @@ export function DashboardAgenciaFlow() {
     setPronto(true);
   }, [agencia, empresasClientes.length, inicializarAgencia]);
 
-  const resumo = useMemo(
+  const resumoConsolidado = useMemo(
     () => obterResumoConsolidado(empresasClientes),
     [empresasClientes],
   );
+
+  const resumoExibido: ResumoConsolidadoAgencia = useMemo(() => {
+    if (!empresaAtivaId) return resumoConsolidado;
+    const cliente = obterResumoEmpresaCliente(empresaAtivaId);
+    return {
+      totalDemandasAtivas: cliente.demandasAtivas,
+      totalContratosAndamento: cliente.contratosAndamento,
+      totalInvestidoMes: cliente.investidoMes,
+      totalEmpresasClientes: resumoConsolidado.totalEmpresasClientes,
+    };
+  }, [empresaAtivaId, resumoConsolidado]);
 
   if (!pronto) {
     return (
@@ -55,14 +71,18 @@ export function DashboardAgenciaFlow() {
             {agencia?.razaoSocial ?? "Visão consolidada"}
           </h1>
           <p className="text-muted-foreground max-w-2xl text-sm">
-            Métricas agregadas de todas as empresas-clientes que você gerencia.
-            Troque o contexto no menu lateral ou selecione uma empresa abaixo.
+            {empresaAtiva
+              ? `Métricas do cliente ativo: ${empresaAtiva.nomeFantasia ?? empresaAtiva.razaoSocial}. Troque no seletor ou na lista abaixo.`
+              : "Métricas agregadas de todas as empresas-clientes. Selecione um cliente para filtrar demandas, resultados e o resumo financeiro."}
           </p>
         </div>
         <AdicionarEmpresaCliente className="shrink-0" />
       </section>
 
-        <CardsResumoAgencia resumo={resumo} />
+        <CardsResumoAgencia
+          resumo={resumoExibido}
+          escopo={empresaAtiva ? "cliente" : "consolidado"}
+        />
 
         <section className="space-y-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -82,14 +102,14 @@ export function DashboardAgenciaFlow() {
                 Ver demandas da empresa ativa
               </Link>
               <Link
-                href="/resultados/ctr-cpf-001"
+                href="/empresa/resultados"
                 className={cn(
                   buttonVariants({ variant: "outline", size: "sm" }),
                   "gap-1.5",
                 )}
               >
                 <BarChart3 className="size-4" aria-hidden />
-                Resultados (exemplo)
+                Resultados do cliente
               </Link>
             </div>
           </div>

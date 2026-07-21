@@ -1,7 +1,12 @@
 import {
+  atuaComo,
+  ehSomenteModelo,
+} from "@/lib/influenciador/atuacao-utils";
+import {
   creatorExibeNota,
   type CreatorCatalogo,
 } from "@/lib/empresa/creator-catalogo-types";
+import { listarCreatorsExtras } from "@/lib/empresa/creators-catalogo-extras";
 import { STATUS_DEMANDA_BUSCA } from "@/lib/demandas/utils";
 import { listarDemandasEmpresa } from "@/lib/empresa/demandas-utils";
 import type { MinhaDemandaItem } from "@/lib/empresa/demandas-types";
@@ -9,6 +14,7 @@ import { nomeNicho } from "@/lib/empresa/orcamento-nicho";
 import { CREATORS_CATALOGO_MOCK } from "@/lib/mock-data/creators-catalogo";
 import { influenciadorAtivoEmListagens } from "@/lib/mock-data/influenciadores-status";
 import { formatarNumeroGrande } from "@/lib/resultados/resultados-utils";
+import type { DiaSemana } from "@/lib/types/influenciador";
 
 export type FaixaSeguidores =
   | "todos"
@@ -32,22 +38,29 @@ export type FaixaPrecoPacote =
   | "2k_4k"
   | "acima_4k";
 
+export type FiltroTipoAtuacaoBusca = "todos" | "influenciador" | "modelo";
+
 export type FiltrosBuscaCreators = {
   texto: string;
+  tipoAtuacao: FiltroTipoAtuacaoBusca;
   nichoId: string | "todos";
   seguidores: FaixaSeguidores;
   engajamento: FaixaEngajamento;
   preco: FaixaPrecoPacote;
   estado: string | "todos";
+  /** Dias da semana — só aplica no filtro "Modelo". */
+  diasDisponiveis: DiaSemana[];
 };
 
 export const FILTROS_BUSCA_CREATORS_INICIAIS: FiltrosBuscaCreators = {
   texto: "",
+  tipoAtuacao: "todos",
   nichoId: "todos",
   seguidores: "todos",
   engajamento: "todos",
   preco: "todos",
   estado: "todos",
+  diasDisponiveis: [],
 };
 
 export const LABELS_FAIXA_SEGUIDORES: Record<FaixaSeguidores, string> = {
@@ -78,8 +91,18 @@ export const LABELS_FAIXA_PRECO: Record<FaixaPrecoPacote, string> = {
 export const PAGE_SIZE_BUSCA_CREATORS = 9;
 
 export function listarCreatorsAtivos(): CreatorCatalogo[] {
-  return CREATORS_CATALOGO_MOCK.filter(
-    (c) => c.status === "ativo" && influenciadorAtivoEmListagens(c.id),
+  const extras = listarCreatorsExtras();
+  const porId = new Map<string, CreatorCatalogo>();
+  for (const c of [...CREATORS_CATALOGO_MOCK, ...extras]) {
+    porId.set(c.id, {
+      ...c,
+      tiposAtuacao: c.tiposAtuacao?.length
+        ? c.tiposAtuacao
+        : ["influenciador"],
+    });
+  }
+  return Array.from(porId.values()).filter((c) =>
+    influenciadorAtivoEmListagens(c.id),
   );
 }
 
@@ -140,6 +163,16 @@ function bateFaixaPreco(preco: number, faixa: FaixaPrecoPacote): boolean {
   }
 }
 
+function bateDisponibilidade(
+  creator: CreatorCatalogo,
+  dias: DiaSemana[],
+): boolean {
+  if (dias.length === 0) return true;
+  const disp = creator.disponibilidade?.diasSemana ?? [];
+  if (disp.length === 0) return false;
+  return dias.some((d) => disp.includes(d));
+}
+
 function normalizar(texto: string): string {
   return texto
     .normalize("NFD")
@@ -153,16 +186,29 @@ export function filtrarCreators(
   creators = listarCreatorsAtivos(),
 ): CreatorCatalogo[] {
   const termo = normalizar(filtros.texto);
+  const modoModelo = filtros.tipoAtuacao === "modelo";
 
   return creators.filter((c) => {
+    if (filtros.tipoAtuacao === "influenciador") {
+      if (!atuaComo(c.tiposAtuacao, "influenciador")) return false;
+    } else if (filtros.tipoAtuacao === "modelo") {
+      if (!atuaComo(c.tiposAtuacao, "modelo")) return false;
+    }
+
     if (filtros.nichoId !== "todos" && c.nichoId !== filtros.nichoId) {
       return false;
     }
-    if (!bateFaixaSeguidores(c.seguidores, filtros.seguidores)) return false;
-    if (!bateFaixaEngajamento(c.engajamentoMedio, filtros.engajamento)) {
-      return false;
+
+    if (modoModelo) {
+      if (!bateDisponibilidade(c, filtros.diasDisponiveis)) return false;
+    } else {
+      if (!bateFaixaSeguidores(c.seguidores, filtros.seguidores)) return false;
+      if (!bateFaixaEngajamento(c.engajamentoMedio, filtros.engajamento)) {
+        return false;
+      }
+      if (!bateFaixaPreco(c.precoPacoteMin, filtros.preco)) return false;
     }
-    if (!bateFaixaPreco(c.precoPacoteMin, filtros.preco)) return false;
+
     if (filtros.estado !== "todos" && c.estado !== filtros.estado) {
       return false;
     }
@@ -201,12 +247,29 @@ export function rotuloAvaliacaoCreator(creator: CreatorCatalogo): string {
 }
 
 export function filtrosBuscaAtivos(filtros: FiltrosBuscaCreators): boolean {
-  return (
+  const base =
     filtros.texto.trim() !== "" ||
+    filtros.tipoAtuacao !== "todos" ||
     filtros.nichoId !== "todos" ||
+    filtros.estado !== "todos";
+
+  if (filtros.tipoAtuacao === "modelo") {
+    return base || filtros.diasDisponiveis.length > 0;
+  }
+
+  return (
+    base ||
     filtros.seguidores !== "todos" ||
     filtros.engajamento !== "todos" ||
-    filtros.preco !== "todos" ||
-    filtros.estado !== "todos"
+    filtros.preco !== "todos"
   );
+}
+
+/** Convite usa score de modelo quando a busca está em Modelo ou o creator é só modelo. */
+export function deveUsarScoreModelo(
+  creator: CreatorCatalogo,
+  tipoAtuacaoFiltro: FiltroTipoAtuacaoBusca,
+): boolean {
+  if (tipoAtuacaoFiltro === "modelo") return true;
+  return ehSomenteModelo(creator.tiposAtuacao);
 }

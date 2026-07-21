@@ -2,14 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { BadgeCheck } from "lucide-react";
 import { toast } from "sonner";
 
 import { PassoCategorias } from "@/components/influenciador/cadastro/passo-categorias";
 import { PassoDadosBasicos } from "@/components/influenciador/cadastro/passo-dados-basicos";
-import { PassoEquipamentosMetricas } from "@/components/influenciador/cadastro/passo-equipamentos-metricas";
-import { PassoPacotesPrecificacao } from "@/components/influenciador/cadastro/passo-pacotes-precificacao";
-import { PassoRevisaoPlano } from "@/components/influenciador/cadastro/passo-revisao-plano";
 import { Button } from "@/components/ui/button";
 import { Progress, ProgressLabel } from "@/components/ui/progress";
 import { Stepper } from "@/components/ui/stepper";
@@ -20,14 +16,16 @@ import {
 } from "@/lib/influenciador/cadastro-types";
 import { useAuth } from "@/lib/auth-context";
 import {
-  atualizarPrecosBase,
-  calcularCompletudePerfil,
   criarEstadoInicial,
   montarPayload,
 } from "@/lib/influenciador/cadastro-utils";
-import { salvarPerfilInfluenciador } from "@/lib/influenciador/perfil-storage";
+import {
+  carregarPerfilInfluenciador,
+  salvarPerfilInfluenciador,
+} from "@/lib/influenciador/perfil-storage";
+import { obterOuCriarPortfolioDoUsuario } from "@/lib/influenciador/portfolio-storage";
+import { definirStatusConta } from "@/lib/mock-data/influenciadores-status";
 import { validarPassoCadastro } from "@/lib/schemas/influenciador-cadastro";
-import { cn } from "@/lib/utils";
 
 const STORAGE_KEY = "influenciador-cadastro-rascunho";
 
@@ -40,13 +38,6 @@ function carregarRascunho(): CadastroDraft {
   } catch {
     return criarEstadoInicial();
   }
-}
-
-function filtrarPacotesParaValidacao(draft: CadastroDraft): CadastroDraft {
-  return {
-    ...draft,
-    pacotes: draft.pacotes.filter((p) => p.nome.trim().length > 0),
-  };
 }
 
 export function CadastroWizard() {
@@ -85,12 +76,36 @@ export function CadastroWizard() {
     stepRef.current?.focus();
   }, []);
 
+  const concluir = useCallback(() => {
+    if (!usuario) return;
+
+    const result = validarPassoCadastro(1, dadosDoPasso(1, draft));
+    if (!result.success) {
+      setErrors(result.errors);
+      toast.error("Revise as áreas de domínio antes de continuar.");
+      return;
+    }
+
+    const existente = carregarPerfilInfluenciador(usuario.id);
+    const payload = montarPayload(draft, usuario, existente);
+    salvarPerfilInfluenciador(usuario.id, payload);
+    definirStatusConta(
+      [usuario.id, payload.influenciador.id],
+      "pendente_verificacao",
+    );
+    obterOuCriarPortfolioDoUsuario(usuario.id);
+
+    localStorage.removeItem(STORAGE_KEY);
+    toast.success(
+      "Conta criada! Complete métricas e preços quando quiser — você já pode usar o app.",
+    );
+    router.push("/inicio");
+  }, [draft, router, usuario]);
+
   const validarEAvancar = useCallback(() => {
-    const draftValidacao =
-      currentStep === 3 ? filtrarPacotesParaValidacao(draft) : draft;
     const result = validarPassoCadastro(
       currentStep,
-      dadosDoPasso(currentStep, draftValidacao),
+      dadosDoPasso(currentStep, draft),
     );
 
     if (!result.success) {
@@ -102,26 +117,14 @@ export function CadastroWizard() {
     setErrors({});
     salvarRascunho(draft);
 
-    const proximo = Math.min(currentStep + 1, CADASTRO_PASSOS.length - 1);
+    if (currentStep >= CADASTRO_PASSOS.length - 1) {
+      concluir();
+      return;
+    }
 
-    setDraft((prev) => {
-      const next =
-        proximo === 3 && prev.seguidores !== ""
-          ? {
-              ...prev,
-              tabelaPrecos: atualizarPrecosBase(
-                prev.tabelaPrecos,
-                prev.seguidores as number,
-              ),
-            }
-          : prev;
-      salvarRascunho(next);
-      return next;
-    });
-
-    setCurrentStep(proximo);
+    setCurrentStep((s) => s + 1);
     focarPasso();
-  }, [currentStep, draft, focarPasso, salvarRascunho]);
+  }, [concluir, currentStep, draft, focarPasso, salvarRascunho]);
 
   const voltar = useCallback(() => {
     setErrors({});
@@ -129,38 +132,6 @@ export function CadastroWizard() {
     setCurrentStep((s) => Math.max(s - 1, 0));
     focarPasso();
   }, [draft, focarPasso, salvarRascunho]);
-
-  const irParaPasso = useCallback(
-    (passo: number) => {
-      setErrors({});
-      setCurrentStep(passo);
-      focarPasso();
-    },
-    [focarPasso],
-  );
-
-  const concluir = useCallback(() => {
-    if (!usuario) return;
-
-    const draftValidacao = filtrarPacotesParaValidacao(draft);
-    const result = validarPassoCadastro(
-      4,
-      dadosDoPasso(4, draftValidacao),
-    );
-
-    if (!result.success) {
-      setErrors(result.errors);
-      toast.error("Selecione um plano antes de concluir.");
-      return;
-    }
-
-    const payload = montarPayload(draftValidacao, usuario);
-    salvarPerfilInfluenciador(usuario.id, payload);
-
-    localStorage.removeItem(STORAGE_KEY);
-    toast.success("Cadastro concluído! Bem-vindo à plataforma.");
-    router.push("/inicio");
-  }, [draft, router, usuario]);
 
   if (!hydrated) {
     return (
@@ -172,52 +143,22 @@ export function CadastroWizard() {
 
   const progresso = ((currentStep + 1) / CADASTRO_PASSOS.length) * 100;
   const isUltimoPasso = currentStep === CADASTRO_PASSOS.length - 1;
-  const completude = calcularCompletudePerfil(draft);
-  const perfilCompleto = completude >= 80;
 
   return (
     <div className="min-h-full bg-fundo-pagina">
       <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-10">
         <header className="mb-8 space-y-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <p className="text-texto-secundario text-sm font-medium">
-                Cadastro de influenciador
-              </p>
-              <h1 className="font-display mt-1 text-2xl font-bold tracking-tight">
-                Monte seu perfil profissional
-              </h1>
-              <p className="text-texto-secundario mt-2 text-sm font-normal">
-                Quanto mais completo, melhores oportunidades compatíveis você recebe
-                com empresas.
-              </p>
-            </div>
-
-            <div
-              className={cn(
-                "secao-editavel flex shrink-0 items-center gap-2 self-start px-3 py-2 ring-0",
-                perfilCompleto && "border-lilas/40",
-              )}
-              aria-label={`Perfil ${completude}% completo`}
-            >
-              {perfilCompleto ? (
-                <BadgeCheck
-                  className="text-verde-neon size-4 shrink-0"
-                  aria-hidden
-                />
-              ) : null}
-              <div className="text-sm">
-                <p className="font-medium">Completude do perfil</p>
-                <p
-                  className={cn(
-                    "font-data text-lg font-bold leading-tight",
-                    perfilCompleto ? "text-verde-neon" : "text-lilas-escuro",
-                  )}
-                >
-                  {completude}%
-                </p>
-              </div>
-            </div>
+          <div>
+            <p className="text-texto-secundario text-sm font-medium">
+              Cadastro de influenciador
+            </p>
+            <h1 className="font-display mt-1 text-2xl font-bold tracking-tight">
+              Crie sua conta
+            </h1>
+            <p className="text-texto-secundario mt-2 text-sm font-normal">
+              Só o essencial agora. Métricas, preços e plano você completa
+              depois, já dentro do app.
+            </p>
           </div>
 
           <Progress value={progresso} aria-label="Progresso do cadastro">
@@ -265,28 +206,6 @@ export function CadastroWizard() {
               errors={errors}
             />
           )}
-          {currentStep === 2 && (
-            <PassoEquipamentosMetricas
-              draft={draft}
-              onChange={updateDraft}
-              errors={errors}
-            />
-          )}
-          {currentStep === 3 && (
-            <PassoPacotesPrecificacao
-              draft={draft}
-              onChange={updateDraft}
-              errors={errors}
-            />
-          )}
-          {currentStep === 4 && (
-            <PassoRevisaoPlano
-              draft={draft}
-              onChange={updateDraft}
-              onEditarPasso={irParaPasso}
-              errors={errors}
-            />
-          )}
         </div>
 
         <footer className="border-border mt-10 flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:justify-between">
@@ -300,25 +219,14 @@ export function CadastroWizard() {
             Voltar
           </Button>
 
-          {isUltimoPasso ? (
-            <Button
-              type="button"
-              variant="cta"
-              onClick={concluir}
-              className="w-full sm:w-auto"
-            >
-              Concluir cadastro
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              variant="cta"
-              onClick={validarEAvancar}
-              className="w-full sm:w-auto"
-            >
-              Continuar
-            </Button>
-          )}
+          <Button
+            type="button"
+            variant="cta"
+            onClick={validarEAvancar}
+            className="w-full sm:w-auto"
+          >
+            {isUltimoPasso ? "Criar conta e entrar" : "Continuar"}
+          </Button>
         </footer>
       </div>
     </div>

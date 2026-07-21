@@ -18,6 +18,7 @@ const STATUS_CONTRATO_ANDAMENTO = new Set(["assinado", "em_execucao"]);
 export type ResumoEmpresaCliente = {
   empresaId: string;
   demandasAtivas: number;
+  contratosAndamento: number;
   ultimoContrato: ContratoAgenciaResumo | null;
   investidoMes: number;
 };
@@ -70,9 +71,13 @@ function demandasAtivasEmpresa(empresaId: string): number {
 export function obterResumoEmpresaCliente(
   empresaId: string,
 ): ResumoEmpresaCliente {
+  const contratos = contratosEmpresa(empresaId);
   return {
     empresaId,
     demandasAtivas: demandasAtivasEmpresa(empresaId),
+    contratosAndamento: contratos.filter((c) =>
+      STATUS_CONTRATO_ANDAMENTO.has(c.status),
+    ).length,
     ultimoContrato: ultimoContrato(empresaId),
     investidoMes: investidoMesEmpresa(empresaId),
   };

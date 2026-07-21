@@ -42,7 +42,7 @@ export function CadastroTipoSelector() {
 
   function escolher(tipo: Usuario["tipo"], href: string) {
     registrarTipo(tipo);
-    toast.success("Conta criada! Complete seu cadastro.");
+    toast.success("Conta criada! Agora complete os dados essenciais.");
     router.push(href);
   }
 

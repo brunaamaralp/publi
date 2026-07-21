@@ -16,6 +16,18 @@ export const influenciadorSchema = z.object({
   pontosXp: z.number().int().nonnegative(),
   notaMediaAvaliacao: z.number().nullable(),
   totalAvaliacoes: z.number().int().nonnegative(),
+  tiposAtuacao: z
+    .array(z.enum(["influenciador", "modelo"]))
+    .min(1)
+    .default(["influenciador"]),
+  disponibilidade: z
+    .object({
+      diasSemana: z.array(
+        z.enum(["dom", "seg", "ter", "qua", "qui", "sex", "sab"]),
+      ),
+      observacao: z.string().optional(),
+    })
+    .optional(),
 });
 
 /** Valida seleção de categorias: ao menos 1 domínio obrigatório; interesse é opcional. */

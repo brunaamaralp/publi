@@ -16,7 +16,10 @@ import {
 } from "@/components/ui/dialog";
 import { BadgeStatusDemanda } from "@/components/empresa/demandas/badge-status-demanda";
 import type { CreatorCatalogo } from "@/lib/empresa/creator-catalogo-types";
-import { listarDemandasAtivasParaConvite } from "@/lib/empresa/busca-creators";
+import {
+  listarDemandasAtivasParaConvite,
+  type FiltroTipoAtuacaoBusca,
+} from "@/lib/empresa/busca-creators";
 import { criarMatchConvite } from "@/lib/empresa/convite-match";
 import type { MinhaDemandaItem } from "@/lib/empresa/demandas-types";
 import { nomeNicho } from "@/lib/empresa/orcamento-nicho";
@@ -29,12 +32,14 @@ type ConvidarDemandaDialogProps = {
   creator: CreatorCatalogo | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  tipoAtuacaoFiltro?: FiltroTipoAtuacaoBusca;
 };
 
 export function ConvidarDemandaDialog({
   creator,
   open,
   onOpenChange,
+  tipoAtuacaoFiltro = "todos",
 }: ConvidarDemandaDialogProps) {
   const router = useRouter();
   const publicador = useEmpresaPublicadora();
@@ -75,6 +80,7 @@ export function ConvidarDemandaDialog({
       creator,
       item,
       empresaNome: publicador.empresaNome ?? "Sua empresa",
+      tipoAtuacaoFiltro,
     });
     toast.success(`Convite criado — veja a compatibilidade com ${creator.nome}.`);
     fechar();

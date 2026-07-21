@@ -1,8 +1,10 @@
 import type {
   Categoria,
+  DisponibilidadeInfluenciador,
   Equipamento,
   PacoteServico,
   TabelaPreco,
+  TipoAtuacao,
 } from "@/lib/types";
 
 export type AudienciaLinha = {
@@ -17,6 +19,8 @@ export type CadastroDraft = {
   fotoPerfilUrl: string | null;
   categoriasDominio: Categoria[];
   categoriasInteresse: Categoria[];
+  tiposAtuacao: TipoAtuacao[];
+  disponibilidade: DisponibilidadeInfluenciador | null;
   equipamentos: Equipamento[];
   printMetricasUrl: string;
   seguidores: number | "";
@@ -29,12 +33,17 @@ export type CadastroDraft = {
   plano: "basico" | "pro" | "elite" | null;
 };
 
+/** Wizard de criação de conta — só dados essenciais (passos 1 e 2). */
 export const CADASTRO_PASSOS = [
   { id: "dados", label: "Dados básicos", description: "Identidade" },
   { id: "categorias", label: "Áreas", description: "Domínio e interesse" },
-  { id: "metricas", label: "Audiência", description: "Métricas e equipamentos" },
-  { id: "precos", label: "Preços", description: "Pacotes e tabela" },
-  { id: "revisao", label: "Revisão", description: "Plano e confirmação" },
+] as const;
+
+/** Schemas de validação das seções pós-cadastro (antigos passos 3–5). */
+export const PERFIL_SECOES = [
+  { id: "metricas", label: "Métricas de audiência" },
+  { id: "precos", label: "Pacotes e preços" },
+  { id: "plano", label: "Escolher plano" },
 ] as const;
 
 export function dadosDoPasso(
@@ -48,23 +57,31 @@ export function dadosDoPasso(
       return {
         categoriasDominio: draft.categoriasDominio,
         categoriasInteresse: draft.categoriasInteresse,
+        tiposAtuacao: draft.tiposAtuacao,
+        disponibilidade: draft.disponibilidade,
       };
-    case 2:
-      return {
-        printMetricasUrl: draft.printMetricasUrl,
-        seguidores: draft.seguidores === "" ? undefined : draft.seguidores,
-        engajamentoMedio:
-          draft.engajamentoMedio === "" ? undefined : draft.engajamentoMedio,
-        equipamentos: draft.equipamentos,
-      };
-    case 3:
-      return {
-        tabelaPrecos: draft.tabelaPrecos,
-        pacotes: draft.pacotes,
-      };
-    case 4:
-      return { plano: draft.plano ?? undefined };
     default:
       return {};
   }
+}
+
+export function dadosSecaoMetricas(draft: CadastroDraft): Record<string, unknown> {
+  return {
+    printMetricasUrl: draft.printMetricasUrl,
+    seguidores: draft.seguidores === "" ? undefined : draft.seguidores,
+    engajamentoMedio:
+      draft.engajamentoMedio === "" ? undefined : draft.engajamentoMedio,
+    equipamentos: draft.equipamentos,
+  };
+}
+
+export function dadosSecaoPrecos(draft: CadastroDraft): Record<string, unknown> {
+  return {
+    tabelaPrecos: draft.tabelaPrecos,
+    pacotes: draft.pacotes.filter((p) => p.nome.trim().length > 0),
+  };
+}
+
+export function dadosSecaoPlano(draft: CadastroDraft): Record<string, unknown> {
+  return { plano: draft.plano ?? undefined };
 }

@@ -1,3 +1,6 @@
+import {
+  normalizarTiposAtuacao,
+} from "@/lib/influenciador/atuacao-utils";
 import type { CreatorCatalogo } from "@/lib/empresa/creator-catalogo-types";
 import { carregarPerfilInfluenciador } from "@/lib/influenciador/perfil-storage";
 import {
@@ -91,6 +94,8 @@ export function portfolioFromCatalogo(
     notaMediaAvaliacao: creator.notaMediaAvaliacao,
     totalAvaliacoes: creator.totalAvaliacoes,
     plano: "pro",
+    tiposAtuacao: normalizarTiposAtuacao(creator.tiposAtuacao),
+    disponibilidade: creator.disponibilidade,
     atualizadoEm: new Date().toISOString(),
   };
 }
@@ -130,6 +135,8 @@ function portfolioFromCadastro(
     notaMediaAvaliacao: perfil.influenciador.notaMediaAvaliacao,
     totalAvaliacoes: perfil.influenciador.totalAvaliacoes,
     plano: perfil.influenciador.plano,
+    tiposAtuacao: normalizarTiposAtuacao(perfil.influenciador.tiposAtuacao),
+    disponibilidade: perfil.influenciador.disponibilidade,
     atualizadoEm: new Date().toISOString(),
   };
 }
@@ -154,6 +161,7 @@ function portfolioVazio(usuarioId: string, portfolioId: string): PortfolioInflue
     notaMediaAvaliacao: null,
     totalAvaliacoes: 0,
     plano: "basico",
+    tiposAtuacao: ["influenciador"],
     atualizadoEm: new Date().toISOString(),
   };
 }
@@ -237,6 +245,8 @@ export function portfolioParaCreatorCatalogo(
     notaMediaAvaliacao: portfolio.notaMediaAvaliacao,
     totalAvaliacoes: portfolio.totalAvaliacoes,
     status,
+    tiposAtuacao: normalizarTiposAtuacao(portfolio.tiposAtuacao),
+    disponibilidade: portfolio.disponibilidade,
   };
 }
 

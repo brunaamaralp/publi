@@ -1,5 +1,9 @@
 import type { CreatorCatalogo } from "@/lib/empresa/creator-catalogo-types";
 import type { MinhaDemandaItem } from "@/lib/empresa/demandas-types";
+import {
+  deveUsarScoreModelo,
+  type FiltroTipoAtuacaoBusca,
+} from "@/lib/empresa/busca-creators";
 import { nomeNicho } from "@/lib/empresa/orcamento-nicho";
 import {
   EMPRESA_NEGOCIACAO_USUARIO_ID,
@@ -7,6 +11,7 @@ import {
 } from "@/lib/negociacao/negociacao-constantes";
 import type { NegociacaoContexto } from "@/lib/negociacao/negociacao-types";
 import type { Match } from "@/lib/types";
+import { calcularScoreModelo } from "@/lib/utils/match-score";
 
 const STORAGE_KEY = "matches-convite-v1";
 
@@ -41,10 +46,9 @@ function persistir(): void {
 }
 
 /**
- * Score mock relativo à demanda — só deve aparecer após o convite
- * (tela de negociação / matches sugeridos), nunca na busca livre.
+ * Score de influenciador (engajamento / nicho / preço) — não usar para modelo.
  */
-function scoreMockParaConvite(
+function scoreInfluenciadorParaConvite(
   creator: CreatorCatalogo,
   item: MinhaDemandaItem,
 ): number {
@@ -58,6 +62,32 @@ function scoreMockParaConvite(
   else if (creator.engajamentoMedio >= 3) score += 3;
   if (creator.precoPacoteMin <= item.demanda.orcamento * 0.4) score += 4;
   return Math.min(98, Math.max(55, Math.round(score)));
+}
+
+function scoreParaConvite(
+  creator: CreatorCatalogo,
+  item: MinhaDemandaItem,
+  tipoAtuacaoFiltro: FiltroTipoAtuacaoBusca,
+): number {
+  if (deveUsarScoreModelo(creator, tipoAtuacaoFiltro)) {
+    const localidades = item.publicoAlvo
+      .filter((p) => p.dimensao === "localidade")
+      .map((p) => p.valor);
+    return calcularScoreModelo(
+      {
+        nichoId: item.demanda.nichoId,
+        prazo: item.demanda.prazo,
+        localidades,
+      },
+      {
+        nichoId: creator.nichoId,
+        cidade: creator.cidade,
+        estado: creator.estado,
+        disponibilidade: creator.disponibilidade,
+      },
+    );
+  }
+  return scoreInfluenciadorParaConvite(creator, item);
 }
 
 export function listarMatchesConvite(): MatchConviteRegistro[] {
@@ -86,11 +116,17 @@ export function criarMatchConvite(params: {
   creator: CreatorCatalogo;
   item: MinhaDemandaItem;
   empresaNome?: string;
+  /** Modo do toggle na busca — define se usa score de modelo. */
+  tipoAtuacaoFiltro?: FiltroTipoAtuacaoBusca;
 }): string {
   hidratar();
 
   const matchId = novoId("match-convite");
-  const score = scoreMockParaConvite(params.creator, params.item);
+  const score = scoreParaConvite(
+    params.creator,
+    params.item,
+    params.tipoAtuacaoFiltro ?? "todos",
+  );
 
   const match: Match = {
     id: matchId,

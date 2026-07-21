@@ -49,7 +49,7 @@ export function BuscaCreatorsFlow() {
             </h1>
             <p className="text-texto-secundario mt-2 max-w-2xl text-sm font-normal">
               Busca ativa fora do fluxo de uma demanda — encontre influenciadores
-              verificados e convide para suas campanhas.
+              e modelos verificados e convide para suas campanhas.
             </p>
           </div>
           <Link
@@ -129,6 +129,7 @@ export function BuscaCreatorsFlow() {
               <li key={creator.id}>
                 <CreatorCard
                   creator={creator}
+                  tipoAtuacaoFiltro={filtros.tipoAtuacao}
                   onConvidar={setConvidar}
                 />
               </li>
@@ -153,6 +154,7 @@ export function BuscaCreatorsFlow() {
 
       <ConvidarDemandaDialog
         creator={convidar}
+        tipoAtuacaoFiltro={filtros.tipoAtuacao}
         open={convidar !== null}
         onOpenChange={(open) => {
           if (!open) setConvidar(null);

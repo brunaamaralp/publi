@@ -11,6 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DIAS_SEMANA } from "@/lib/influenciador/atuacao-utils";
 import {
   estadosDisponiveisNoCatalogo,
   LABELS_FAIXA_ENGAJAMENTO,
@@ -19,9 +21,11 @@ import {
   type FaixaEngajamento,
   type FaixaPrecoPacote,
   type FaixaSeguidores,
+  type FiltroTipoAtuacaoBusca,
   type FiltrosBuscaCreators,
 } from "@/lib/empresa/busca-creators";
 import { CATEGORIAS_CATALOGO } from "@/lib/mock-data/categorias";
+import type { DiaSemana } from "@/lib/types/influenciador";
 import { cn } from "@/lib/utils";
 
 type FiltrosBuscaCreatorsProps = {
@@ -36,15 +40,53 @@ export function FiltrosBuscaCreatorsPainel({
   className,
 }: FiltrosBuscaCreatorsProps) {
   const estados = estadosDisponiveisNoCatalogo();
+  const modoModelo = filtros.tipoAtuacao === "modelo";
+
+  function toggleDia(dia: DiaSemana) {
+    const tem = filtros.diasDisponiveis.includes(dia);
+    onChange({
+      ...filtros,
+      diasDisponiveis: tem
+        ? filtros.diasDisponiveis.filter((d) => d !== dia)
+        : [...filtros.diasDisponiveis, dia],
+    });
+  }
 
   return (
     <div className={cn("secao-editavel space-y-4 ring-0", className)}>
-      <div className="flex items-center gap-2">
-        <SlidersHorizontal
-          className="text-texto-secundario size-4"
-          aria-hidden
-        />
-        <h2 className="font-display text-sm font-bold">Busca e filtros</h2>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-2">
+          <SlidersHorizontal
+            className="text-texto-secundario size-4"
+            aria-hidden
+          />
+          <h2 className="font-display text-sm font-bold">Busca e filtros</h2>
+        </div>
+
+        <Tabs
+          value={filtros.tipoAtuacao}
+          onValueChange={(valor) => {
+            if (!valor) return;
+            const tipoAtuacao = valor as FiltroTipoAtuacaoBusca;
+            onChange({
+              ...filtros,
+              tipoAtuacao,
+              ...(tipoAtuacao === "modelo"
+                ? {
+                    seguidores: "todos",
+                    engajamento: "todos",
+                    preco: "todos",
+                  }
+                : { diasDisponiveis: [] }),
+            });
+          }}
+        >
+          <TabsList aria-label="Tipo de atuação">
+            <TabsTrigger value="todos">Todos</TabsTrigger>
+            <TabsTrigger value="influenciador">Influenciador</TabsTrigger>
+            <TabsTrigger value="modelo">Modelo</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
 
       <div className="space-y-2">
@@ -87,86 +129,122 @@ export function FiltrosBuscaCreatorsPainel({
           </Select>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="filtro-seguidores">Seguidores</Label>
-          <Select
-            value={filtros.seguidores}
-            onValueChange={(valor) => {
-              if (valor) {
-                onChange({
-                  ...filtros,
-                  seguidores: valor as FaixaSeguidores,
-                });
-              }
-            }}
-          >
-            <SelectTrigger id="filtro-seguidores" className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {(Object.keys(LABELS_FAIXA_SEGUIDORES) as FaixaSeguidores[]).map(
-                (key) => (
-                  <SelectItem key={key} value={key}>
-                    {LABELS_FAIXA_SEGUIDORES[key]}
-                  </SelectItem>
-                ),
-              )}
-            </SelectContent>
-          </Select>
-        </div>
+        {modoModelo ? (
+          <div className="space-y-2 sm:col-span-2">
+            <Label>Disponibilidade (dias da semana)</Label>
+            <div className="flex flex-wrap gap-2">
+              {DIAS_SEMANA.map((dia) => {
+                const ativo = filtros.diasDisponiveis.includes(dia.id);
+                return (
+                  <button
+                    key={dia.id}
+                    type="button"
+                    onClick={() => toggleDia(dia.id)}
+                    className={cn(
+                      "rounded-button border px-3 py-1.5 text-xs font-medium transition-colors",
+                      ativo
+                        ? "border-verde-neon bg-verde-carvao-escuro text-verde-neon"
+                        : "border-cinza-200 bg-white text-foreground hover:border-verde-neon/40",
+                    )}
+                    aria-pressed={ativo}
+                  >
+                    {dia.labelCurto}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-texto-secundario text-xs font-normal">
+              Filtra quem topa ensaios nos dias selecionados (qualquer um dos
+              dias).
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="space-y-2">
+              <Label htmlFor="filtro-seguidores">Seguidores</Label>
+              <Select
+                value={filtros.seguidores}
+                onValueChange={(valor) => {
+                  if (valor) {
+                    onChange({
+                      ...filtros,
+                      seguidores: valor as FaixaSeguidores,
+                    });
+                  }
+                }}
+              >
+                <SelectTrigger id="filtro-seguidores" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {(
+                    Object.keys(LABELS_FAIXA_SEGUIDORES) as FaixaSeguidores[]
+                  ).map((key) => (
+                    <SelectItem key={key} value={key}>
+                      {LABELS_FAIXA_SEGUIDORES[key]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="filtro-engajamento">Engajamento</Label>
-          <Select
-            value={filtros.engajamento}
-            onValueChange={(valor) => {
-              if (valor) {
-                onChange({
-                  ...filtros,
-                  engajamento: valor as FaixaEngajamento,
-                });
-              }
-            }}
-          >
-            <SelectTrigger id="filtro-engajamento" className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {(
-                Object.keys(LABELS_FAIXA_ENGAJAMENTO) as FaixaEngajamento[]
-              ).map((key) => (
-                <SelectItem key={key} value={key}>
-                  {LABELS_FAIXA_ENGAJAMENTO[key]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="filtro-engajamento">Engajamento</Label>
+              <Select
+                value={filtros.engajamento}
+                onValueChange={(valor) => {
+                  if (valor) {
+                    onChange({
+                      ...filtros,
+                      engajamento: valor as FaixaEngajamento,
+                    });
+                  }
+                }}
+              >
+                <SelectTrigger id="filtro-engajamento" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {(
+                    Object.keys(LABELS_FAIXA_ENGAJAMENTO) as FaixaEngajamento[]
+                  ).map((key) => (
+                    <SelectItem key={key} value={key}>
+                      {LABELS_FAIXA_ENGAJAMENTO[key]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="filtro-preco">Preço de pacote</Label>
-          <Select
-            value={filtros.preco}
-            onValueChange={(valor) => {
-              if (valor) {
-                onChange({ ...filtros, preco: valor as FaixaPrecoPacote });
-              }
-            }}
-          >
-            <SelectTrigger id="filtro-preco" className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {(Object.keys(LABELS_FAIXA_PRECO) as FaixaPrecoPacote[]).map(
-                (key) => (
-                  <SelectItem key={key} value={key}>
-                    {LABELS_FAIXA_PRECO[key]}
-                  </SelectItem>
-                ),
-              )}
-            </SelectContent>
-          </Select>
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="filtro-preco">Preço de pacote</Label>
+              <Select
+                value={filtros.preco}
+                onValueChange={(valor) => {
+                  if (valor) {
+                    onChange({
+                      ...filtros,
+                      preco: valor as FaixaPrecoPacote,
+                    });
+                  }
+                }}
+              >
+                <SelectTrigger id="filtro-preco" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {(Object.keys(LABELS_FAIXA_PRECO) as FaixaPrecoPacote[]).map(
+                    (key) => (
+                      <SelectItem key={key} value={key}>
+                        {LABELS_FAIXA_PRECO[key]}
+                      </SelectItem>
+                    ),
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+          </>
+        )}
 
         <div className="space-y-2">
           <Label htmlFor="filtro-estado">Estado</Label>

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 import {
@@ -25,6 +26,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/lib/auth-context";
 import {
   demandaVisivelNaBusca,
+  parseQueryDemandas,
+  serializarQueryDemandas,
   type OrdenacaoDemanda,
 } from "@/lib/demandas/utils";
 import {
@@ -60,7 +63,6 @@ function aplicarFiltros(
   filtros: FiltrosDemanda,
 ): DemandaFeedItem[] {
   return itens.filter((item) => {
-    // Rascunhos (e demais status fora da busca) nunca entram no feed.
     if (!demandaVisivelNaBusca(item.demanda.status)) {
       return false;
     }
@@ -77,13 +79,35 @@ function aplicarFiltros(
   });
 }
 
-export function FeedDemandas() {
+function FeedDemandasInner() {
   const { usuario } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const parsed = useMemo(
+    () => parseQueryDemandas(searchParams),
+    [searchParams],
+  );
+
   const [perfilPronto, setPerfilPronto] = useState(false);
   const [itens, setItens] = useState<DemandaFeedItem[]>([]);
-  const [filtros, setFiltros] = useState<FiltrosDemanda>(FILTROS_INICIAIS);
+  const [filtros, setFiltros] = useState<FiltrosDemanda>(() => ({
+    formato: parsed.formato,
+    orcamentoMinimo: parsed.orcamentoMinimo,
+    ordenacao: parsed.ordenacao,
+  }));
   const [recusarMatchId, setRecusarMatchId] = useState<string | null>(null);
-  const [abaAtiva, setAbaAtiva] = useState("para-voce");
+  const [abaAtiva, setAbaAtiva] = useState(parsed.aba);
+
+  useEffect(() => {
+    setFiltros({
+      formato: parsed.formato,
+      orcamentoMinimo: parsed.orcamentoMinimo,
+      ordenacao: parsed.ordenacao,
+    });
+    setAbaAtiva(parsed.aba);
+  }, [parsed]);
 
   useEffect(() => {
     if (!usuario) {
@@ -95,6 +119,30 @@ export function FeedDemandas() {
     setPerfilPronto(concluido);
     setItens(concluido ? listarDemandasFeed() : []);
   }, [usuario]);
+
+  const queryFeed = useMemo(
+    () =>
+      serializarQueryDemandas({
+        ...filtros,
+        aba: abaAtiva,
+      }),
+    [filtros, abaAtiva],
+  );
+
+  function sincronizarUrl(prox: FiltrosDemanda, aba: string) {
+    const qs = serializarQueryDemandas({ ...prox, aba });
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  }
+
+  function handleFiltrosChange(prox: FiltrosDemanda) {
+    setFiltros(prox);
+    sincronizarUrl(prox, abaAtiva);
+  }
+
+  function handleAbaChange(aba: string) {
+    setAbaAtiva(aba);
+    sincronizarUrl(filtros, aba);
+  }
 
   const sugeridos = useMemo(() => {
     const base = itens.filter((i) => i.match.status === "sugerido");
@@ -116,8 +164,10 @@ export function FeedDemandas() {
           : item,
       ),
     );
-                toast.success("Interesse enviado — a empresa verá seu perfil nesta demanda.");
-    setAbaAtiva("enviados");
+    toast.success(
+      "Interesse enviado — a empresa verá seu perfil nesta demanda.",
+    );
+    handleAbaChange("enviados");
   }
 
   function confirmarRecusa() {
@@ -164,12 +214,12 @@ export function FeedDemandas() {
 
   return (
     <div className="min-h-full bg-fundo-pagina">
-      <div className="mx-auto w-full max-w-lg px-4 py-6 sm:max-w-xl sm:py-8">
-        <header className="mb-6">
+      <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-8">
+        <header className="mb-6 max-w-2xl">
           <p className="text-texto-secundario text-sm font-medium">
             Oportunidades
           </p>
-          <h1 className="font-display mt-1 text-2xl font-bold tracking-tight">
+          <h1 className="font-display mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
             Demandas para você
           </h1>
           <p className="text-texto-secundario mt-2 text-sm font-normal">
@@ -180,12 +230,12 @@ export function FeedDemandas() {
 
         <FiltrosDemandas
           filtros={filtros}
-          onChange={setFiltros}
+          onChange={handleFiltrosChange}
           className="mb-6"
         />
 
-        <Tabs value={abaAtiva} onValueChange={setAbaAtiva}>
-          <TabsList className="mb-4 w-full">
+        <Tabs value={abaAtiva} onValueChange={handleAbaChange}>
+          <TabsList className="mb-4 w-full max-w-md">
             <TabsTrigger value="para-voce" className="flex-1">
               Para você
               {sugeridos.length > 0 ? (
@@ -204,7 +254,7 @@ export function FeedDemandas() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="para-voce" className="space-y-4">
+          <TabsContent value="para-voce">
             {sugeridos.length === 0 ? (
               <DemandaListaVazia
                 mensagem={
@@ -215,13 +265,17 @@ export function FeedDemandas() {
                 mostrarLinkPerfil={totalDisponiveis === 0}
               />
             ) : (
-              <ul className="space-y-4" aria-label="Demandas sugeridas">
+              <ul
+                className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 xl:grid-cols-3"
+                aria-label="Demandas sugeridas"
+              >
                 {sugeridos.map((item) => (
-                  <li key={item.match.id}>
+                  <li key={item.match.id} className="min-w-0">
                     <DemandaCard
                       item={item}
                       onInteresse={handleInteresse}
                       onRecusar={setRecusarMatchId}
+                      queryFeed={queryFeed}
                     />
                   </li>
                 ))}
@@ -229,7 +283,7 @@ export function FeedDemandas() {
             )}
           </TabsContent>
 
-          <TabsContent value="enviados" className="space-y-4">
+          <TabsContent value="enviados">
             {enviados.length === 0 ? (
               <DemandaListaVazia
                 mensagem="Você ainda não demonstrou interesse em nenhuma demanda. Explore a aba 'Para você' e clique em 'Tenho interesse'."
@@ -237,16 +291,17 @@ export function FeedDemandas() {
               />
             ) : (
               <ul
-                className="space-y-4"
+                className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 xl:grid-cols-3"
                 aria-label="Demandas com interesse enviado"
               >
                 {enviados.map((item) => (
-                  <li key={item.match.id}>
+                  <li key={item.match.id} className="min-w-0">
                     <DemandaCard
                       item={item}
                       onInteresse={handleInteresse}
                       onRecusar={setRecusarMatchId}
                       modoEnviado
+                      queryFeed={queryFeed}
                     />
                   </li>
                 ))}
@@ -290,5 +345,21 @@ export function FeedDemandas() {
         </Dialog>
       </div>
     </div>
+  );
+}
+
+export function FeedDemandas() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-full bg-fundo-pagina">
+          <div className="mx-auto max-w-6xl px-4 py-8">
+            <p className="text-texto-secundario text-sm">Carregando demandas…</p>
+          </div>
+        </div>
+      }
+    >
+      <FeedDemandasInner />
+    </Suspense>
   );
 }

@@ -1,11 +1,15 @@
 "use client";
 
 import { Plus, X } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { IndicadorMetrica } from "@/components/influenciador/cadastro/indicador-metrica";
+import {
+  IndicadorPosicaoMercado,
+  ResumoPosicaoMercado,
+} from "@/components/influenciador/cadastro/indicador-posicao-mercado";
 import {
   Card,
   CardContent,
@@ -23,20 +27,63 @@ import {
   formatarMoeda,
   LABELS_TIPO_SERVICO,
 } from "@/lib/influenciador/cadastro-utils";
+import { listarInfluenciadoresMercado } from "@/lib/mock-data/influenciadores-mercado";
 import { tabelaPrecoSchema } from "@/lib/schemas/influenciador";
-import type { PacoteServico, TabelaPreco } from "@/lib/types";
+import type { Influenciador, PacoteServico, TabelaPreco } from "@/lib/types";
+import {
+  compararPrecosComMercado,
+  type ComparacaoServicoMercado,
+  type PerfilComparacaoMercado,
+} from "@/lib/utils/comparacao-mercado";
+
+/** Contexto local para comparação — não altera `Influenciador` / `TabelaPreco`. */
+export type ContextoComparacaoMercado = {
+  influenciador: Influenciador;
+  cidade: string;
+  estado: string;
+};
 
 type PassoPacotesPrecificacaoProps = {
   draft: CadastroDraft;
   onChange: (partial: Partial<CadastroDraft>) => void;
   errors: Record<string, string>;
+  /** Quando informado, exibe posição de mercado ao lado do preço-base. */
+  contextoMercado?: ContextoComparacaoMercado | null;
 };
 
 export function PassoPacotesPrecificacao({
   draft,
   onChange,
   errors,
+  contextoMercado = null,
 }: PassoPacotesPrecificacaoProps) {
+  const resumoMercado = useMemo(() => {
+    if (!contextoMercado) return null;
+    const seguidores =
+      typeof draft.seguidores === "number" ? draft.seguidores : 0;
+    if (seguidores <= 0 || draft.categoriasDominio.length === 0) return null;
+
+    const atual: PerfilComparacaoMercado = {
+      influenciador: contextoMercado.influenciador,
+      categoriasDominioIds: draft.categoriasDominio.map((c) => c.id),
+      cidade: contextoMercado.cidade,
+      estado: contextoMercado.estado,
+      seguidores,
+      tabelaPrecos: draft.tabelaPrecos,
+    };
+
+    return compararPrecosComMercado(atual, listarInfluenciadoresMercado());
+  }, [contextoMercado, draft.categoriasDominio, draft.seguidores, draft.tabelaPrecos]);
+
+  const comparacaoPorTipo = useMemo(() => {
+    if (!resumoMercado) return null;
+    const map = new Map<TabelaPreco["tipoServico"], ComparacaoServicoMercado>();
+    for (const item of resumoMercado.porServico) {
+      map.set(item.tipoServico, item);
+    }
+    return map;
+  }, [resumoMercado]);
+
   function atualizarPrecoPraticado(id: string, valor: number | "") {
     onChange({
       tabelaPrecos: draft.tabelaPrecos.map((item) =>
@@ -85,14 +132,19 @@ export function PassoPacotesPrecificacao({
         className="secao-editavel space-y-4"
         aria-labelledby="tabela-precos-titulo"
       >
-        <div>
-          <h3 id="tabela-precos-titulo" className="text-sm font-medium">
-            Tabela de preços por tipo de serviço
-          </h3>
-          {errors.tabelaPrecos ? (
-            <p role="alert" className="text-destructive mt-1 text-sm">
-              {errors.tabelaPrecos}
-            </p>
+        <div className="space-y-3">
+          <div>
+            <h3 id="tabela-precos-titulo" className="text-sm font-medium">
+              Tabela de preços por tipo de serviço
+            </h3>
+            {errors.tabelaPrecos ? (
+              <p role="alert" className="text-destructive mt-1 text-sm">
+                {errors.tabelaPrecos}
+              </p>
+            ) : null}
+          </div>
+          {resumoMercado ? (
+            <ResumoPosicaoMercado texto={resumoMercado.textoResumo} />
           ) : null}
         </div>
 
@@ -104,6 +156,7 @@ export function PassoPacotesPrecificacao({
               index={index}
               errorPath={errors[`tabelaPrecos.${index}.precoPraticado`]}
               onChange={(valor) => atualizarPrecoPraticado(item.id, valor)}
+              comparacao={comparacaoPorTipo?.get(item.tipoServico) ?? null}
             />
           ))}
         </div>
@@ -154,11 +207,13 @@ function LinhaTabelaPreco({
   index,
   errorPath,
   onChange,
+  comparacao,
 }: {
   item: TabelaPreco;
   index: number;
   errorPath?: string;
   onChange: (valor: number | "") => void;
+  comparacao: ComparacaoServicoMercado | null;
 }) {
   const [erroInline, setErroInline] = useState<string | null>(null);
   const label = LABELS_TIPO_SERVICO[item.tipoServico];
@@ -190,7 +245,12 @@ function LinhaTabelaPreco({
               {formatarMoeda(item.precoBaseSugerido)}
             </span>
           </p>
+          <p className="text-muted-foreground text-[11px] leading-snug">
+            Piso da plataforma para o seu porte de audiência — distinto da
+            posição de mercado abaixo.
+          </p>
         </div>
+        {comparacao ? <IndicadorPosicaoMercado comparacao={comparacao} /> : null}
       </div>
       <div className="hidden text-center text-xs text-muted-foreground sm:block">
         →

@@ -361,5 +361,12 @@ export function listarDemandasFeed(): DemandaFeedItem[] {
   );
 }
 
+/** Busca no feed por id da demanda (apenas itens elegíveis). */
+export function obterDemandaFeedPorId(
+  demandaId: string,
+): DemandaFeedItem | undefined {
+  return listarDemandasFeed().find((item) => item.demanda.id === demandaId);
+}
+
 export const ORCAMENTO_MIN_MOCK = 1500;
 export const ORCAMENTO_MAX_MOCK = 10000;

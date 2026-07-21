@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin, Star, Users, Zap } from "lucide-react";
+import { CalendarDays, MapPin, Star, Users, Zap } from "lucide-react";
 import Link from "next/link";
 
 import { BadgeSemantico } from "@/components/ui/badge-semantico";
@@ -11,14 +11,21 @@ import { creatorExibeNota } from "@/lib/empresa/creator-catalogo-types";
 import {
   formatarFaixaSeguidores,
   rotuloAvaliacaoCreator,
+  type FiltroTipoAtuacaoBusca,
 } from "@/lib/empresa/busca-creators";
 import { nomeNicho } from "@/lib/empresa/orcamento-nicho";
+import {
+  ehSomenteModelo,
+  rotuloDiasSemana,
+  tambemAtuaComoModelo,
+} from "@/lib/influenciador/atuacao-utils";
 import { formatarMoeda } from "@/lib/influenciador/cadastro-utils";
 import { cn } from "@/lib/utils";
 
 type CreatorCardProps = {
   creator: CreatorCatalogo;
   onConvidar: (creator: CreatorCatalogo) => void;
+  tipoAtuacaoFiltro?: FiltroTipoAtuacaoBusca;
   className?: string;
 };
 
@@ -34,9 +41,14 @@ function iniciais(nome: string): string {
 export function CreatorCard({
   creator,
   onConvidar,
+  tipoAtuacaoFiltro = "todos",
   className,
 }: CreatorCardProps) {
   const exibeNota = creatorExibeNota(creator);
+  const soModelo = ehSomenteModelo(creator.tiposAtuacao);
+  const hibrido = tambemAtuaComoModelo(creator.tiposAtuacao);
+  const verComoModelo = tipoAtuacaoFiltro === "modelo" || soModelo;
+  const dias = creator.disponibilidade?.diasSemana ?? [];
 
   return (
     <article
@@ -64,7 +76,17 @@ export function CreatorCard({
             {creator.handle}
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-1.5">
-            <BadgeSemantico variante="info">{nomeNicho(creator.nichoId)}</BadgeSemantico>
+            <BadgeSemantico variante="info">
+              {nomeNicho(creator.nichoId)}
+            </BadgeSemantico>
+            {soModelo ? (
+              <BadgeSemantico variante="neutro">Modelo</BadgeSemantico>
+            ) : null}
+            {hibrido && tipoAtuacaoFiltro !== "modelo" ? (
+              <BadgeSemantico variante="sucesso">
+                Também atua como modelo
+              </BadgeSemantico>
+            ) : null}
             {exibeNota ? (
               <span className="text-texto-secundario inline-flex items-center gap-1 text-xs font-medium">
                 <Star className="size-3 text-ambar-escuro" aria-hidden />
@@ -78,39 +100,76 @@ export function CreatorCard({
       </Link>
 
       <dl className="grid grid-cols-2 gap-2 text-sm">
-        <div>
-          <dt className="text-texto-secundario flex items-center gap-1 text-xs">
-            <Users className="size-3" aria-hidden />
-            Seguidores
-          </dt>
-          <dd className="font-data mt-0.5 font-semibold">
-            {formatarFaixaSeguidores(creator.seguidores)}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-texto-secundario flex items-center gap-1 text-xs">
-            <Zap className="size-3" aria-hidden />
-            Engajamento
-          </dt>
-          <dd className="font-data mt-0.5 font-semibold">
-            {creator.engajamentoMedio.toFixed(1)}%
-          </dd>
-        </div>
-        <div>
-          <dt className="text-texto-secundario text-xs">Pacotes a partir de</dt>
-          <dd className="font-data mt-0.5 font-semibold">
-            {formatarMoeda(creator.precoPacoteMin)}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-texto-secundario flex items-center gap-1 text-xs">
-            <MapPin className="size-3" aria-hidden />
-            Local
-          </dt>
-          <dd className="mt-0.5 truncate text-sm font-medium">
-            {creator.cidade}, {creator.estado}
-          </dd>
-        </div>
+        {verComoModelo ? (
+          <>
+            <div className="col-span-2">
+              <dt className="text-texto-secundario flex items-center gap-1 text-xs">
+                <CalendarDays className="size-3" aria-hidden />
+                Disponibilidade
+              </dt>
+              <dd className="mt-0.5 text-sm font-medium">
+                {rotuloDiasSemana(dias)}
+              </dd>
+            </div>
+            {!soModelo ? (
+              <div>
+                <dt className="text-texto-secundario text-xs">
+                  Pacotes a partir de
+                </dt>
+                <dd className="font-data mt-0.5 font-semibold">
+                  {formatarMoeda(creator.precoPacoteMin)}
+                </dd>
+              </div>
+            ) : null}
+            <div className={soModelo ? "col-span-2" : undefined}>
+              <dt className="text-texto-secundario flex items-center gap-1 text-xs">
+                <MapPin className="size-3" aria-hidden />
+                Local
+              </dt>
+              <dd className="mt-0.5 truncate text-sm font-medium">
+                {creator.cidade}, {creator.estado}
+              </dd>
+            </div>
+          </>
+        ) : (
+          <>
+            <div>
+              <dt className="text-texto-secundario flex items-center gap-1 text-xs">
+                <Users className="size-3" aria-hidden />
+                Seguidores
+              </dt>
+              <dd className="font-data mt-0.5 font-semibold">
+                {formatarFaixaSeguidores(creator.seguidores)}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-texto-secundario flex items-center gap-1 text-xs">
+                <Zap className="size-3" aria-hidden />
+                Engajamento
+              </dt>
+              <dd className="font-data mt-0.5 font-semibold">
+                {creator.engajamentoMedio.toFixed(1)}%
+              </dd>
+            </div>
+            <div>
+              <dt className="text-texto-secundario text-xs">
+                Pacotes a partir de
+              </dt>
+              <dd className="font-data mt-0.5 font-semibold">
+                {formatarMoeda(creator.precoPacoteMin)}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-texto-secundario flex items-center gap-1 text-xs">
+                <MapPin className="size-3" aria-hidden />
+                Local
+              </dt>
+              <dd className="mt-0.5 truncate text-sm font-medium">
+                {creator.cidade}, {creator.estado}
+              </dd>
+            </div>
+          </>
+        )}
       </dl>
 
       <p className="text-texto-secundario line-clamp-2 text-xs leading-relaxed font-normal">

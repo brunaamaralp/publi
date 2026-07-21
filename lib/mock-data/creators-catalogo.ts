@@ -1,12 +1,22 @@
 import type { CreatorCatalogo } from "@/lib/empresa/creator-catalogo-types";
+import type {
+  DiaSemana,
+  DisponibilidadeInfluenciador,
+  TipoAtuacao,
+} from "@/lib/types/influenciador";
 
 import { INFLUENCIADOR_MOCK_ID } from "@/lib/mock-data/avaliacoes";
+
+type CreatorCatalogoBase = Omit<
+  CreatorCatalogo,
+  "tiposAtuacao" | "disponibilidade"
+>;
 
 /**
  * Catálogo mock para busca ativa de creators.
  * Apenas status "ativo" devem aparecer na UI (filtrado em listarCreatorsAtivos).
  */
-export const CREATORS_CATALOGO_MOCK: CreatorCatalogo[] = [
+const CREATORS_CATALOGO_BASE: CreatorCatalogoBase[] = [
   {
     id: INFLUENCIADOR_MOCK_ID,
     usuarioId: "usr-influ-neg-001",
@@ -416,3 +426,75 @@ export const CREATORS_CATALOGO_MOCK: CreatorCatalogo[] = [
     status: "ativo",
   },
 ];
+
+type AtuacaoOverride = {
+  tiposAtuacao: TipoAtuacao[];
+  disponibilidade?: DisponibilidadeInfluenciador;
+};
+
+/** Alguns só modelo, outros híbridos — para testar o toggle Influenciador / Modelo / Todos. */
+const ATUACAO_POR_ID: Record<string, AtuacaoOverride> = {
+  [INFLUENCIADOR_MOCK_ID]: {
+    tiposAtuacao: ["influenciador", "modelo"],
+    disponibilidade: {
+      diasSemana: ["seg", "ter", "qua", "qui"] as DiaSemana[],
+      observacao: "Ensaios em SP capital",
+    },
+  },
+  "inf-cat-003": {
+    tiposAtuacao: ["influenciador", "modelo"],
+    disponibilidade: {
+      diasSemana: ["ter", "qui", "sab"] as DiaSemana[],
+    },
+  },
+  "inf-cat-005": {
+    tiposAtuacao: ["modelo"],
+    disponibilidade: {
+      diasSemana: ["seg", "qua", "sex"] as DiaSemana[],
+      observacao: "Disponível para food styling e aparições",
+    },
+  },
+  "inf-cat-007": {
+    tiposAtuacao: ["influenciador", "modelo"],
+    disponibilidade: {
+      diasSemana: ["seg", "ter", "qua", "qui", "sex"] as DiaSemana[],
+    },
+  },
+  "inf-cat-013": {
+    tiposAtuacao: ["modelo"],
+    disponibilidade: {
+      diasSemana: ["sab", "dom"] as DiaSemana[],
+    },
+  },
+  "inf-cat-017": {
+    tiposAtuacao: ["influenciador", "modelo"],
+    disponibilidade: {
+      diasSemana: ["qua", "qui", "sex", "sab"] as DiaSemana[],
+    },
+  },
+  "inf-cat-021": {
+    tiposAtuacao: ["modelo"],
+    disponibilidade: {
+      diasSemana: ["ter", "qua", "qui"] as DiaSemana[],
+      observacao: "Foco em beauty e moda editorial",
+    },
+  },
+  "inf-cat-023": {
+    tiposAtuacao: ["influenciador", "modelo"],
+    disponibilidade: {
+      diasSemana: ["seg", "sex", "sab"] as DiaSemana[],
+    },
+  },
+};
+
+export const CREATORS_CATALOGO_MOCK: CreatorCatalogo[] =
+  CREATORS_CATALOGO_BASE.map((c) => {
+    const override = ATUACAO_POR_ID[c.id];
+    return {
+      ...c,
+      tiposAtuacao: override?.tiposAtuacao ?? ["influenciador"],
+      ...(override?.disponibilidade
+        ? { disponibilidade: override.disponibilidade }
+        : {}),
+    };
+  });

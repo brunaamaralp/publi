@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   BarChart3,
   Building2,
+  CreditCard,
   FileText,
   GraduationCap,
   Home,
@@ -52,6 +53,12 @@ export const NAV_GRUPOS: NavGrupo[] = [
         label: "Meu portfólio",
         icone: UserRound,
         descricao: "Vitrine pública para empresas",
+      },
+      {
+        href: "/influenciador/plano",
+        label: "Plano",
+        icone: CreditCard,
+        descricao: "Escolha ou troque sua assinatura",
       },
       {
         href: "/influenciador/treinamentos",

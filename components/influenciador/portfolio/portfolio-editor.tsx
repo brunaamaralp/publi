@@ -4,8 +4,10 @@ import { useRef, useState } from "react";
 import { Camera, Eye, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
+import { SecoesPerfilPortfolio } from "@/components/influenciador/portfolio/secoes-perfil-portfolio";
 import { PortfolioView } from "@/components/influenciador/portfolio/portfolio-view";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -15,10 +17,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  DIAS_SEMANA,
+  ehSomenteModelo,
+  normalizarTiposAtuacao,
+} from "@/lib/influenciador/atuacao-utils";
+import {
+  carregarPerfilInfluenciador,
+  marcarSecaoCompleta,
+  salvarPerfilInfluenciador,
+} from "@/lib/influenciador/perfil-storage";
+import { enfileirarInfluenciadorParaModeracao } from "@/lib/moderacao/moderacao-utils";
 import { CATEGORIAS_CATALOGO } from "@/lib/mock-data/categorias";
-import { salvarPortfolio } from "@/lib/influenciador/portfolio-storage";
+import {
+  carregarPortfolioPorId,
+  salvarPortfolio,
+} from "@/lib/influenciador/portfolio-storage";
 import {
   LABELS_PLATAFORMA_REDE,
   novoIdLocal,
@@ -26,15 +41,26 @@ import {
   type RedeSocialPortfolio,
   type TrabalhoAnterior,
 } from "@/lib/influenciador/portfolio-types";
-import type { PacoteServico } from "@/lib/types";
+import type { DiaSemana, TipoAtuacao } from "@/lib/types/influenciador";
 import { cn } from "@/lib/utils";
 
 type PortfolioEditorProps = {
   inicial: PortfolioInfluenciador;
 };
 
+function comTiposPadrao(
+  portfolio: PortfolioInfluenciador,
+): PortfolioInfluenciador {
+  return {
+    ...portfolio,
+    tiposAtuacao: normalizarTiposAtuacao(portfolio.tiposAtuacao),
+  };
+}
+
 export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
-  const [draft, setDraft] = useState<PortfolioInfluenciador>(inicial);
+  const [draft, setDraft] = useState<PortfolioInfluenciador>(() =>
+    comTiposPadrao(inicial),
+  );
   const [salvando, setSalvando] = useState(false);
   const [preview, setPreview] = useState(false);
   const fotoPerfilRef = useRef<HTMLInputElement>(null);
@@ -66,39 +92,52 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
       toast.error("A bio precisa ter pelo menos 20 caracteres.");
       return;
     }
+    if (
+      draft.tiposAtuacao.includes("modelo") &&
+      (!draft.disponibilidade || draft.disponibilidade.diasSemana.length === 0)
+    ) {
+      toast.error("Informe ao menos um dia de disponibilidade como modelo.");
+      return;
+    }
     setSalvando(true);
-    salvarPortfolio(draft);
+    const next = comTiposPadrao(draft);
+    salvarPortfolio(next);
+    sincronizarAtuacaoNoPerfil(next);
+
+    const perfil = carregarPerfilInfluenciador(next.usuarioId);
+    if (perfil && ehSomenteModelo(next.tiposAtuacao)) {
+      const trabalhosOk = next.trabalhos.filter(
+        (t) => t.titulo.trim() || t.marca.trim(),
+      ).length;
+      if (trabalhosOk > 0) {
+        marcarSecaoCompleta(next.usuarioId, "metricas");
+        enfileirarInfluenciadorParaModeracao(perfil);
+      }
+    }
+
     toast.success("Portfólio atualizado.");
     setSalvando(false);
+  }
+
+  function sincronizarAtuacaoNoPerfil(portfolio: PortfolioInfluenciador) {
+    const perfil = carregarPerfilInfluenciador(portfolio.usuarioId);
+    if (!perfil) return;
+    const tipos = normalizarTiposAtuacao(portfolio.tiposAtuacao);
+    salvarPerfilInfluenciador(portfolio.usuarioId, {
+      ...perfil,
+      influenciador: {
+        ...perfil.influenciador,
+        tiposAtuacao: tipos,
+        ...(tipos.includes("modelo") && portfolio.disponibilidade
+          ? { disponibilidade: portfolio.disponibilidade }
+          : { disponibilidade: undefined }),
+      },
+    });
   }
 
   function verComoVisitante() {
     salvarPortfolio(draft);
     window.open(`/influenciador/${draft.id}`, "_blank", "noopener,noreferrer");
-  }
-
-  function addPacote() {
-    const novo: PacoteServico = {
-      id: novoIdLocal("pkg"),
-      nome: "",
-      descricao: "",
-      preco: 0,
-      itensInclusos: [],
-      ativo: true,
-    };
-    patch({ pacotes: [...draft.pacotes, novo] });
-  }
-
-  function updatePacote(id: string, partial: Partial<PacoteServico>) {
-    patch({
-      pacotes: draft.pacotes.map((p) =>
-        p.id === id ? { ...p, ...partial } : p,
-      ),
-    });
-  }
-
-  function removePacote(id: string) {
-    patch({ pacotes: draft.pacotes.filter((p) => p.id !== id) });
   }
 
   function addRede() {
@@ -155,8 +194,8 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
             Meu portfólio
           </h1>
           <p className="text-texto-secundario mt-2 max-w-xl text-sm font-normal">
-            Edite sua vitrine pública. Empresas veem esta página ao clicar no
-            seu card na busca.
+            Edite sua vitrine pública, métricas e preços. Empresas veem esta
+            página ao clicar no seu card na busca.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -331,6 +370,9 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
         </div>
       </section>
 
+      {/* Atuação como modelo */}
+      <SecaoAtuacaoModelo draft={draft} onPatch={patch} />
+
       {/* Nichos */}
       <section className="secao-editavel space-y-3 ring-0">
         <h2 className="font-display text-sm font-bold">Nicho(s)</h2>
@@ -353,40 +395,6 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
               </button>
             );
           })}
-        </div>
-      </section>
-
-      {/* Métricas */}
-      <section className="secao-editavel space-y-4 ring-0">
-        <h2 className="font-display text-sm font-bold">Métricas de audiência</h2>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="pf-seg">Seguidores</Label>
-            <Input
-              id="pf-seg"
-              type="number"
-              min={0}
-              value={draft.seguidores || ""}
-              onChange={(e) =>
-                patch({ seguidores: Number(e.target.value) || 0 })
-              }
-              className="border-cinza-200 bg-white"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="pf-eng">Engajamento médio (%)</Label>
-            <Input
-              id="pf-eng"
-              type="number"
-              min={0}
-              step={0.1}
-              value={draft.engajamentoMedio || ""}
-              onChange={(e) =>
-                patch({ engajamentoMedio: Number(e.target.value) || 0 })
-              }
-              className="border-cinza-200 bg-white"
-            />
-          </div>
         </div>
       </section>
 
@@ -470,102 +478,23 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
         </ul>
       </section>
 
-      {/* Pacotes */}
-      <section className="secao-editavel space-y-4 ring-0">
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="font-display text-sm font-bold">Pacotes / serviços</h2>
-          <Button type="button" variant="outline" size="sm" onClick={addPacote}>
-            <Plus className="size-4" aria-hidden />
-            Adicionar
-          </Button>
-        </div>
-        <ul className="space-y-4">
-          {draft.pacotes.map((pacote) => (
-            <li
-              key={pacote.id}
-              className="space-y-3 rounded-card border border-cinza-200 p-4"
-            >
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <Switch
-                    checked={pacote.ativo}
-                    onCheckedChange={(checked) =>
-                      updatePacote(pacote.id, { ativo: checked })
-                    }
-                  />
-                  <span className="text-xs font-medium">
-                    {pacote.ativo ? "Ativo" : "Inativo"}
-                  </span>
-                </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removePacote(pacote.id)}
-                  aria-label="Remover pacote"
-                >
-                  <Trash2 className="size-4" aria-hidden />
-                </Button>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label>Nome</Label>
-                  <Input
-                    value={pacote.nome}
-                    onChange={(e) =>
-                      updatePacote(pacote.id, { nome: e.target.value })
-                    }
-                    className="border-cinza-200 bg-white"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Preço (R$)</Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    value={pacote.preco || ""}
-                    onChange={(e) =>
-                      updatePacote(pacote.id, {
-                        preco: Number(e.target.value) || 0,
-                      })
-                    }
-                    className="border-cinza-200 bg-white"
-                  />
-                </div>
-                <div className="space-y-2 sm:col-span-2">
-                  <Label>Escopo resumido</Label>
-                  <Textarea
-                    value={pacote.descricao}
-                    onChange={(e) =>
-                      updatePacote(pacote.id, { descricao: e.target.value })
-                    }
-                    rows={2}
-                    className="border-cinza-200 bg-white"
-                  />
-                </div>
-                <div className="space-y-2 sm:col-span-2">
-                  <Label>Itens inclusos (separados por vírgula)</Label>
-                  <Input
-                    value={pacote.itensInclusos.join(", ")}
-                    onChange={(e) =>
-                      updatePacote(pacote.id, {
-                        itensInclusos: e.target.value
-                          .split(",")
-                          .map((s) => s.trim())
-                          .filter(Boolean),
-                      })
-                    }
-                    className="border-cinza-200 bg-white"
-                  />
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
+      {/* Métricas, equipamentos, tabela de preços e pacotes (pós-cadastro) */}
+      <SecoesPerfilPortfolio
+        onPerfilAtualizado={() => {
+          const atualizado = carregarPortfolioPorId(draft.id);
+          if (!atualizado) return;
+          setDraft((prev) => ({
+            ...prev,
+            seguidores: atualizado.seguidores,
+            engajamentoMedio: atualizado.engajamentoMedio,
+            pacotes: atualizado.pacotes,
+            plano: atualizado.plano,
+          }));
+        }}
+      />
 
       {/* Trabalhos */}
-      <section className="secao-editavel space-y-4 ring-0">
+      <section id="trabalhos" className="secao-editavel space-y-4 ring-0">
         <div className="flex items-center justify-between gap-2">
           <h2 className="font-display text-sm font-bold">Trabalhos anteriores</h2>
           <Button
@@ -678,5 +607,100 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
         </Button>
       </div>
     </div>
+  );
+}
+
+function SecaoAtuacaoModelo({
+  draft,
+  onPatch,
+}: {
+  draft: PortfolioInfluenciador;
+  onPatch: (partial: Partial<PortfolioInfluenciador>) => void;
+}) {
+  const disponivelComoModelo = draft.tiposAtuacao.includes("modelo");
+  const dias = draft.disponibilidade?.diasSemana ?? [];
+
+  function setModelo(checked: boolean) {
+    let tiposAtuacao: TipoAtuacao[];
+    if (checked) {
+      tiposAtuacao = Array.from(
+        new Set<TipoAtuacao>([...draft.tiposAtuacao, "modelo"]),
+      );
+      if (!tiposAtuacao.includes("influenciador") && tiposAtuacao.length === 1) {
+        // Mantém influenciador no portfólio a menos que a pessoa remova depois
+        // via fluxo de cadastro “só modelo” — aqui o default é híbrido.
+        tiposAtuacao = ["influenciador", "modelo"];
+      }
+    } else {
+      tiposAtuacao = draft.tiposAtuacao.filter((t) => t !== "modelo");
+      if (tiposAtuacao.length === 0) tiposAtuacao = ["influenciador"];
+    }
+    onPatch({
+      tiposAtuacao,
+      disponibilidade: checked
+        ? draft.disponibilidade ?? { diasSemana: [] }
+        : undefined,
+    });
+  }
+
+  function toggleDia(dia: DiaSemana) {
+    const atuais = draft.disponibilidade?.diasSemana ?? [];
+    const next = atuais.includes(dia)
+      ? atuais.filter((d) => d !== dia)
+      : [...atuais, dia];
+    onPatch({
+      disponibilidade: {
+        diasSemana: next,
+        observacao: draft.disponibilidade?.observacao,
+      },
+    });
+  }
+
+  return (
+    <section className="secao-editavel space-y-4 ring-0">
+      <h2 className="font-display text-sm font-bold">Atuação como modelo</h2>
+      <div className="flex items-start gap-3">
+        <Checkbox
+          id="pf-atuacao-modelo"
+          checked={disponivelComoModelo}
+          onCheckedChange={(v) => setModelo(v === true)}
+          className="mt-0.5"
+        />
+        <div className="space-y-1">
+          <Label htmlFor="pf-atuacao-modelo" className="cursor-pointer">
+            Também estou disponível como modelo
+          </Label>
+          <p className="text-texto-secundario text-xs font-normal">
+            Fotos/vídeos para marcas, sem precisar de canal próprio.
+          </p>
+        </div>
+      </div>
+      {disponivelComoModelo ? (
+        <div className="space-y-2">
+          <Label>Dias em que topa ensaios / gravações</Label>
+          <div className="flex flex-wrap gap-2">
+            {DIAS_SEMANA.map((dia) => {
+              const ativo = dias.includes(dia.id);
+              return (
+                <button
+                  key={dia.id}
+                  type="button"
+                  onClick={() => toggleDia(dia.id)}
+                  className={cn(
+                    "rounded-button border px-3 py-1.5 text-xs font-medium transition-colors",
+                    ativo
+                      ? "border-verde-neon bg-verde-carvao-escuro text-verde-neon"
+                      : "border-cinza-200 bg-white hover:border-verde-neon/40",
+                  )}
+                  aria-pressed={ativo}
+                >
+                  {dia.labelCurto}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+    </section>
   );
 }

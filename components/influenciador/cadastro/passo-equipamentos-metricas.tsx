@@ -69,7 +69,8 @@ export function PassoEquipamentosMetricas({
       <div>
         <h2 className="font-display text-lg font-bold">Equipamentos e métricas</h2>
         <p className="text-texto-secundario text-sm font-normal">
-          Dados que aumentam a confiança das empresas na hora de contratar você.
+          Envie o print das suas métricas para começarmos a análise do seu
+          perfil. Equipamentos e demografia aumentam a confiança das empresas.
         </p>
       </div>
 

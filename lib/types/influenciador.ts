@@ -1,3 +1,20 @@
+export type TipoAtuacao = "influenciador" | "modelo";
+
+/** Dias da semana em que o creator topa ensaios/gravações (MVP — sem calendário). */
+export type DiaSemana =
+  | "dom"
+  | "seg"
+  | "ter"
+  | "qua"
+  | "qui"
+  | "sex"
+  | "sab";
+
+export type DisponibilidadeInfluenciador = {
+  diasSemana: DiaSemana[];
+  observacao?: string;
+};
+
 export type Influenciador = {
   id: string;
   usuarioId: string;
@@ -8,6 +25,14 @@ export type Influenciador = {
   pontosXp: number;
   notaMediaAvaliacao: number | null; // cache, null se ainda não tem avaliação
   totalAvaliacoes: number;
+  /**
+   * Papéis de atuação no mesmo cadastro.
+   * Pode ser os dois ao mesmo tempo (ex.: influenciador de moda que também faz ensaio).
+   * Default implícito para cadastros antigos: `['influenciador']`.
+   */
+  tiposAtuacao: TipoAtuacao[];
+  /** Só relevante quando `tiposAtuacao` inclui `'modelo'`. */
+  disponibilidade?: DisponibilidadeInfluenciador;
 };
 
 export type Categoria = {

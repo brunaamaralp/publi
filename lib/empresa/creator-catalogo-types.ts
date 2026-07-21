@@ -1,3 +1,7 @@
+import type {
+  DisponibilidadeInfluenciador,
+  TipoAtuacao,
+} from "@/lib/types/influenciador";
 import type { Usuario } from "@/lib/types/usuario";
 
 /** Perfil listável na busca ativa de creators (empresa). */
@@ -18,6 +22,9 @@ export type CreatorCatalogo = {
   notaMediaAvaliacao: number | null;
   totalAvaliacoes: number;
   status: Usuario["status"];
+  /** Default implícito: `['influenciador']`. */
+  tiposAtuacao: TipoAtuacao[];
+  disponibilidade?: DisponibilidadeInfluenciador;
 };
 
 /** Cold-start: nota só após este mínimo de avaliações. */

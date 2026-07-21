@@ -1,8 +1,17 @@
 import {
   USUARIOS_PENDENTES_MODERACAO_MOCK,
+  type CadastroInfluenciadorPendente,
   type UsuarioPendenteModeracao,
 } from "@/lib/mock-data/moderacao";
 import { definirStatusConta } from "@/lib/mock-data/influenciadores-status";
+import {
+  atualizarStatusCreatorExtra,
+  registrarCreatorAprovadoDoCadastro,
+} from "@/lib/empresa/creators-catalogo-extras";
+import { ehSomenteModelo } from "@/lib/influenciador/atuacao-utils";
+import type { CadastroPayload } from "@/lib/influenciador/cadastro-utils";
+import { perfilProntoParaAnalise } from "@/lib/influenciador/cadastro-utils";
+import { carregarPortfolioPorId } from "@/lib/influenciador/portfolio-storage";
 import type { Usuario } from "@/lib/types/usuario";
 
 const STORAGE_KEY = "moderacao-estado";
@@ -24,6 +33,34 @@ function idsStatusDoItem(item: UsuarioPendenteModeracao): string[] {
     return [usuarioId, item.cadastro.empresa.id];
   }
   return [usuarioId, item.cadastro.agencia.id];
+}
+
+function trabalhosDoCadastro(
+  cadastro: Pick<CadastroInfluenciadorPendente, "usuario" | "influenciador">,
+): number {
+  if (typeof window === "undefined") return 0;
+  const portfolio =
+    carregarPortfolioPorId(cadastro.influenciador.id) ??
+    carregarPortfolioPorId(`inf-${cadastro.usuario.id}`);
+  return (
+    portfolio?.trabalhos.filter(
+      (t) => t.titulo.trim().length > 0 || t.marca.trim().length > 0,
+    ).length ?? 0
+  );
+}
+
+/** Gate de moderação: print (influenciador) ou portfólio de trabalhos (só modelo). */
+export function influenciadorElegivelParaModeracao(
+  cadastro: Pick<
+    CadastroInfluenciadorPendente,
+    "metricaPerfil" | "influenciador" | "usuario"
+  >,
+): boolean {
+  return perfilProntoParaAnalise(cadastro, {
+    trabalhosAnteriores: ehSomenteModelo(cadastro.influenciador.tiposAtuacao)
+      ? trabalhosDoCadastro(cadastro)
+      : undefined,
+  });
 }
 
 export function carregarEstadoModeracao(): ModeracaoEstado {
@@ -82,6 +119,49 @@ export function formatarDataCadastro(iso: string): string {
   });
 }
 
+/**
+ * Enfileira o influenciador para moderação após o print de métricas.
+ * Idempotente: atualiza o cadastro se já estiver na fila.
+ * Não enfileira se ainda não houver print (gate do Prompt 14).
+ */
+export function enfileirarInfluenciadorParaModeracao(
+  payload: CadastroPayload,
+): ModeracaoEstado {
+  const estado = carregarEstadoModeracao();
+  if (!influenciadorElegivelParaModeracao(payload)) {
+    return estado;
+  }
+
+  const cadastro: CadastroInfluenciadorPendente = {
+    usuario: {
+      ...payload.usuario,
+      status: "pendente_verificacao",
+    },
+    influenciador: payload.influenciador,
+    categorias: payload.categorias,
+    equipamentos: payload.equipamentos,
+    metricaPerfil: {
+      ...payload.metricaPerfil,
+      statusValidacao: "pendente",
+    },
+    audiencia: payload.audiencia,
+  };
+
+  const usuarioId = payload.usuario.id;
+  const semEste = estado.pendentes.filter(
+    (p) => getUsuarioId(p) !== usuarioId,
+  );
+  const next: ModeracaoEstado = {
+    pendentes: [...semEste, { tipo: "influenciador", cadastro }],
+  };
+  salvarEstadoModeracao(next);
+  definirStatusConta(
+    [usuarioId, payload.influenciador.id],
+    "pendente_verificacao",
+  );
+  return next;
+}
+
 export function filtrarPendentes(
   pendentes: UsuarioPendenteModeracao[],
   tipo: FiltroTipoUsuario,
@@ -92,10 +172,19 @@ export function filtrarPendentes(
   return pendentes.filter((item) => {
     if (tipo !== "todos" && item.tipo !== tipo) return false;
 
+    // Gate: influenciador sem print não aparece para o time de moderação.
+    if (
+      item.tipo === "influenciador" &&
+      !influenciadorElegivelParaModeracao(item.cadastro)
+    ) {
+      return false;
+    }
+
     if (data === "todos") return true;
 
     const criado = new Date(item.cadastro.usuario.criadoEm).getTime();
-    const limiteMs = data === "7d" ? 7 * 24 * 60 * 60 * 1000 : 30 * 24 * 60 * 60 * 1000;
+    const limiteMs =
+      data === "7d" ? 7 * 24 * 60 * 60 * 1000 : 30 * 24 * 60 * 60 * 1000;
     return agora - criado <= limiteMs;
   });
 }
@@ -108,6 +197,13 @@ function aplicarDecisaoModeracao(
   const item = estado.pendentes.find((p) => getUsuarioId(p) === usuarioId);
   if (item) {
     definirStatusConta(idsStatusDoItem(item), status);
+    if (item.tipo === "influenciador") {
+      if (status === "ativo") {
+        registrarCreatorAprovadoDoCadastro(item.cadastro);
+      } else {
+        atualizarStatusCreatorExtra(item.cadastro.influenciador.id, status);
+      }
+    }
   }
   return {
     pendentes: estado.pendentes.filter(

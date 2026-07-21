@@ -10,6 +10,7 @@ import {
   Wallet,
 } from "lucide-react";
 
+import { BannerCompletarPerfil } from "@/components/influenciador/banner-completar-perfil";
 import { buttonVariants } from "@/components/ui/button";
 import { formatarNomeExibicao } from "@/lib/app/formatar-nome-exibicao";
 import { useAuth } from "@/lib/auth-context";
@@ -27,7 +28,7 @@ const ATALHOS = [
   {
     href: "/influenciador/meu-portfolio",
     titulo: "Meu portfólio",
-    descricao: "Edite bio, pacotes e trabalhos da sua vitrine pública",
+    descricao: "Edite bio, métricas, pacotes e trabalhos da sua vitrine",
     icone: UserRound,
     destaque: false,
   },
@@ -77,6 +78,8 @@ export function InicioInfluenciador({ nomeExibicao }: InicioInfluenciadorProps) 
           Acompanhe oportunidades, treinamentos e ganhos pelo menu lateral.
         </p>
       </header>
+
+      <BannerCompletarPerfil />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {RESUMO.map((item) => (

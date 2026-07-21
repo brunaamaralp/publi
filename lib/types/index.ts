@@ -3,11 +3,14 @@ export type { Usuario } from "./usuario";
 export type {
   AudienciaDemografia,
   Categoria,
+  DiaSemana,
+  DisponibilidadeInfluenciador,
   Equipamento,
   Influenciador,
   MetricaPerfil,
   PacoteServico,
   TabelaPreco,
+  TipoAtuacao,
 } from "./influenciador";
 
 export type { Empresa } from "./empresa";

@@ -21,9 +21,33 @@ export const cadastroPasso2Schema = z.object({
     .array(categoriaSchema)
     .min(1, "Selecione pelo menos uma área de domínio"),
   categoriasInteresse: z.array(categoriaSchema),
+  tiposAtuacao: z
+    .array(z.enum(["influenciador", "modelo"]))
+    .min(1, "Selecione ao menos um tipo de atuação"),
+  disponibilidade: z
+    .object({
+      diasSemana: z.array(
+        z.enum(["dom", "seg", "ter", "qua", "qui", "sex", "sab"]),
+      ),
+      observacao: z.string().optional(),
+    })
+    .nullable()
+    .optional(),
+}).superRefine((data, ctx) => {
+  if (
+    data.tiposAtuacao.includes("modelo") &&
+    (!data.disponibilidade || data.disponibilidade.diasSemana.length === 0)
+  ) {
+    ctx.addIssue({
+      code: "custom",
+      message: "Informe ao menos um dia de disponibilidade como modelo",
+      path: ["disponibilidade"],
+    });
+  }
 });
 
-export const cadastroPasso3Schema = z.object({
+/** Seção pós-cadastro: equipamentos e métricas (antigo passo 3). */
+export const perfilSecaoMetricasSchema = z.object({
   printMetricasUrl: z.string().min(1, "O print de métricas é obrigatório"),
   seguidores: z
     .number({
@@ -40,25 +64,31 @@ export const cadastroPasso3Schema = z.object({
   equipamentos: z.array(equipamentoSchema),
 });
 
-export const cadastroPasso4Schema = z.object({
+/** Seção pós-cadastro: pacotes e precificação (antigo passo 4). */
+export const perfilSecaoPrecosSchema = z.object({
   tabelaPrecos: z
     .array(tabelaPrecoSchema)
     .length(5, "Todos os tipos de serviço devem ser precificados"),
   pacotes: z.array(pacoteServicoSchema),
 });
 
-export const cadastroPasso5Schema = z.object({
+/** Seção pós-cadastro: plano (antigo passo 5). */
+export const perfilSecaoPlanoSchema = z.object({
   plano: z.enum(["basico", "pro", "elite"], {
     error: "Selecione um plano de assinatura",
   }),
 });
 
+/** @deprecated Use perfilSecaoMetricasSchema — mantido para compatibilidade. */
+export const cadastroPasso3Schema = perfilSecaoMetricasSchema;
+/** @deprecated Use perfilSecaoPrecosSchema — mantido para compatibilidade. */
+export const cadastroPasso4Schema = perfilSecaoPrecosSchema;
+/** @deprecated Use perfilSecaoPlanoSchema — mantido para compatibilidade. */
+export const cadastroPasso5Schema = perfilSecaoPlanoSchema;
+
 export const CADASTRO_STEP_SCHEMAS = [
   cadastroPasso1Schema,
   cadastroPasso2Schema,
-  cadastroPasso3Schema,
-  cadastroPasso4Schema,
-  cadastroPasso5Schema,
 ] as const;
 
 export function validarPassoCadastro(
@@ -70,7 +100,30 @@ export function validarPassoCadastro(
     return { success: true };
   }
 
-  const result = schema.safeParse(dados);
+  return mapearResultadoZod(schema.safeParse(dados));
+}
+
+export function validarSecaoMetricas(
+  dados: Record<string, unknown>,
+): { success: true } | { success: false; errors: Record<string, string> } {
+  return mapearResultadoZod(perfilSecaoMetricasSchema.safeParse(dados));
+}
+
+export function validarSecaoPrecos(
+  dados: Record<string, unknown>,
+): { success: true } | { success: false; errors: Record<string, string> } {
+  return mapearResultadoZod(perfilSecaoPrecosSchema.safeParse(dados));
+}
+
+export function validarSecaoPlano(
+  dados: Record<string, unknown>,
+): { success: true } | { success: false; errors: Record<string, string> } {
+  return mapearResultadoZod(perfilSecaoPlanoSchema.safeParse(dados));
+}
+
+function mapearResultadoZod(
+  result: { success: true } | { success: false; error: z.ZodError },
+): { success: true } | { success: false; errors: Record<string, string> } {
   if (result.success) {
     return { success: true };
   }
