@@ -7,7 +7,9 @@ import {
   Home,
   LayoutDashboard,
   PlusCircle,
+  Search,
   ShieldCheck,
+  UserRound,
   Wallet,
 } from "lucide-react";
 
@@ -46,6 +48,12 @@ export const NAV_GRUPOS: NavGrupo[] = [
         rotasRelacionadas: ["/negociacao"],
       },
       {
+        href: "/influenciador/meu-portfolio",
+        label: "Meu portfólio",
+        icone: UserRound,
+        descricao: "Vitrine pública para empresas",
+      },
+      {
         href: "/influenciador/treinamentos",
         label: "Treinamentos",
         icone: GraduationCap,
@@ -79,6 +87,13 @@ export const NAV_GRUPOS: NavGrupo[] = [
         aninhado: true,
       },
       {
+        href: "/empresa/buscar-creators",
+        label: "Buscar creators",
+        icone: Search,
+        descricao: "Busca ativa de influenciadores",
+        rotasRelacionadas: ["/influenciador"],
+      },
+      {
         href: "/empresa/resultados",
         label: "Resultados",
         icone: BarChart3,
@@ -110,6 +125,12 @@ export const NAV_GRUPOS: NavGrupo[] = [
         label: "Nova campanha",
         icone: PlusCircle,
         aninhado: true,
+      },
+      {
+        href: "/empresa/buscar-creators",
+        label: "Buscar creators",
+        icone: Search,
+        rotasRelacionadas: ["/influenciador"],
       },
       {
         href: "/empresa/resultados",

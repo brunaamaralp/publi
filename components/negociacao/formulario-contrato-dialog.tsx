@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -15,12 +15,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { contratoFormSchema } from "@/lib/schemas/contrato";
-import type { NegociacaoContexto } from "@/lib/negociacao/negociacao-types";
+import type {
+  NegociacaoContexto,
+  NegociacaoEstado,
+} from "@/lib/negociacao/negociacao-types";
 
 type FormularioContratoDialogProps = {
   aberto: boolean;
   onOpenChange: (aberto: boolean) => void;
   contexto: NegociacaoContexto;
+  estado: NegociacaoEstado;
   onGerar: (dados: {
     escopo: string;
     valor: number;
@@ -28,17 +32,47 @@ type FormularioContratoDialogProps = {
   }) => void;
 };
 
+function valoresIniciais(
+  contexto: NegociacaoContexto,
+  estado: NegociacaoEstado,
+) {
+  if (estado.termosPropostos) return estado.termosPropostos;
+  if (estado.contrato) {
+    return {
+      escopo: estado.contrato.escopo,
+      valor: estado.contrato.valor,
+      prazoEntrega: estado.contrato.prazoEntrega,
+    };
+  }
+  return {
+    escopo: contexto.demanda.briefing,
+    valor: contexto.demanda.orcamento,
+    prazoEntrega: contexto.demanda.prazo,
+  };
+}
+
 export function FormularioContratoDialog({
   aberto,
   onOpenChange,
   contexto,
+  estado,
   onGerar,
 }: FormularioContratoDialogProps) {
   const { demanda } = contexto;
-  const [escopo, setEscopo] = useState(demanda.briefing);
-  const [valor, setValor] = useState<number | "">(demanda.orcamento);
-  const [prazoEntrega, setPrazoEntrega] = useState(demanda.prazo);
+  const iniciais = valoresIniciais(contexto, estado);
+  const [escopo, setEscopo] = useState(iniciais.escopo);
+  const [valor, setValor] = useState<number | "">(iniciais.valor);
+  const [prazoEntrega, setPrazoEntrega] = useState(iniciais.prazoEntrega);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (!aberto) return;
+    const next = valoresIniciais(contexto, estado);
+    setEscopo(next.escopo);
+    setValor(next.valor);
+    setPrazoEntrega(next.prazoEntrega);
+    setErrors({});
+  }, [aberto, contexto, estado]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -68,8 +102,9 @@ export function FormularioContratoDialog({
         <DialogHeader>
           <DialogTitle>Fechar contrato</DialogTitle>
           <DialogDescription>
-            Revise os termos da campanha{" "}
-            <strong>{demanda.titulo}</strong> antes de gerar o documento.
+            Use os valores combinados na conversa para{" "}
+            <strong>{demanda.titulo}</strong>. Orçamento e briefing da demanda
+            são só o ponto de partida — ajuste o que foi negociado.
           </DialogDescription>
         </DialogHeader>
 

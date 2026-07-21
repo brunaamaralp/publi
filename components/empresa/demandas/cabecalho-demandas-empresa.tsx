@@ -51,11 +51,17 @@ export function CabecalhoDemandasEmpresa({
         ) : null}
       </div>
 
-      {publicador.modo === "agencia" ? (
+      {publicador.modo === "agencia" ||
+      publicador.modo === "agencia_sem_cliente" ? (
         <div className="flex flex-col gap-3 rounded-card border border-lilas-claro bg-lilas-claro p-4 text-lilas-escuro sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm font-normal">
             Agência{" "}
             <span className="font-semibold">{publicador.agenciaNome}</span>
+            {publicador.modo === "agencia_sem_cliente" ? (
+              <span className="mt-1 block text-xs font-medium text-destructive">
+                Selecione um cliente para publicar e gerenciar demandas.
+              </span>
+            ) : null}
           </p>
           <SeletorEmpresaCliente className="text-lilas-escuro [&_span]:text-lilas-escuro/70" />
         </div>

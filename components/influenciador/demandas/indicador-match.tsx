@@ -1,116 +1,15 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { BadgeCheck } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
+import {
+  LABELS_FAIXA_MATCH,
+  LABELS_FAIXA_MATCH_CURTA,
+  nivelMatchRing,
+  type MatchRingNivel,
+} from "@/components/ui/match-ring";
 import { cn } from "@/lib/utils";
-
-type IndicadorMatchProps = {
-  score: number;
-  className?: string;
-  /** Posição do badge no card — início (esquerda) para destaque no feed */
-  alinhamento?: "inicio" | "fim";
-};
-
-function nivelScore(score: number): "alto" | "medio" | "baixo" {
-  if (score > 80) return "alto";
-  if (score >= 50) return "medio";
-  return "baixo";
-}
-
-export function IndicadorMatch({
-  score,
-  className,
-  alinhamento = "fim",
-}: IndicadorMatchProps) {
-  const nivel = nivelScore(score);
-  const alinhaInicio = alinhamento === "inicio";
-
-  return (
-    <div
-      className={cn(
-        "flex shrink-0 flex-col gap-1.5",
-        alinhaInicio ? "items-start" : "items-end",
-        className,
-      )}
-      aria-label={
-        nivel === "baixo"
-          ? `${score}% de compatibilidade estimada — ainda sem histórico na plataforma`
-          : `${score}% de compatibilidade com seu perfil`
-      }
-    >
-      <div
-        className={cn(
-          "flex min-w-[5rem] flex-col rounded-card border px-3 py-2.5",
-          nivel === "alto" &&
-            "border-verde-neon bg-verde-carvao-escuro",
-          nivel === "medio" &&
-            "border-cinza-200 bg-verde-carvao-escuro",
-          nivel === "baixo" && "border-cinza-200 bg-white",
-        )}
-      >
-        <span
-          className={cn(
-            "font-display text-4xl leading-none font-bold sm:text-[2.75rem]",
-            nivel === "alto" && "text-verde-neon font-data",
-            nivel === "medio" && "font-data text-white",
-            nivel === "baixo" && "font-data text-cinza-500",
-          )}
-        >
-          {score}%
-        </span>
-        <span
-          className={cn(
-            "mt-1 text-[10px] font-medium tracking-widest uppercase",
-            nivel === "alto" && "text-verde-neon/80",
-            nivel === "medio" && "text-cinza-500",
-            nivel === "baixo" && "text-cinza-500",
-          )}
-        >
-          compatível
-        </span>
-      </div>
-      {nivel === "baixo" ? (
-        <p
-          className={cn(
-            "max-w-[8.5rem] text-[11px] leading-snug font-normal text-cinza-500",
-            alinhaInicio ? "text-left" : "text-right",
-          )}
-        >
-          Estimativa inicial — ainda sem histórico na plataforma
-        </p>
-      ) : (
-        <p
-          className={cn(
-            "text-texto-secundario text-[11px] font-normal",
-            alinhaInicio ? "text-left" : "text-right",
-          )}
-        >
-          Compatível com você
-        </p>
-      )}
-    </div>
-  );
-}
-
-type BadgeEmpresaProps = {
-  nome: string;
-  verificada?: boolean;
-};
-
-export function BadgeEmpresa({ nome, verificada }: BadgeEmpresaProps) {
-  return (
-    <div className="flex items-center gap-1.5">
-      <span className="text-texto-secundario text-xs font-medium">{nome}</span>
-      {verificada ? (
-        <BadgeCheck
-          className="text-verde-neon size-3.5"
-          aria-label="Empresa verificada"
-        />
-      ) : null}
-    </div>
-  );
-}
 
 type BadgeFormatoDemandaProps = {
   children: ReactNode;
@@ -129,6 +28,51 @@ export function BadgeFormatoDemanda({
       )}
     >
       {children}
+    </span>
+  );
+}
+
+const BADGE_NIVEL: Record<MatchRingNivel, string> = {
+  alto: "border-verde-neon/35 bg-[color-mix(in_srgb,var(--verde-neon)_14%,white)] text-verde-acao",
+  medio: "border-verde-acao/25 bg-accent text-verde-acao",
+  baixo: "border-cinza-200 bg-cinza-200/40 text-cinza-500",
+};
+
+type IndicadorMatchProps = {
+  score: number;
+  /** `compact` = só %; `completo` = % + faixa curta. */
+  variante?: "compact" | "completo";
+  className?: string;
+};
+
+/** Chip de compatibilidade — mesmo idioma visual do MatchRing em espaços densos. */
+export function IndicadorMatch({
+  score,
+  variante = "completo",
+  className,
+}: IndicadorMatchProps) {
+  const scoreArredondado = Math.round(Math.min(100, Math.max(0, score)));
+  const nivel = nivelMatchRing(scoreArredondado);
+
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium",
+        BADGE_NIVEL[nivel],
+        className,
+      )}
+      title={LABELS_FAIXA_MATCH[nivel]}
+      aria-label={`${scoreArredondado}% — ${LABELS_FAIXA_MATCH[nivel]}`}
+    >
+      {nivel === "alto" ? (
+        <Sparkles className="size-3 shrink-0" aria-hidden />
+      ) : null}
+      <span className="font-data tabular-nums">{scoreArredondado}%</span>
+      {variante === "completo" ? (
+        <span className="font-normal opacity-80">
+          · {LABELS_FAIXA_MATCH_CURTA[nivel]}
+        </span>
+      ) : null}
     </span>
   );
 }

@@ -10,7 +10,7 @@ export default function LoginPage() {
   return (
     <AuthLayout
       titulo="Parcerias que começam com confiança"
-      subtitulo="Entre para acessar demandas, negociações, contratos e resultados — tudo em um só lugar."
+      subtitulo="Escolha se você é empresa ou influencer e entre para testar as telas de cada perfil."
     >
       <LoginForm />
     </AuthLayout>

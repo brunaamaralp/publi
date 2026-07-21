@@ -19,6 +19,8 @@ import { RevisaoEntregaEmpresa } from "@/components/pagamento/revisao-entrega-em
 import { SeletorPapelPagamento } from "@/components/pagamento/seletor-papel-pagamento";
 import { buttonVariants } from "@/components/ui/button";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth-context";
+import { rotaVoltarPagamento } from "@/lib/app/voltar-por-papel";
 import {
   CONTRATO_CNPJ_ID,
   CONTRATO_CPF_ID,
@@ -40,7 +42,11 @@ type PagamentoFlowProps = {
 };
 
 export function PagamentoFlow({ contratoId }: PagamentoFlowProps) {
+  const { usuario } = useAuth();
   const contexto = getContratoPagamentoContexto(contratoId);
+  const rotaVoltar = usuario
+    ? rotaVoltarPagamento(usuario.tipo)
+    : "/empresa/demandas";
   const [estado, setEstado] = useState<PagamentoFluxoEstado | null>(null);
   const [carregado, setCarregado] = useState(false);
   const [papel, setPapel] = useState<PapelPagamento>("empresa");
@@ -103,7 +109,7 @@ export function PagamentoFlow({ contratoId }: PagamentoFlowProps) {
       <div className="mx-auto max-w-2xl space-y-6 px-4 py-8 sm:px-6">
         <header className="space-y-4">
           <Link
-            href="/empresa/demandas"
+            href={rotaVoltar}
             className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "-ml-2 w-fit")}
           >
             <ArrowLeft className="size-4" aria-hidden />

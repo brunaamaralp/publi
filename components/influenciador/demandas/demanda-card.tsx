@@ -2,14 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Calendar, Wallet } from "lucide-react";
+import { BadgeCheck, CalendarDays } from "lucide-react";
 
 import {
-  BadgeEmpresa,
   BadgeFormatoDemanda,
-  IndicadorMatch,
 } from "@/components/influenciador/demandas/indicador-match";
-import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { MatchRing } from "@/components/ui/match-ring";
 import { formatarPrazo, labelFormatoEntrega } from "@/lib/demandas/utils";
 import { formatarMoeda } from "@/lib/influenciador/cadastro-utils";
 import type { DemandaFeedItem } from "@/lib/mock-data/demandas";
@@ -23,6 +24,15 @@ type DemandaCardProps = {
   onRecusar: (matchId: string) => void;
   modoEnviado?: boolean;
 };
+
+function iniciaisEmpresa(nome: string) {
+  return nome
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((parte) => parte[0]?.toUpperCase() ?? "")
+    .join("");
+}
 
 export function DemandaCard({
   item,
@@ -41,29 +51,75 @@ export function DemandaCard({
   return (
     <article
       className={cn(
-        "overflow-hidden rounded-card border border-cinza-200 bg-white transition-[border-color,box-shadow]",
-        "hover:border-verde-neon focus-within:border-verde-neon",
-        modoEnviado && "border-verde-neon/50",
+        "w-full overflow-hidden rounded-2xl border border-cinza-200 bg-white p-5 shadow-sm transition-[border-color,box-shadow]",
+        "hover:border-verde-neon/60 focus-within:border-verde-neon/60",
+        "animate-in fade-in-0 slide-in-from-bottom-2 duration-300",
+        modoEnviado && "border-verde-acao/40 bg-[color-mix(in_srgb,var(--verde-acao)_4%,white)]",
       )}
     >
-      <header className="border-b border-cinza-200/80 p-4">
-        <div className="flex items-start gap-4">
-          <IndicadorMatch score={match.score} alinhamento="inicio" />
-          <div className="min-w-0 flex-1 space-y-2 pt-0.5">
-            <BadgeEmpresa nome={empresaNome} verificada={empresaVerificada} />
-            <h3 className="font-display text-base leading-snug font-bold">
-              {demanda.titulo}
-            </h3>
-            <div className="flex flex-wrap gap-1.5">
-              <BadgeFormatoDemanda>
-                {labelFormatoEntrega(demanda.formatoEntrega)}
-              </BadgeFormatoDemanda>
+      <header className="flex items-start gap-4">
+        <MatchRing
+          score={match.score}
+          size="sm"
+          showLabel
+          darkBackdrop
+          className="shrink-0"
+        />
+        <div className="min-w-0 flex-1 space-y-2">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <Avatar size="sm">
+                <AvatarFallback className="bg-lilas-claro font-display text-xs font-semibold text-lilas-escuro">
+                  {iniciaisEmpresa(empresaNome)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <p className="truncate text-sm font-medium">{empresaNome}</p>
+                  {empresaVerificada ? (
+                    <BadgeCheck
+                      className="text-verde-acao size-3.5 shrink-0"
+                      aria-label="Empresa verificada"
+                    />
+                  ) : null}
+                </div>
+              </div>
             </div>
+            {modoEnviado ? (
+              <Badge
+                variant="outline"
+                className="shrink-0 border-lilas-escuro/25 bg-lilas-claro text-lilas-escuro"
+              >
+                Enviado
+              </Badge>
+            ) : null}
           </div>
+          <h2 className="font-display text-base leading-snug font-semibold tracking-tight">
+            {demanda.titulo}
+          </h2>
         </div>
       </header>
 
-      <div className="space-y-3 p-4">
+      <div className="mt-4 space-y-3">
+        <p className="font-display font-data text-2xl font-bold tracking-tight sm:text-3xl">
+          {formatarMoeda(demanda.orcamento)}
+        </p>
+
+        <div className="text-texto-secundario flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm">
+          <span className="inline-flex items-center gap-1.5">
+            <CalendarDays className="size-3.5 shrink-0" aria-hidden />
+            <span>
+              Prazo{" "}
+              <span className="text-foreground font-data font-medium">
+                {formatarPrazo(demanda.prazo)}
+              </span>
+            </span>
+          </span>
+          <BadgeFormatoDemanda>
+            {labelFormatoEntrega(demanda.formatoEntrega)}
+          </BadgeFormatoDemanda>
+        </div>
+
         <p className="text-texto-secundario text-sm leading-relaxed font-normal">
           {briefingExibido}
           {briefingLongo ? (
@@ -76,49 +132,44 @@ export function DemandaCard({
             </button>
           ) : null}
         </p>
-
-        <div className="text-texto-secundario flex flex-wrap gap-x-5 gap-y-2 text-sm font-normal">
-          <span className="inline-flex items-center gap-1.5">
-            <Wallet className="size-3.5 shrink-0" aria-hidden />
-            <span className="text-foreground font-data font-medium">
-              {formatarMoeda(demanda.orcamento)}
-            </span>
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <Calendar className="size-3.5 shrink-0" aria-hidden />
-            Prazo:{" "}
-            <span className="text-foreground font-data">
-              {formatarPrazo(demanda.prazo)}
-            </span>
-          </span>
-        </div>
       </div>
 
       {!modoEnviado ? (
-        <footer className="flex gap-2 border-t border-cinza-200/80 p-4">
-          <Button
-            type="button"
-            variant="outline"
-            className="flex-1"
-            onClick={() => onRecusar(match.id)}
-          >
-            Recusar
-          </Button>
+        <div className="mt-5 grid grid-cols-1 gap-2.5 sm:grid-cols-[1.4fr_1fr]">
           <Button
             type="button"
             variant="cta"
-            className="flex-1"
+            size="lg"
+            className="w-full"
             onClick={() => onInteresse(match.id)}
           >
             Tenho interesse
           </Button>
-        </footer>
+          <Button
+            type="button"
+            variant="ghost"
+            size="lg"
+            className="text-texto-secundario w-full hover:text-foreground"
+            onClick={() => onRecusar(match.id)}
+          >
+            Não é pra mim
+          </Button>
+        </div>
       ) : (
-        <footer className="border-t border-cinza-200/80 p-4">
-          <p className="text-verde-neon w-full text-center text-sm font-medium">
-            Interesse enviado — aguardando resposta da empresa
+        <div className="mt-5 space-y-2.5">
+          <p className="text-texto-secundario text-center text-sm font-normal">
+            Interesse enviado — a empresa pode iniciar a conversa.
           </p>
-        </footer>
+          <Link
+            href={`/negociacao/${match.id}`}
+            className={cn(
+              buttonVariants({ variant: "cta", size: "lg" }),
+              "w-full",
+            )}
+          >
+            Acompanhar negociação
+          </Link>
+        </div>
       )}
     </article>
   );
@@ -134,7 +185,7 @@ export function DemandaListaVazia({
   mostrarLinkPerfil = true,
 }: DemandaListaVaziaProps) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-card border border-dashed border-cinza-200 bg-white px-4 py-16 text-center">
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-cinza-200 bg-white px-4 py-16 text-center">
       <p className="text-texto-secundario max-w-sm text-sm leading-relaxed font-normal">
         {mensagem}
       </p>

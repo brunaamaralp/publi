@@ -4,9 +4,17 @@ export type Demanda = {
   titulo: string;
   briefing: string;
   orcamento: number;
+  /** Categoria/nicho da campanha (catálogo em `CATEGORIAS_CATALOGO`). */
+  nichoId?: string;
   formatoEntrega: "reels" | "stories" | "post_feed" | "unboxing" | "live";
   prazo: string;
-  status: "aberta" | "em_negociacao" | "fechada" | "cancelada";
+  status:
+    | "rascunho"
+    | "aberta"
+    | "em_negociacao"
+    | "em_andamento"
+    | "fechada"
+    | "cancelada";
 };
 
 export type PublicoAlvoDemanda = {

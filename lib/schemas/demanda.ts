@@ -16,7 +16,14 @@ export const demandaSchema = z.object({
   orcamento: z.number().positive("Orçamento deve ser um valor positivo"),
   formatoEntrega: formatoEntregaSchema,
   prazo: z.string().min(1, "Prazo é obrigatório"),
-  status: z.enum(["aberta", "em_negociacao", "fechada", "cancelada"]),
+  status: z.enum([
+    "rascunho",
+    "aberta",
+    "em_negociacao",
+    "em_andamento",
+    "fechada",
+    "cancelada",
+  ]),
 });
 
 export const publicoAlvoDemandaSchema = z.object({

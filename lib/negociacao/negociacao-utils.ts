@@ -92,6 +92,11 @@ export function gerarContratoRascunho(
   return {
     ...estado,
     contrato,
+    termosPropostos: {
+      escopo: dados.escopo.trim(),
+      valor: dados.valor,
+      prazoEntrega: dados.prazoEntrega,
+    },
     conversa: { ...estado.conversa, contratoId: contrato.id },
     etapaContrato: "documento",
     assinaturaEmpresa: false,

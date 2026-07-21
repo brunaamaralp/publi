@@ -6,8 +6,9 @@ import { EstrelasNota } from "@/components/avaliacao/estrelas-nota";
 import { IndicadorMetrica } from "@/components/influenciador/cadastro/indicador-metrica";
 import type { Avaliacao } from "@/lib/types";
 import {
-  calcularMediaAvaliacoes,
+  mediaPublicaAvaliacoes,
   formatarMedia,
+  MIN_AVALIACOES_NOTA_PUBLICA,
 } from "@/lib/avaliacao/utils";
 import { cn } from "@/lib/utils";
 
@@ -22,7 +23,7 @@ export function ResumoReputacao({
   variante = "compacta",
   className,
 }: ResumoReputacaoProps) {
-  const media = calcularMediaAvaliacoes(avaliacoes);
+  const media = mediaPublicaAvaliacoes(avaliacoes);
   const total = avaliacoes.length;
 
   if (media === null) {
@@ -34,7 +35,11 @@ export function ResumoReputacao({
         )}
       >
         <IndicadorMetrica tipo="auto-calculado" />
-        <p className="text-sm opacity-80">Sem avaliações ainda</p>
+        <p className="text-sm opacity-80">
+          {total === 0
+            ? "Sem avaliações ainda"
+            : `Novo no Publi (faltam ${MIN_AVALIACOES_NOTA_PUBLICA - total} para nota pública)`}
+        </p>
       </div>
     );
   }

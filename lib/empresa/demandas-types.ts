@@ -5,6 +5,7 @@ export type DemandaPublicacaoDraft = {
   titulo: string;
   briefing: string;
   formatoEntrega: Demanda["formatoEntrega"] | "";
+  nichoId: string;
   orcamento: number | "";
   prazo: string;
   publicoGenero: AudienciaLinha[];
@@ -17,4 +18,6 @@ export type MinhaDemandaItem = {
   publicoAlvo: PublicoAlvoDemanda[];
   matchesGerados: number;
   publicadoEm: string;
+  /** Sinaliza que o orçamento mudou após matches já existirem. */
+  matchesDesatualizados?: boolean;
 };

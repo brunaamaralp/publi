@@ -7,6 +7,7 @@ import {
   INFLUENCIADOR_NEGOCIACAO_USUARIO_ID,
 } from "@/lib/mock-data/negociacao";
 import { DEMANDAS_FEED_MOCK } from "@/lib/mock-data/demandas";
+import { obterContextoPagamentoRegistrado } from "@/lib/pagamento/contrato-pagamento-registro";
 import type { ContratoPagamentoContexto } from "@/lib/pagamento/pagamento-types";
 
 /** Contrato assinado — influenciador CPF (dispara fluxo de RPA). */
@@ -84,5 +85,7 @@ export const MUNICIPIOS_MOCK = [
 export function getContratoPagamentoContexto(
   contratoId: string,
 ): ContratoPagamentoContexto | null {
+  const registrado = obterContextoPagamentoRegistrado(contratoId);
+  if (registrado) return registrado;
   return CONTRATOS_PAGAMENTO_MOCK[contratoId] ?? null;
 }

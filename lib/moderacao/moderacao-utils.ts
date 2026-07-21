@@ -2,6 +2,7 @@ import {
   USUARIOS_PENDENTES_MODERACAO_MOCK,
   type UsuarioPendenteModeracao,
 } from "@/lib/mock-data/moderacao";
+import { definirStatusConta } from "@/lib/mock-data/influenciadores-status";
 import type { Usuario } from "@/lib/types/usuario";
 
 const STORAGE_KEY = "moderacao-estado";
@@ -13,6 +14,17 @@ export type FiltroDataCadastro = "todos" | "7d" | "30d";
 export type ModeracaoEstado = {
   pendentes: UsuarioPendenteModeracao[];
 };
+
+function idsStatusDoItem(item: UsuarioPendenteModeracao): string[] {
+  const usuarioId = item.cadastro.usuario.id;
+  if (item.tipo === "influenciador") {
+    return [usuarioId, item.cadastro.influenciador.id];
+  }
+  if (item.tipo === "empresa") {
+    return [usuarioId, item.cadastro.empresa.id];
+  }
+  return [usuarioId, item.cadastro.agencia.id];
+}
 
 export function carregarEstadoModeracao(): ModeracaoEstado {
   if (typeof window === "undefined") {
@@ -88,20 +100,32 @@ export function filtrarPendentes(
   });
 }
 
+function aplicarDecisaoModeracao(
+  estado: ModeracaoEstado,
+  usuarioId: string,
+  status: Usuario["status"],
+): ModeracaoEstado {
+  const item = estado.pendentes.find((p) => getUsuarioId(p) === usuarioId);
+  if (item) {
+    definirStatusConta(idsStatusDoItem(item), status);
+  }
+  return {
+    pendentes: estado.pendentes.filter(
+      (p) => getUsuarioId(p) !== usuarioId,
+    ),
+  };
+}
+
 export function aprovarUsuario(
   estado: ModeracaoEstado,
   usuarioId: string,
 ): ModeracaoEstado {
-  return {
-    pendentes: estado.pendentes.filter(
-      (item) => getUsuarioId(item) !== usuarioId,
-    ),
-  };
+  return aplicarDecisaoModeracao(estado, usuarioId, "ativo");
 }
 
 export function rejeitarUsuario(
   estado: ModeracaoEstado,
   usuarioId: string,
 ): ModeracaoEstado {
-  return aprovarUsuario(estado, usuarioId);
+  return aplicarDecisaoModeracao(estado, usuarioId, "suspenso");
 }

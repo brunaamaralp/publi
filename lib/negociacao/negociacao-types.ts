@@ -33,6 +33,12 @@ export type NegociacaoEstado = {
   desbloqueadoEm?: string;
   mensagens: Mensagem[];
   contrato: Contrato | null;
+  /** Últimos termos confirmados no formulário (sobrevivem a reabertura). */
+  termosPropostos?: {
+    escopo: string;
+    valor: number;
+    prazoEntrega: string;
+  };
   etapaContrato: EtapaContrato;
   assinaturaEmpresa: boolean;
   assinaturaInfluenciador: boolean;

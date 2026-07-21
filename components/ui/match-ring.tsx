@@ -4,19 +4,33 @@ import { cn } from "@/lib/utils";
 
 export type MatchRingNivel = "alto" | "medio" | "baixo";
 
+/** Faixas de compatibilidade: ≥80 alto, ≥50 médio, abaixo baixo. */
 export function nivelMatchRing(score: number): MatchRingNivel {
-  if (score > 80) return "alto";
+  if (score >= 80) return "alto";
   if (score >= 50) return "medio";
   return "baixo";
 }
 
+/** Rótulos longos para badges e listagens. */
+export const LABELS_FAIXA_MATCH: Record<MatchRingNivel, string> = {
+  alto: "Alta compatibilidade",
+  medio: "Compatibilidade média",
+  baixo: "Compatibilidade a explorar",
+};
+
+/** Rótulos curtos para legendas. */
+export const LABELS_FAIXA_MATCH_CURTA: Record<MatchRingNivel, string> = {
+  alto: "Alta",
+  medio: "Média",
+  baixo: "Baixa",
+};
+
 const RING_STYLES: Record<
   MatchRingNivel,
-  { stroke: string; glow?: string; label: string }
+  { stroke: string; label: string }
 > = {
   alto: {
     stroke: "var(--verde-neon)",
-    glow: "drop-shadow(0 0 6px color-mix(in srgb, var(--verde-neon) 35%, transparent))",
     label: "text-verde-neon",
   },
   medio: {
@@ -31,19 +45,22 @@ const RING_STYLES: Record<
 
 type MatchRingProps = {
   score: number;
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
+  /** Mostra legenda abaixo do anel (faixa curta ou `label`). */
   showLabel?: boolean;
+  /** Legenda customizada; padrão = faixa curta (Alta / Média / Baixa). */
   label?: string;
   className?: string;
-  /** Substitui o texto central padrão (ex: "240" em vez de "75%") */
+  /** Substitui o percentual no centro (ex.: XP). */
   centerValue?: string;
-  /** Texto do aria-label; padrão descreve percentual de compatibilidade */
+  /** Texto do aria-label; padrão descreve score + faixa. */
   ariaLabel?: string;
-  /** Fundo verde-carvão realça o neon apenas no traço do anel (scores altos) */
+  /** Fundo verde-carvão realça o traço do anel. */
   darkBackdrop?: boolean;
 };
 
 const SIZE_MAP = {
+  xs: { box: 44, r: 18, stroke: 3.5, text: "text-[0.65rem]", sub: "text-[0.5rem]" },
   sm: { box: 56, r: 24, stroke: 4, text: "text-sm", sub: "text-[0.55rem]" },
   md: { box: 80, r: 36, stroke: 6, text: "text-xl", sub: "text-[0.6rem]" },
   lg: { box: 96, r: 42, stroke: 6, text: "text-2xl", sub: "text-[0.65rem]" },
@@ -53,18 +70,22 @@ export function MatchRing({
   score,
   size = "md",
   showLabel = false,
-  label = "compatível",
+  label,
   className,
   centerValue,
   ariaLabel,
   darkBackdrop = true,
 }: MatchRingProps) {
-  const nivel = nivelMatchRing(score);
+  const scoreArredondado = Math.round(Math.min(100, Math.max(0, score)));
+  const nivel = nivelMatchRing(scoreArredondado);
   const styles = RING_STYLES[nivel];
   const dim = SIZE_MAP[size];
   const circunferencia = 2 * Math.PI * dim.r;
-  const offset = circunferencia - (score / 100) * circunferencia;
+  const offset = circunferencia - (scoreArredondado / 100) * circunferencia;
   const center = dim.box / 2;
+  const faixaCurta = LABELS_FAIXA_MATCH_CURTA[nivel];
+  const legenda = label ?? faixaCurta;
+  const valorCentro = centerValue ?? `${scoreArredondado}%`;
 
   return (
     <div
@@ -73,14 +94,16 @@ export function MatchRing({
         darkBackdrop && "rounded-card bg-verde-carvao-escuro px-3 py-2",
         className,
       )}
-      aria-label={ariaLabel ?? `${score}% de compatibilidade`}
+      aria-label={
+        ariaLabel ??
+        `${scoreArredondado}% de compatibilidade — ${LABELS_FAIXA_MATCH[nivel]}`
+      }
     >
       <div className="relative" style={{ width: dim.box, height: dim.box }}>
         <svg
           className="size-full -rotate-90"
           viewBox={`0 0 ${dim.box} ${dim.box}`}
           aria-hidden
-          style={styles.glow ? { filter: styles.glow } : undefined}
         >
           <circle
             cx={center}
@@ -100,32 +123,32 @@ export function MatchRing({
             strokeLinecap="round"
             strokeDasharray={circunferencia}
             strokeDashoffset={offset}
-            className="transition-all duration-500"
+            className="transition-[stroke-dashoffset] duration-500 ease-out"
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span
             className={cn(
-              "font-data leading-none font-bold",
+              "font-data leading-none font-bold tabular-nums",
               dim.text,
               darkBackdrop ? "text-branco" : "text-foreground",
             )}
           >
-            {centerValue ?? `${score}%`}
+            {valorCentro}
           </span>
-          {showLabel ? (
-            <span
-              className={cn(
-                "mt-0.5 font-medium tracking-wide uppercase",
-                dim.sub,
-                darkBackdrop ? "text-cinza-500" : styles.label,
-              )}
-            >
-              {label}
-            </span>
-          ) : null}
         </div>
       </div>
+      {showLabel ? (
+        <span
+          className={cn(
+            "font-medium tracking-wide uppercase",
+            dim.sub,
+            darkBackdrop ? "text-cinza-500" : styles.label,
+          )}
+        >
+          {legenda}
+        </span>
+      ) : null}
     </div>
   );
 }

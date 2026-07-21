@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock, Lock } from "lucide-react";
+import { Clock, EyeOff, Lock } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -11,7 +11,11 @@ import { EstrelasNota } from "@/components/avaliacao/estrelas-nota";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { jaAvaliouContrato } from "@/lib/avaliacao/utils";
+import {
+  avaliacaoDaParte,
+  avaliacaoMutuaRevelada,
+  jaAvaliouContrato,
+} from "@/lib/avaliacao/utils";
 import { avaliacaoFormSchema } from "@/lib/schemas/avaliacao";
 import type { Avaliacao } from "@/lib/types";
 import type { Contrato } from "@/lib/types/contrato";
@@ -22,6 +26,8 @@ type AvaliacaoDialogProps = {
   avaliadorId: string;
   avaliadoId: string;
   nomeContraparte: string;
+  /** ID do outro avaliador (para revelação mútua). */
+  contraparteAvaliadorId: string;
   avaliacoesExistentes: Avaliacao[];
   onAvaliacaoEnviada?: (avaliacao: Avaliacao) => void;
   className?: string;
@@ -32,6 +38,7 @@ export function AvaliacaoDialog({
   avaliadorId,
   avaliadoId,
   nomeContraparte,
+  contraparteAvaliadorId,
   avaliacoesExistentes,
   onAvaliacaoEnviada,
   className,
@@ -42,12 +49,27 @@ export function AvaliacaoDialog({
   const [erro, setErro] = useState<string | null>(null);
 
   const contratoCumprido = contrato.status === "cumprido";
-  const avaliacaoEnviada = avaliacoesExistentes.find(
-    (a) => a.contratoId === contrato.id && a.avaliadorId === avaliadorId,
+  const avaliacaoEnviada = avaliacaoDaParte(
+    avaliacoesExistentes,
+    contrato.id,
+    avaliadorId,
   );
   const jaAvaliou =
     enviado ||
     jaAvaliouContrato(avaliacoesExistentes, contrato.id, avaliadorId);
+  const revelada = avaliacaoMutuaRevelada(
+    avaliacoesExistentes,
+    contrato.id,
+    avaliadorId,
+    contraparteAvaliadorId,
+  );
+  const notaContraparte = revelada
+    ? avaliacaoDaParte(
+        avaliacoesExistentes,
+        contrato.id,
+        contraparteAvaliadorId,
+      )
+    : undefined;
 
   function handleEnviar() {
     if (nota === null) return;
@@ -82,7 +104,10 @@ export function AvaliacaoDialog({
     onAvaliacaoEnviada?.(novaAvaliacao);
     setEnviado(true);
     setErro(null);
-    toast.success("Avaliação enviada com sucesso!");
+    toast.success("Avaliação enviada!", {
+      description:
+        "A nota da contraparte só aparece quando ambos avaliarem.",
+    });
   }
 
   if (!contratoCumprido) {
@@ -136,17 +161,16 @@ export function AvaliacaoDialog({
         <div className="flex items-start gap-2 rounded-card border border-cinza-200 bg-cinza-200/30 px-3 py-2.5">
           <Lock className="text-cinza-500 mt-0.5 size-3.5 shrink-0" aria-hidden />
           <p className="text-texto-secundario text-xs font-normal leading-relaxed">
-            Avaliação já enviada para este contrato. Uma avaliação por contrato
-            e por avaliador — não é possível alterar ou reenviar.
+            Sua avaliação foi enviada. Uma avaliação por contrato e por
+            avaliador — não é possível alterar.
           </p>
         </div>
 
-        <div
-          className="pointer-events-none space-y-5 opacity-75"
-          aria-disabled="true"
-        >
+        <div className="space-y-5">
           <div className="space-y-2">
-            <Label className="text-texto-secundario font-normal">Nota</Label>
+            <Label className="text-texto-secundario font-normal">
+              Sua nota
+            </Label>
             {notaFinal ? (
               <EstrelasNota nota={notaFinal} tamanho="lg" mostrarNumero />
             ) : null}
@@ -154,10 +178,39 @@ export function AvaliacaoDialog({
 
           <div className="space-y-2">
             <Label className="text-texto-secundario font-normal">
-              Comentário
+              Seu comentário
             </Label>
             <ComentarioAvaliacaoCard>{comentarioFinal}</ComentarioAvaliacaoCard>
           </div>
+
+          {revelada && notaContraparte ? (
+            <div className="space-y-3 border-t border-cinza-200 pt-4">
+              <Label className="text-texto-secundario font-normal">
+                Nota de {nomeContraparte} para você
+              </Label>
+              <EstrelasNota
+                nota={notaContraparte.notaFornecedor}
+                tamanho="lg"
+                mostrarNumero
+              />
+              {notaContraparte.comentario ? (
+                <ComentarioAvaliacaoCard>
+                  {notaContraparte.comentario}
+                </ComentarioAvaliacaoCard>
+              ) : null}
+            </div>
+          ) : (
+            <div className="flex items-start gap-2 rounded-card border border-lilas/40 bg-lilas-claro px-3 py-2.5">
+              <EyeOff
+                className="text-lilas-escuro mt-0.5 size-3.5 shrink-0"
+                aria-hidden
+              />
+              <p className="text-lilas-escuro text-xs font-normal leading-relaxed">
+                A nota da contraparte fica oculta até que {nomeContraparte}{" "}
+                também avalie.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -172,16 +225,16 @@ export function AvaliacaoDialog({
           Avaliar {nomeContraparte}
         </h2>
         <p className="text-texto-secundario text-sm font-normal">
-          Sua avaliação ajuda a construir reputação na plataforma. Cada parte
-          avalia a outra uma única vez por contrato concluído.
+          Sua avaliação ajuda a construir reputação na plataforma. A nota que
+          você receber só será revelada depois que ambos avaliarem.
         </p>
       </div>
 
       <div className="rounded-card border border-lilas/40 bg-lilas-claro px-3 py-2.5">
         <p className="text-lilas-escuro text-xs font-normal leading-relaxed">
-          <span className="font-semibold">Uma avaliação por contrato.</span>{" "}
-          Após enviar, o formulário ficará bloqueado para este contrato e este
-          avaliador.
+          <span className="font-semibold">Avaliação mútua e sigilosa.</span>{" "}
+          Após enviar, o formulário fica bloqueado. A nota da outra parte só
+          aparece quando os dois lados tiverem avaliado.
         </p>
       </div>
 
@@ -224,15 +277,7 @@ export function AvaliacaoDialog({
           rows={4}
           maxLength={300}
           className="border-cinza-200 bg-white font-normal"
-          aria-describedby="comentario-avaliacao-hint"
         />
-        <p
-          id="comentario-avaliacao-hint"
-          className="text-texto-secundario text-xs font-normal"
-        >
-          O comentário fica em card neutro — a nota não altera as cores do
-          formulário.
-        </p>
       </div>
 
       {erro ? (

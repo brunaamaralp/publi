@@ -1,6 +1,7 @@
 import type { Entrega, Pagamento, Rpa } from "@/lib/types";
 
 import { getContratoPagamentoContexto } from "@/lib/mock-data/contratos-pagamento";
+import { sincronizarStatusContratoRegistrado } from "@/lib/pagamento/contrato-pagamento-registro";
 import type {
   CalculoRpa,
   ContratoPagamentoContexto,
@@ -67,6 +68,23 @@ export function carregarPagamentoEstado(
 export function salvarPagamentoEstado(estado: PagamentoFluxoEstado) {
   if (typeof window === "undefined") return;
   localStorage.setItem(storageKey(estado.contratoId), JSON.stringify(estado));
+
+  const matchId = estado.contrato.matchId;
+  if (!matchId) return;
+  try {
+    const negKey = `negociacao-estado-${matchId}`;
+    const raw = localStorage.getItem(negKey);
+    if (!raw) return;
+    const neg = JSON.parse(raw) as {
+      contrato?: { id?: string; status?: string } | null;
+    };
+    if (neg.contrato?.id === estado.contratoId) {
+      neg.contrato = { ...neg.contrato, status: estado.contrato.status };
+      localStorage.setItem(negKey, JSON.stringify(neg));
+    }
+  } catch {
+    // ignore
+  }
 }
 
 export function registrarDeposito(
@@ -94,6 +112,8 @@ export function registrarDeposito(
       status: "confirmado_pela_empresa",
     };
   }
+
+  sincronizarStatusContratoRegistrado(estado.contratoId, "em_execucao");
 
   return {
     ...estado,
@@ -127,6 +147,8 @@ export function confirmarEntrega(
   estado: PagamentoFluxoEstado,
 ): PagamentoFluxoEstado {
   if (!estado.pagamento || !estado.entrega) return estado;
+
+  sincronizarStatusContratoRegistrado(estado.contratoId, "cumprido");
 
   return {
     ...estado,

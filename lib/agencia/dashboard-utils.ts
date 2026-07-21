@@ -8,7 +8,11 @@ import {
 } from "@/lib/mock-data/agencia-dashboard";
 import { formatarMoeda } from "@/lib/influenciador/cadastro-utils";
 
-const STATUS_DEMANDA_ATIVA = new Set(["aberta", "em_negociacao"]);
+const STATUS_DEMANDA_ATIVA = new Set([
+  "aberta",
+  "em_negociacao",
+  "em_andamento",
+]);
 const STATUS_CONTRATO_ANDAMENTO = new Set(["assinado", "em_execucao"]);
 
 export type ResumoEmpresaCliente = {

@@ -6,6 +6,7 @@ import {
   BarChart3,
   FileText,
   GraduationCap,
+  UserRound,
   Wallet,
 } from "lucide-react";
 
@@ -22,6 +23,13 @@ const ATALHOS = [
     descricao: "12 campanhas com compatibilidade acima de 70%",
     icone: FileText,
     destaque: true,
+  },
+  {
+    href: "/influenciador/meu-portfolio",
+    titulo: "Meu portfólio",
+    descricao: "Edite bio, pacotes e trabalhos da sua vitrine pública",
+    icone: UserRound,
+    destaque: false,
   },
   {
     href: "/influenciador/treinamentos",

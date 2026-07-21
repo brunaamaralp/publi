@@ -1,6 +1,11 @@
 import type { Demanda, Match } from "@/lib/types";
 
+import { demandaVisivelNaBusca } from "@/lib/demandas/utils";
 import { INFLUENCIADOR_MOCK_ID } from "@/lib/mock-data/avaliacoes";
+import {
+  influenciadorAtivoEmListagens,
+  INFLUENCIADOR_SUSPENSO_MOCK_ID,
+} from "@/lib/mock-data/influenciadores-status";
 
 /** Item do feed combinando demanda, match e metadados de exibição. */
 export type DemandaFeedItem = {
@@ -45,7 +50,7 @@ export const DEMANDAS_FEED_MOCK: DemandaFeedItem[] = [
       orcamento: 4200,
       formatoEntrega: "reels",
       prazo: "2026-08-01",
-      status: "aberta",
+      status: "em_negociacao",
     },
     match: {
       id: "match-002",
@@ -68,7 +73,7 @@ export const DEMANDAS_FEED_MOCK: DemandaFeedItem[] = [
       orcamento: 6000,
       formatoEntrega: "stories",
       prazo: "2026-07-28",
-      status: "aberta",
+      status: "em_andamento",
     },
     match: {
       id: "match-003",
@@ -288,7 +293,73 @@ export const DEMANDAS_FEED_MOCK: DemandaFeedItem[] = [
     empresaVerificada: true,
     publicadoEm: "2026-06-27T09:30:00.000Z",
   },
+  /**
+   * Rascunho no mock do feed só para validar exclusão na listagem do influenciador.
+   * Não deve aparecer após o filtro por demanda.status (etapa de telas).
+   */
+  {
+    demanda: {
+      id: "dem-013",
+      empresaId: "emp-plat-011",
+      titulo: "Campanha ainda em edição (rascunho)",
+      briefing:
+        "Demanda não publicada — não deve ser listada para influenciadores.",
+      orcamento: 5000,
+      formatoEntrega: "reels",
+      prazo: "2026-09-30",
+      status: "rascunho",
+    },
+    match: {
+      id: "match-013",
+      demandaId: "dem-013",
+      influenciadorId: INFLUENCIADOR_MOCK_ID,
+      score: 40,
+      status: "sugerido",
+    },
+    empresaNome: "Marca Interna",
+    empresaVerificada: false,
+    publicadoEm: "2026-07-16T12:00:00.000Z",
+  },
+  /**
+   * Match apontando para influenciador suspenso — excluído por listarDemandasFeed.
+   */
+  {
+    demanda: {
+      id: "dem-014",
+      empresaId: "emp-plat-012",
+      titulo: "Campanha com criador suspenso (demo filtro)",
+      briefing:
+        "Não deve aparecer no feed — influenciador do match não está ativo.",
+      orcamento: 3200,
+      formatoEntrega: "stories",
+      prazo: "2026-08-20",
+      status: "aberta",
+    },
+    match: {
+      id: "match-014",
+      demandaId: "dem-014",
+      influenciadorId: INFLUENCIADOR_SUSPENSO_MOCK_ID,
+      score: 70,
+      status: "sugerido",
+    },
+    empresaNome: "Filtro Demo Co.",
+    empresaVerificada: true,
+    publicadoEm: "2026-07-16T13:00:00.000Z",
+  },
 ];
+
+/**
+ * Origem do feed do influenciador: só inclui matches cujo influenciador está ativo
+ * e demandas elegíveis à busca (exclui rascunho).
+ * Telas devem consumir esta função, não o array bruto.
+ */
+export function listarDemandasFeed(): DemandaFeedItem[] {
+  return DEMANDAS_FEED_MOCK.filter(
+    (item) =>
+      demandaVisivelNaBusca(item.demanda.status) &&
+      influenciadorAtivoEmListagens(item.match.influenciadorId),
+  );
+}
 
 export const ORCAMENTO_MIN_MOCK = 1500;
 export const ORCAMENTO_MAX_MOCK = 10000;

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, BarChart3, Building2, PlusCircle } from "lucide-react";
+import { ArrowRight, BarChart3, Building2, PlusCircle, Search } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,13 @@ const ATALHOS = [
     descricao: "Crie uma nova demanda para criadores compatíveis",
     icone: PlusCircle,
     destaque: true,
+  },
+  {
+    href: "/empresa/buscar-creators",
+    titulo: "Buscar creators",
+    descricao: "Busca ativa de influenciadores fora do fluxo de demanda",
+    icone: Search,
+    destaque: false,
   },
   {
     href: "/empresa/demandas",

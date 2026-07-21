@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Building2 } from "lucide-react";
+import { AlertTriangle, Building2 } from "lucide-react";
 import { toast } from "sonner";
 
+import { SeletorEmpresaCliente } from "@/components/agencia/seletor-empresa-cliente";
 import { AudienciaBreakdown } from "@/components/influenciador/cadastro/audiencia-breakdown";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,12 +21,21 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import {
   criarDemandaPublicacaoInicial,
+  erroOrcamentoAoVivo,
+  podePublicarDemanda,
   publicarDemanda,
+  salvarRascunhoDemanda,
   validarDemandaPublicacao,
+  validarDemandaRascunho,
 } from "@/lib/empresa/demandas-utils";
 import type { DemandaPublicacaoDraft } from "@/lib/empresa/demandas-types";
+import {
+  NICHOS_DEMANDA,
+  orcamentoMinimoNicho,
+} from "@/lib/empresa/orcamento-nicho";
 import { useEmpresaPublicadora } from "@/lib/empresa/use-empresa-publicadora";
 import {
+  formatarMoeda,
   LABELS_TIPO_SERVICO,
   TIPOS_SERVICO,
 } from "@/lib/influenciador/cadastro-utils";
@@ -39,12 +49,69 @@ export function FormularioNovaDemanda() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [enviando, setEnviando] = useState(false);
 
+  const erroOrcamentoLive = useMemo(
+    () => erroOrcamentoAoVivo(draft),
+    [draft],
+  );
+
+  const minimoNicho = draft.nichoId
+    ? orcamentoMinimoNicho(draft.nichoId)
+    : null;
+
+  const semClienteAgencia = publicador.modo === "agencia_sem_cliente";
+
+  const publicarDesabilitado =
+    enviando ||
+    semClienteAgencia ||
+    !podePublicarDemanda(draft) ||
+    !!erroOrcamentoLive;
+
   function updateDraft(partial: Partial<DemandaPublicacaoDraft>) {
-    setDraft((prev) => ({ ...prev, ...partial }));
+    setDraft((prev) => {
+      const next = { ...prev, ...partial };
+      setErrors((errs) => {
+        const live = erroOrcamentoAoVivo(next);
+        const nextErrs = { ...errs };
+        if ("nichoId" in partial) delete nextErrs.nichoId;
+        if (live) {
+          nextErrs.orcamento = live;
+        } else {
+          delete nextErrs.orcamento;
+        }
+        return nextErrs;
+      });
+      return next;
+    });
+  }
+
+  function handleSalvarRascunho() {
+    if (semClienteAgencia || !publicador.empresaId) {
+      toast.error("Selecione um cliente para publicar esta demanda");
+      return;
+    }
+    const validationErrors = validarDemandaRascunho(draft);
+    setErrors(validationErrors);
+    if (Object.keys(validationErrors).length > 0) return;
+
+    setEnviando(true);
+    try {
+      salvarRascunhoDemanda(draft, publicador.empresaId);
+      toast.success(
+        "Rascunho salvo. Ele não aparece na busca de influenciadores.",
+      );
+      router.push("/empresa/demandas");
+    } finally {
+      setEnviando(false);
+    }
   }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (semClienteAgencia || !publicador.empresaId) {
+      toast.error("Selecione um cliente para publicar esta demanda");
+      return;
+    }
+
     const validationErrors = validarDemandaPublicacao(draft);
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) return;
@@ -59,6 +126,8 @@ export function FormularioNovaDemanda() {
     }
   }
 
+  const orcamentoErro = errors.orcamento || erroOrcamentoLive;
+
   return (
     <form onSubmit={handleSubmit} className="space-y-8" noValidate>
       {publicador.modo === "agencia" ? (
@@ -72,6 +141,19 @@ export function FormularioNovaDemanda() {
             {publicador.empresaNome}
           </span>
         </Badge>
+      ) : null}
+
+      {semClienteAgencia ? (
+        <div className="space-y-3 rounded-card border border-destructive/30 bg-destructive/5 p-4">
+          <p
+            role="status"
+            className="text-destructive flex items-start gap-2 text-sm"
+          >
+            <AlertTriangle className="mt-0.5 size-4 shrink-0" aria-hidden />
+            Selecione um cliente para publicar esta demanda
+          </p>
+          <SeletorEmpresaCliente />
+        </div>
       ) : null}
 
       <section className="space-y-4" aria-labelledby="titulo-demanda">
@@ -129,6 +211,42 @@ export function FormularioNovaDemanda() {
         </h2>
 
         <div className="space-y-2">
+          <Label htmlFor="nicho">
+            Nicho <span className="text-destructive">*</span>
+          </Label>
+          <Select
+            value={draft.nichoId || undefined}
+            onValueChange={(value) =>
+              updateDraft({ nichoId: value ?? "" })
+            }
+          >
+            <SelectTrigger
+              id="nicho"
+              className="w-full"
+              aria-invalid={!!errors.nichoId}
+            >
+              <SelectValue placeholder="Selecione o nicho" />
+            </SelectTrigger>
+            <SelectContent>
+              {NICHOS_DEMANDA.map((nicho) => (
+                <SelectItem key={nicho.id} value={nicho.id}>
+                  {nicho.nome}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {errors.nichoId ? (
+            <p role="alert" className="text-destructive text-sm">
+              {errors.nichoId}
+            </p>
+          ) : minimoNicho ? (
+            <p className="text-texto-secundario text-xs">
+              Orçamento mínimo sugerido: {formatarMoeda(minimoNicho)}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="space-y-2">
           <Label htmlFor="formato">
             Formato de entrega <span className="text-destructive">*</span>
           </Label>
@@ -136,8 +254,8 @@ export function FormularioNovaDemanda() {
             value={draft.formatoEntrega || undefined}
             onValueChange={(value) =>
               updateDraft({
-                formatoEntrega:
-                  value as DemandaPublicacaoDraft["formatoEntrega"],
+                formatoEntrega: (value ??
+                  "") as DemandaPublicacaoDraft["formatoEntrega"],
               })
             }
           >
@@ -181,21 +299,21 @@ export function FormularioNovaDemanda() {
               });
             }}
             placeholder="Ex: 5000"
-            aria-invalid={!!errors.orcamento}
-            aria-describedby={errors.orcamento ? "orcamento-error" : undefined}
+            aria-invalid={!!orcamentoErro}
+            aria-describedby={orcamentoErro ? "orcamento-error" : undefined}
           />
-          {errors.orcamento ? (
+          {orcamentoErro ? (
             <p
               id="orcamento-error"
               role="alert"
               className="text-destructive text-sm"
             >
-              {errors.orcamento}
+              {orcamentoErro}
             </p>
           ) : null}
         </div>
 
-        <div className="space-y-2 sm:col-span-2 sm:max-w-xs">
+        <div className="space-y-2">
           <Label htmlFor="prazo">
             Prazo <span className="text-destructive">*</span>
           </Label>
@@ -247,7 +365,13 @@ export function FormularioNovaDemanda() {
         />
       </section>
 
-      <footer className="border-border flex flex-col-reverse gap-3 border-t pt-6 sm:flex-row sm:justify-end">
+      <footer className="border-border flex flex-col gap-3 border-t pt-6">
+        {semClienteAgencia ? (
+          <p role="status" className="text-destructive text-sm sm:text-right">
+            Selecione um cliente para publicar esta demanda
+          </p>
+        ) : null}
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <Button
           type="button"
           variant="outline"
@@ -255,9 +379,28 @@ export function FormularioNovaDemanda() {
         >
           Cancelar
         </Button>
-        <Button type="submit" disabled={enviando}>
+        <Button
+          type="button"
+          variant="secondary"
+          disabled={enviando || semClienteAgencia}
+          onClick={handleSalvarRascunho}
+        >
+          Salvar rascunho
+        </Button>
+        <Button
+          type="submit"
+          disabled={publicarDesabilitado}
+          title={
+            semClienteAgencia
+              ? "Selecione um cliente para publicar esta demanda"
+              : erroOrcamentoLive
+                ? erroOrcamentoLive
+                : undefined
+          }
+        >
           {enviando ? "Publicando…" : "Publicar demanda"}
         </Button>
+        </div>
       </footer>
     </form>
   );

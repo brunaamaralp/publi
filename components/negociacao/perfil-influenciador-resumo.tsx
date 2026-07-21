@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { exibeNotaPublica } from "@/lib/avaliacao/utils";
 import type { NegociacaoContexto } from "@/lib/negociacao/negociacao-types";
 import { cn } from "@/lib/utils";
 
@@ -25,10 +26,19 @@ export function PerfilInfluenciadorResumoCard({
   return (
     <Card className={cn(className)}>
       <CardHeader className="flex flex-row items-start gap-4 pb-3">
-        <MatchRing score={match.score} size="sm" darkBackdrop />
+        <MatchRing
+          score={match.score}
+          size="sm"
+          showLabel
+          darkBackdrop
+          className="shrink-0"
+        />
         <div className="min-w-0 flex-1">
           <CardTitle className="text-lg">{influenciador.nome}</CardTitle>
           <CardDescription className="mt-1">{influenciador.nicho}</CardDescription>
+          <p className="text-texto-secundario mt-2 text-xs font-normal">
+            Score de compatibilidade com esta demanda
+          </p>
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -61,9 +71,12 @@ export function PerfilInfluenciadorResumoCard({
               Avaliação
             </dt>
             <dd className="font-data mt-0.5 font-semibold">
-              {influenciador.notaMedia !== null
-                ? `${influenciador.notaMedia.toFixed(1)} (${influenciador.totalAvaliacoes})`
-                : "—"}
+              {exibeNotaPublica({
+                totalAvaliacoes: influenciador.totalAvaliacoes,
+                notaMedia: influenciador.notaMedia,
+              })
+                ? `${influenciador.notaMedia!.toFixed(1)} (${influenciador.totalAvaliacoes})`
+                : "Novo no Publi"}
             </dd>
           </div>
         </dl>

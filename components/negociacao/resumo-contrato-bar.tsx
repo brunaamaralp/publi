@@ -1,7 +1,12 @@
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+
+import { buttonVariants } from "@/components/ui/button";
 import type { Contrato } from "@/lib/types";
 import { LABELS_STATUS_CONTRATO } from "@/lib/negociacao/negociacao-utils";
 import { formatarMoeda } from "@/lib/influenciador/cadastro-utils";
 import { formatarPrazo } from "@/lib/demandas/utils";
+import { hrefPagamentoContrato } from "@/lib/pagamento/contrato-pagamento-link";
 import { cn } from "@/lib/utils";
 
 type ResumoContratoBarProps = {
@@ -39,9 +44,20 @@ export function ResumoContratoBar({
           Prazo: {formatarPrazo(contrato.prazoEntrega)}
         </p>
       </div>
-      <p className="font-data text-base font-semibold">
-        {formatarMoeda(contrato.valor)}
-      </p>
+      <div className="flex flex-wrap items-center gap-3">
+        <p className="font-data text-base font-semibold">
+          {formatarMoeda(contrato.valor)}
+        </p>
+        {assinado ? (
+          <Link
+            href={hrefPagamentoContrato(contrato)}
+            className={cn(buttonVariants({ variant: "cta", size: "sm" }))}
+          >
+            Ir para pagamento
+            <ArrowRight className="size-4" aria-hidden />
+          </Link>
+        ) : null}
+      </div>
     </div>
   );
 }

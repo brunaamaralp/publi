@@ -7,6 +7,11 @@ import { ArrowLeft } from "lucide-react";
 import { ChatNegociacao } from "@/components/negociacao/chat-negociacao";
 import { PaywallDesbloqueio } from "@/components/negociacao/paywall-desbloqueio";
 import { buttonVariants } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth-context";
+import {
+  rotaListaPorPapel,
+  rotuloVoltarPorPapel,
+} from "@/lib/app/voltar-por-papel";
 import { getNegociacaoContexto } from "@/lib/mock-data/negociacao";
 import type { NegociacaoEstado } from "@/lib/negociacao/negociacao-types";
 import {
@@ -17,6 +22,7 @@ import {
   gerarContratoRascunho,
   salvarNegociacaoEstado,
 } from "@/lib/negociacao/negociacao-utils";
+import { registrarContextoPagamentoDeNegociacao } from "@/lib/pagamento/contrato-pagamento-registro";
 import { cn } from "@/lib/utils";
 
 type NegociacaoFlowProps = {
@@ -24,7 +30,14 @@ type NegociacaoFlowProps = {
 };
 
 export function NegociacaoFlow({ matchId }: NegociacaoFlowProps) {
+  const { usuario } = useAuth();
   const contexto = getNegociacaoContexto(matchId);
+  const rotaVoltar = usuario
+    ? rotaListaPorPapel(usuario.tipo)
+    : "/influenciador/demandas";
+  const rotuloVoltar = usuario
+    ? rotuloVoltarPorPapel(usuario.tipo)
+    : "Voltar às oportunidades";
   const [estado, setEstado] = useState<NegociacaoEstado | null>(null);
   const [carregado, setCarregado] = useState(false);
 
@@ -60,10 +73,10 @@ export function NegociacaoFlow({ matchId }: NegociacaoFlowProps) {
           corresponde a uma negociação disponível.
         </p>
         <Link
-          href="/influenciador/demandas"
+          href={rotaVoltar}
           className={cn(buttonVariants({ variant: "outline" }), "mt-6")}
         >
-          Voltar às oportunidades
+          {rotuloVoltar}
         </Link>
       </div>
     );
@@ -82,11 +95,12 @@ export function NegociacaoFlow({ matchId }: NegociacaoFlowProps) {
       <header className="border-b border-cinza-200 bg-white/95 px-4 py-3 backdrop-blur sm:px-6">
         <div className="mx-auto flex max-w-3xl items-center gap-3">
           <Link
-            href="/empresa/demandas"
+            href={rotaVoltar}
             className={cn(
               buttonVariants({ variant: "ghost", size: "sm" }),
               "-ml-2",
             )}
+            aria-label={rotuloVoltar}
           >
             <ArrowLeft className="size-4" aria-hidden />
             Voltar
@@ -120,7 +134,16 @@ export function NegociacaoFlow({ matchId }: NegociacaoFlowProps) {
               atualizarEstado(assinarContratoEmpresa);
             }}
             onAssinarInfluenciador={() => {
-              atualizarEstado(assinarContratoInfluenciador);
+              atualizarEstado((prev) => {
+                const next = assinarContratoInfluenciador(prev);
+                if (next.contrato?.status === "assinado" && contexto) {
+                  registrarContextoPagamentoDeNegociacao(
+                    next.contrato,
+                    contexto,
+                  );
+                }
+                return next;
+              });
             }}
           />
         )}

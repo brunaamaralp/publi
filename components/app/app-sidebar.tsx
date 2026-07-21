@@ -22,6 +22,7 @@ const LABEL_TIPO: Record<string, string> = {
 const LABEL_STATUS: Record<string, string> = {
   ativo: "Ativo",
   suspenso: "Suspenso",
+  pendente_verificacao: "Pendente",
 };
 
 type AppSidebarProps = {

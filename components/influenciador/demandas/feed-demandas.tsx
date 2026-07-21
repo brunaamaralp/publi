@@ -23,9 +23,12 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/lib/auth-context";
-import type { OrdenacaoDemanda } from "@/lib/demandas/utils";
 import {
-  DEMANDAS_FEED_MOCK,
+  demandaVisivelNaBusca,
+  type OrdenacaoDemanda,
+} from "@/lib/demandas/utils";
+import {
+  listarDemandasFeed,
   type DemandaFeedItem,
 } from "@/lib/mock-data/demandas";
 import { perfilInfluenciadorConcluido } from "@/lib/influenciador/perfil-storage";
@@ -57,6 +60,10 @@ function aplicarFiltros(
   filtros: FiltrosDemanda,
 ): DemandaFeedItem[] {
   return itens.filter((item) => {
+    // Rascunhos (e demais status fora da busca) nunca entram no feed.
+    if (!demandaVisivelNaBusca(item.demanda.status)) {
+      return false;
+    }
     if (
       filtros.formato !== "todos" &&
       item.demanda.formatoEntrega !== filtros.formato
@@ -86,7 +93,7 @@ export function FeedDemandas() {
     }
     const concluido = perfilInfluenciadorConcluido(usuario.id);
     setPerfilPronto(concluido);
-    setItens(concluido ? DEMANDAS_FEED_MOCK : []);
+    setItens(concluido ? listarDemandasFeed() : []);
   }, [usuario]);
 
   const sugeridos = useMemo(() => {
@@ -109,7 +116,7 @@ export function FeedDemandas() {
           : item,
       ),
     );
-    toast.success("Interesse enviado! A empresa será notificada.");
+                toast.success("Interesse enviado — a empresa verá seu perfil nesta demanda.");
     setAbaAtiva("enviados");
   }
 
@@ -118,7 +125,7 @@ export function FeedDemandas() {
     setItens((prev) =>
       prev.filter((item) => item.match.id !== recusarMatchId),
     );
-    toast("Demanda recusada e removida da sua lista.");
+    toast("Oportunidade removida da sua lista.");
     setRecusarMatchId(null);
   }
 
@@ -166,14 +173,9 @@ export function FeedDemandas() {
             Demandas para você
           </h1>
           <p className="text-texto-secundario mt-2 text-sm font-normal">
-            Ordenadas por compatibilidade com seu perfil — quanto maior a aderência,
-            melhor a oportunidade.
+            Cada oportunidade traz um score de compatibilidade com o seu perfil.
+            Foque nos percentuais mais altos para aumentar a chance de fechar.
           </p>
-          {filtros.ordenacao === "melhor_match" && sugeridos.length > 0 ? (
-            <p className="text-lilas-escuro mt-3 text-xs font-medium">
-              Exibindo da maior para a menor compatibilidade
-            </p>
-          ) : null}
         </header>
 
         <FiltrosDemandas
@@ -261,11 +263,11 @@ export function FeedDemandas() {
         >
           <DialogContent className="sm:max-w-sm">
             <DialogHeader>
-              <DialogTitle>Recusar esta demanda?</DialogTitle>
+              <DialogTitle>Remover esta oportunidade?</DialogTitle>
               <DialogDescription>
                 {itemRecusar
-                  ? `“${itemRecusar.demanda.titulo}” será removida da sua lista. Você não poderá desfazer esta ação.`
-                  : "Esta demanda será removida da sua lista."}
+                  ? `“${itemRecusar.demanda.titulo}” sai da sua lista. Você não poderá desfazer esta ação.`
+                  : "Esta oportunidade será removida da sua lista."}
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="gap-2 sm:gap-0">
@@ -274,14 +276,14 @@ export function FeedDemandas() {
                 variant="outline"
                 onClick={() => setRecusarMatchId(null)}
               >
-                Cancelar
+                Manter
               </Button>
               <Button
                 type="button"
                 variant="destructive"
                 onClick={confirmarRecusa}
               >
-                Recusar demanda
+                Remover
               </Button>
             </DialogFooter>
           </DialogContent>

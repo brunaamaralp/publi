@@ -1,5 +1,9 @@
 import { GuardTipo } from "@/components/auth/guard-tipo";
 
+/**
+ * Layout da área /influenciador — permite visitação pública de portfólios
+ * por empresa/agência. Rotas privadas têm GuardTipo próprio.
+ */
 export default function InfluenciadorPortalLayout({
   children,
 }: {
@@ -7,8 +11,8 @@ export default function InfluenciadorPortalLayout({
 }) {
   return (
     <GuardTipo
-      permitidos={["influenciador"]}
-      mensagem="Esta área é exclusiva para contas de influenciador."
+      permitidos={["influenciador", "empresa", "agencia", "admin"]}
+      mensagem="Faça login para acessar esta área."
     >
       {children}
     </GuardTipo>

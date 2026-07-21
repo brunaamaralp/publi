@@ -1,16 +1,27 @@
 import type { Mensagem } from "@/lib/types";
 
+import { obterMatchConvite } from "@/lib/empresa/convite-match";
 import {
   EMPRESA_MOCK_ID,
   INFLUENCIADOR_MOCK_ID,
 } from "@/lib/mock-data/avaliacoes";
 import { DEMANDAS_FEED_MOCK } from "@/lib/mock-data/demandas";
+import {
+  INFLUENCIADOR_SUSPENSO_MOCK_ID,
+  INFLUENCIADOR_SUSPENSO_USUARIO_ID,
+} from "@/lib/mock-data/influenciadores-status";
+import {
+  EMPRESA_NEGOCIACAO_USUARIO_ID,
+  INFLUENCIADOR_NEGOCIACAO_USUARIO_ID,
+  TAXA_DESBLOQUEIO_PADRAO,
+} from "@/lib/negociacao/negociacao-constantes";
 import type { NegociacaoContexto } from "@/lib/negociacao/negociacao-types";
 
-export const EMPRESA_NEGOCIACAO_USUARIO_ID = "usr-empresa-neg-001";
-export const INFLUENCIADOR_NEGOCIACAO_USUARIO_ID = "usr-influ-neg-001";
-
-export const TAXA_DESBLOQUEIO_PADRAO = 49.9;
+export {
+  EMPRESA_NEGOCIACAO_USUARIO_ID,
+  INFLUENCIADOR_NEGOCIACAO_USUARIO_ID,
+  TAXA_DESBLOQUEIO_PADRAO,
+} from "@/lib/negociacao/negociacao-constantes";
 
 const CONTEXTO_MATCH_001: NegociacaoContexto = {
   match: {
@@ -60,15 +71,44 @@ const CONTEXTO_MATCH_002: NegociacaoContexto = {
   taxaDesbloqueio: TAXA_DESBLOQUEIO_PADRAO,
 };
 
+/** Match com influenciador suspenso — filtrado em listarMatchesPorDemanda. */
+const CONTEXTO_MATCH_SUSPENSO: NegociacaoContexto = {
+  match: {
+    id: "match-suspenso",
+    demandaId: "dem-001",
+    influenciadorId: INFLUENCIADOR_SUSPENSO_MOCK_ID,
+    score: 85,
+    status: "sugerido",
+  },
+  demanda: DEMANDAS_FEED_MOCK[0]!.demanda,
+  influenciador: {
+    id: INFLUENCIADOR_SUSPENSO_MOCK_ID,
+    nome: "Criador Suspenso (demo)",
+    nicho: "Lifestyle",
+    seguidores: 50000,
+    engajamentoMedio: 3.2,
+    notaMedia: 4.0,
+    totalAvaliacoes: 8,
+  },
+  empresa: {
+    id: EMPRESA_MOCK_ID,
+    nome: "Glow Cosmetics",
+    usuarioId: EMPRESA_NEGOCIACAO_USUARIO_ID,
+  },
+  influenciadorUsuarioId: INFLUENCIADOR_SUSPENSO_USUARIO_ID,
+  taxaDesbloqueio: TAXA_DESBLOQUEIO_PADRAO,
+};
+
 export const NEGOCIACAO_CONTEXTOS: Record<string, NegociacaoContexto> = {
   "match-001": CONTEXTO_MATCH_001,
   "match-002": CONTEXTO_MATCH_002,
+  "match-suspenso": CONTEXTO_MATCH_SUSPENSO,
 };
 
 export function getNegociacaoContexto(
   matchId: string,
 ): NegociacaoContexto | null {
-  return NEGOCIACAO_CONTEXTOS[matchId] ?? null;
+  return NEGOCIACAO_CONTEXTOS[matchId] ?? obterMatchConvite(matchId);
 }
 
 export function criarMensagensIniciais(

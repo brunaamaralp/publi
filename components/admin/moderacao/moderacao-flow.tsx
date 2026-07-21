@@ -70,7 +70,8 @@ export function ModeracaoFlow() {
     fecharRevisao();
 
     toast.success(`${nome} aprovado`, {
-      description: "Status alterado para ativo. Perfil liberado na plataforma.",
+      description:
+        "Status da conta definido como ativo — passa a valer nas buscas e matches.",
     });
   }
 
@@ -89,7 +90,7 @@ export function ModeracaoFlow() {
     fecharRevisao();
 
     toast.error(`${nome} rejeitado`, {
-      description: motivo,
+      description: `${motivo} Status da conta definido como suspenso.`,
     });
   }
 

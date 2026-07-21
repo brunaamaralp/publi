@@ -18,7 +18,11 @@ const STORAGE_KEY = "auth-usuario";
 type AuthContextValue = {
   usuario: Usuario | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Usuario;
+  login: (
+    email: string,
+    password: string,
+    tipo?: Usuario["tipo"],
+  ) => Usuario;
   registrarTipo: (tipo: Usuario["tipo"], email?: string) => Usuario;
   logout: () => void;
 };
@@ -29,7 +33,11 @@ const CONTAS_DEMO: Record<
   string,
   Pick<Usuario, "tipo" | "status"> & { id?: string }
 > = {
-  "influenciador@publi.app": { tipo: "influenciador", status: "ativo" },
+  "influenciador@publi.app": {
+    tipo: "influenciador",
+    status: "ativo",
+    id: "usr-influ-neg-001",
+  },
   "empresa@publi.app": { tipo: "empresa", status: "ativo" },
   "agencia@publi.app": { tipo: "agencia", status: "ativo" },
   "admin@publi.app": { tipo: "admin", status: "ativo" },
@@ -56,13 +64,7 @@ function carregar(): Usuario | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    const usuario = JSON.parse(raw) as Usuario;
-    if (usuario.status === "pendente_verificacao") {
-      const ativo = { ...usuario, status: "ativo" as const };
-      persistir(ativo);
-      return ativo;
-    }
-    return usuario;
+    return JSON.parse(raw) as Usuario;
   } catch {
     return null;
   }
@@ -77,21 +79,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = useCallback((email: string, _password: string) => {
-    void _password;
-    const normalizado = email.trim().toLowerCase();
-    const demo = CONTAS_DEMO[normalizado];
-    const next: Usuario = {
-      id: demo?.id ?? novoId(),
-      email: normalizado,
-      tipo: demo?.tipo ?? "influenciador",
-      status: demo?.status ?? "ativo",
-      criadoEm: new Date().toISOString(),
-    };
-    flushSync(() => setUsuario(next));
-    persistir(next);
-    return next;
-  }, []);
+  const login = useCallback(
+    (email: string, _password: string, tipo?: Usuario["tipo"]) => {
+      void _password;
+      const normalizado = email.trim().toLowerCase();
+      const demo = CONTAS_DEMO[normalizado];
+      const next: Usuario = {
+        id: demo?.id ?? novoId(),
+        email: normalizado,
+        tipo: tipo ?? demo?.tipo ?? "influenciador",
+        status: demo?.status ?? "ativo",
+        criadoEm: new Date().toISOString(),
+      };
+      flushSync(() => setUsuario(next));
+      persistir(next);
+      return next;
+    },
+    [],
+  );
 
   const registrarTipo = useCallback(
     (tipo: Usuario["tipo"], email = "novo@publi.app") => {
@@ -99,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         id: novoId(),
         email: email.trim().toLowerCase(),
         tipo,
-        status: "ativo",
+        status: "pendente_verificacao",
         criadoEm: new Date().toISOString(),
       };
       flushSync(() => setUsuario(next));
