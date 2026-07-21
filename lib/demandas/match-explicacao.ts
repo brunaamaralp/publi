@@ -30,10 +30,10 @@ export function explicarMatchScore(score: number): ExplicacaoMatch {
     nivel === "alto" ? 0.42 : nivel === "medio" ? 0.38 : 0.34;
   const pesoAudiencia =
     nivel === "alto" ? 0.33 : nivel === "medio" ? 0.34 : 0.36;
-  const pesoFormato = 1 - pesoNicho - pesoAudiencia;
 
   const pontosNicho = Math.round(scoreArredondado * pesoNicho);
   const pontosAudiencia = Math.round(scoreArredondado * pesoAudiencia);
+  /** Restante do score após nicho/audiência (evita drift de arredondamento). */
   const pontosFormato = Math.max(
     0,
     scoreArredondado - pontosNicho - pontosAudiencia,

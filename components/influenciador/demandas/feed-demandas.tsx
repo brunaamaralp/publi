@@ -9,7 +9,6 @@ import {
   DemandaListaVazia,
 } from "@/components/influenciador/demandas/demanda-card";
 import {
-  FILTROS_INICIAIS,
   FiltrosDemandas,
   type FiltrosDemanda,
 } from "@/components/influenciador/demandas/filtros-demandas";
