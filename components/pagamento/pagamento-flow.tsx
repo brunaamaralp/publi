@@ -94,7 +94,7 @@ export function PagamentoFlow({ contratoId }: PagamentoFlowProps) {
   );
 
   useEffect(() => {
-    let atual = carregarPagamentoEstado(contratoId);
+    const atual = carregarPagamentoEstado(contratoId);
     if (!atual) {
       setEstado(null);
       setCarregado(true);
