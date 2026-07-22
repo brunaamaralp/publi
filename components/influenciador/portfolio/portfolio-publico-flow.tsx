@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Hourglass } from "lucide-react";
+import { ArrowLeft, Hourglass, MessageCircle } from "lucide-react";
 
 import { ConvidarDemandaDialog } from "@/components/empresa/busca-creators/convidar-demanda-dialog";
+import { ChatPortfolioDialog } from "@/components/influenciador/portfolio/chat-portfolio-dialog";
+import { CheckoutContratarDialog } from "@/components/influenciador/portfolio/checkout-contratar-dialog";
 import { PortfolioView } from "@/components/influenciador/portfolio/portfolio-view";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
@@ -15,6 +17,7 @@ import {
   statusPublicoPortfolio,
 } from "@/lib/influenciador/portfolio-storage";
 import type { PortfolioInfluenciador } from "@/lib/influenciador/portfolio-types";
+import type { PacoteServico } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 type PortfolioPublicoFlowProps = {
@@ -32,6 +35,10 @@ export function PortfolioPublicoFlow({
     ReturnType<typeof statusPublicoPortfolio> | "carregando"
   >("carregando");
   const [convidar, setConvidar] = useState<CreatorCatalogo | null>(null);
+  const [pacoteCheckout, setPacoteCheckout] = useState<PacoteServico | null>(
+    null,
+  );
+  const [chatAberto, setChatAberto] = useState(false);
 
   const isEmpresa =
     usuario?.tipo === "empresa" || usuario?.tipo === "agencia";
@@ -134,17 +141,29 @@ export function PortfolioPublicoFlow({
       <PortfolioView
         portfolio={portfolio}
         ocultarHandlesRedes
+        onContratarPacote={isEmpresa ? setPacoteCheckout : undefined}
         acoes={
           isEmpresa ? (
-            <Button
-              type="button"
-              variant="cta"
-              onClick={() =>
-                setConvidar(portfolioParaCreatorCatalogo(portfolio))
-              }
-            >
-              Convidar para demanda
-            </Button>
+            <div className="flex flex-col gap-2 sm:items-end">
+              <Button
+                type="button"
+                variant="cta"
+                onClick={() =>
+                  setConvidar(portfolioParaCreatorCatalogo(portfolio))
+                }
+              >
+                Convidar para demanda
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setChatAberto(true)}
+              >
+                <MessageCircle className="size-4" aria-hidden />
+                Tenho dúvidas antes de contratar
+              </Button>
+            </div>
           ) : null
         }
       />
@@ -156,6 +175,35 @@ export function PortfolioPublicoFlow({
           if (!open) setConvidar(null);
         }}
       />
+
+      {isEmpresa && usuario ? (
+        <>
+          <CheckoutContratarDialog
+            aberto={pacoteCheckout !== null}
+            onOpenChange={(open) => {
+              if (!open) setPacoteCheckout(null);
+            }}
+            portfolio={portfolio}
+            pacote={pacoteCheckout}
+            empresa={{
+              usuarioId: usuario.id,
+              nome: usuario.email,
+            }}
+            onContratoCriado={() => {
+              setPacoteCheckout(null);
+              setPortfolio(carregarPortfolioPorId(portfolioId));
+            }}
+          />
+
+          <ChatPortfolioDialog
+            aberto={chatAberto}
+            onOpenChange={setChatAberto}
+            portfolio={portfolio}
+            empresaUsuarioId={usuario.id}
+            empresaNome={usuario.email}
+          />
+        </>
+      ) : null}
     </div>
   );
 }

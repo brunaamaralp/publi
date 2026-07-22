@@ -30,6 +30,7 @@ export const cadastroPasso2Schema = z.object({
         z.enum(["dom", "seg", "ter", "qua", "qui", "sex", "sab"]),
       ),
       observacao: z.string().optional(),
+      datasIndisponiveis: z.array(z.string()).optional(),
     })
     .nullable()
     .optional(),

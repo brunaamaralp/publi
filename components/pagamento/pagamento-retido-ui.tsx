@@ -5,43 +5,52 @@ import type { Pagamento } from "@/lib/types";
 import { formatarMoeda } from "@/lib/influenciador/cadastro-utils";
 import { cn } from "@/lib/utils";
 
-export type StatusEscrowExibicao =
+export type StatusPagamentoRetidoExibicao =
   | Pagamento["status"]
   | "em_disputa"
   | "aguardando_deposito";
 
-const LABELS: Record<StatusEscrowExibicao, string> = {
+const LABELS: Record<StatusPagamentoRetidoExibicao, string> = {
   retido: "Retido até entrega",
   liberado: "Liberado",
   estornado: "Estornado",
+  reembolsado: "Reembolsado à empresa",
   em_disputa: "Em disputa",
   aguardando_deposito: "Aguardando depósito",
 };
 
-const BADGE_CLASSES: Record<StatusEscrowExibicao, string> = {
+const BADGE_CLASSES: Record<StatusPagamentoRetidoExibicao, string> = {
   retido: "border-lilas/50 bg-lilas-claro text-lilas-escuro",
   liberado:
     "border-verde-carvao-claro bg-verde-carvao-escuro text-verde-neon",
   estornado: "border-cinza-200 bg-cinza-200/40 text-cinza-500",
+  reembolsado: "border-cinza-200 bg-cinza-200/40 text-cinza-500",
   em_disputa: "border-ambar/40 bg-ambar-claro text-ambar-escuro",
   aguardando_deposito: "border-lilas/50 bg-lilas-claro text-lilas-escuro",
 };
 
 /** Borda lateral de 3px em listas e cards de pagamento */
-export const BORDA_LINHA_ESCROW: Record<StatusEscrowExibicao, string> = {
+export const BORDA_LINHA_PAGAMENTO_RETIDO: Record<
+  StatusPagamentoRetidoExibicao,
+  string
+> = {
   retido: "border-l-[3px] border-l-lilas",
   liberado: "border-l-[3px] border-l-verde-neon",
   estornado: "",
+  reembolsado: "border-l-[3px] border-l-cinza-500",
   em_disputa: "border-l-[3px] border-l-ambar",
   aguardando_deposito: "border-l-[3px] border-l-lilas",
 };
 
-type BadgeStatusEscrowProps = {
-  status: StatusEscrowExibicao;
+type BadgeStatusPagamentoRetidoProps = {
+  status: StatusPagamentoRetidoExibicao;
   className?: string;
 };
 
-export function BadgeStatusEscrow({ status, className }: BadgeStatusEscrowProps) {
+export function BadgeStatusPagamentoRetido({
+  status,
+  className,
+}: BadgeStatusPagamentoRetidoProps) {
   return (
     <span
       className={cn(
@@ -55,19 +64,19 @@ export function BadgeStatusEscrow({ status, className }: BadgeStatusEscrowProps)
   );
 }
 
-type ValorEscrowDestaqueProps = {
+type ValorPagamentoRetidoDestaqueProps = {
   valor: number;
-  status: StatusEscrowExibicao;
+  status: StatusPagamentoRetidoExibicao;
   className?: string;
   tamanho?: "md" | "lg";
 };
 
-export function ValorEscrowDestaque({
+export function ValorPagamentoRetidoDestaque({
   valor,
   status,
   className,
   tamanho = "lg",
-}: ValorEscrowDestaqueProps) {
+}: ValorPagamentoRetidoDestaqueProps) {
   return (
     <div
       className={cn(
@@ -83,24 +92,28 @@ export function ValorEscrowDestaque({
       >
         <span className="font-data">{formatarMoeda(valor)}</span>
       </p>
-      <BadgeStatusEscrow status={status} />
+      <BadgeStatusPagamentoRetido status={status} />
     </div>
   );
 }
 
-type CardEscrowProps = {
-  status: StatusEscrowExibicao;
+type CardPagamentoRetidoProps = {
+  status: StatusPagamentoRetidoExibicao;
   children: ReactNode;
   className?: string;
 };
 
-/** Card com borda lateral colorida por status de escrow */
-export function CardEscrow({ status, children, className }: CardEscrowProps) {
+/** Card com borda lateral colorida por status de pagamento retido */
+export function CardPagamentoRetido({
+  status,
+  children,
+  className,
+}: CardPagamentoRetidoProps) {
   return (
     <div
       className={cn(
         "secao-editavel overflow-hidden ring-0",
-        BORDA_LINHA_ESCROW[status],
+        BORDA_LINHA_PAGAMENTO_RETIDO[status],
         className,
       )}
     >
@@ -113,7 +126,7 @@ type LinhaHistoricoPagamentoProps = {
   data: string;
   titulo: string;
   valor: number;
-  status: StatusEscrowExibicao;
+  status: StatusPagamentoRetidoExibicao;
   acao?: ReactNode;
   className?: string;
 };
@@ -131,7 +144,7 @@ export function LinhaHistoricoPagamento({
     <div
       className={cn(
         "flex flex-wrap items-center justify-between gap-3 border-b border-cinza-200 bg-white px-4 py-3 last:border-0",
-        BORDA_LINHA_ESCROW[status],
+        BORDA_LINHA_PAGAMENTO_RETIDO[status],
         className,
       )}
     >
@@ -143,20 +156,20 @@ export function LinhaHistoricoPagamento({
         <p className="font-data text-right font-semibold tabular-nums">
           {formatarMoeda(valor)}
         </p>
-        <BadgeStatusEscrow status={status} />
+        <BadgeStatusPagamentoRetido status={status} />
         {acao}
       </div>
     </div>
   );
 }
 
-type IndicadorProvedorEscrowProps = {
+type IndicadorProvedorPagamentoRetidoProps = {
   className?: string;
 };
 
-export function IndicadorProvedorEscrow({
+export function IndicadorProvedorPagamentoRetido({
   className,
-}: IndicadorProvedorEscrowProps) {
+}: IndicadorProvedorPagamentoRetidoProps) {
   return (
     <p
       className={cn(
@@ -171,11 +184,11 @@ export function IndicadorProvedorEscrow({
   );
 }
 
-export function statusEscrowDePagamento(
+export function statusPagamentoRetidoDePagamento(
   pagamento: Pagamento | null,
   contratoStatus?: string,
   entregaContestada?: boolean,
-): StatusEscrowExibicao {
+): StatusPagamentoRetidoExibicao {
   if (entregaContestada || contratoStatus === "em_disputa") {
     return "em_disputa";
   }

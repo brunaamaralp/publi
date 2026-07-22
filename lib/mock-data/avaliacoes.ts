@@ -1,4 +1,5 @@
 import type { Avaliacao } from "@/lib/types";
+import { camposCicloEntregaIniciais } from "@/lib/types/contrato";
 
 /** ID do influenciador mock usado no cadastro/perfil. */
 export const INFLUENCIADOR_MOCK_ID = "inf-mock-001";
@@ -13,11 +14,13 @@ export const CONTRATO_MOCK_CUMPRIDO = {
   valor: 2500,
   escopo: "Campanha de lançamento — 2 reels + 3 stories",
   prazoEntrega: "2026-05-15",
-  status: "cumprido" as const,
+  status: "concluida" as const,
   dataAssinatura: "2026-04-01",
   empresaId: EMPRESA_MOCK_ID,
   influenciadorId: INFLUENCIADOR_MOCK_ID,
   empresaNome: "Marca Exemplo Ltda.",
+  ...camposCicloEntregaIniciais(),
+  statusEntrega: "aprovado" as const,
 };
 
 export const avaliacoesRecebidasMock: Avaliacao[] = [

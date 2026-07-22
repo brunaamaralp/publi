@@ -80,15 +80,15 @@ export function InicioAdmin({ nomeExibicao }: InicioAdminProps) {
             </Link>
           </article>
 
-          <article className="flex flex-col gap-4 rounded-card border border-cinza-200 bg-white p-4">
+          <article className="flex flex-col gap-4 rounded-card border border-cinza-200 border-l-[3px] border-l-ambar bg-white p-4">
             <div className="flex items-start gap-3">
               <div className="flex size-9 shrink-0 items-center justify-center rounded-button border border-cinza-200 bg-fundo-pagina">
                 <Users className="size-4" aria-hidden />
               </div>
               <div className="min-w-0 space-y-1">
-                <h3 className="font-display text-base font-bold">Visão geral</h3>
+                <h3 className="font-display text-base font-bold">Disputas</h3>
                 <p className="text-texto-secundario text-sm font-normal leading-relaxed">
-                  Influenciadores, empresas e agências aguardando análise
+                  Não-entrega ou má-fé — decisão binária no painel de moderação
                 </p>
               </div>
             </div>
@@ -96,7 +96,7 @@ export function InicioAdmin({ nomeExibicao }: InicioAdminProps) {
               href="/admin/moderacao"
               className={cn(buttonVariants({ variant: "outline", size: "sm" }), "w-fit")}
             >
-              Ver pendentes
+              Abrir disputas
               <ArrowRight className="size-4" aria-hidden />
             </Link>
           </article>

@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 
 import { AvaliacaoDialog } from "@/components/avaliacao/avaliacao-dialog";
 import {
-  CardEscrow,
-  IndicadorProvedorEscrow,
-  ValorEscrowDestaque,
-} from "@/components/pagamento/escrow-ui";
+  CardPagamentoRetido,
+  IndicadorProvedorPagamentoRetido,
+  ValorPagamentoRetidoDestaque,
+} from "@/components/pagamento/pagamento-retido-ui";
 import {
   carregarAvaliacoesContrato,
   salvarAvaliacaoContrato,
@@ -51,7 +51,7 @@ export function ResumoPagamentoLiberado({
     : contexto.influenciador.nome;
 
   return (
-    <CardEscrow status="liberado" className="space-y-6 p-4">
+    <CardPagamentoRetido status="liberado" className="space-y-6 p-4">
       <div className="space-y-2">
         <h2 className="font-display text-xl font-bold">Pagamento liberado</h2>
         <p className="text-texto-secundario text-sm font-normal">
@@ -61,9 +61,9 @@ export function ResumoPagamentoLiberado({
         </p>
       </div>
 
-      <ValorEscrowDestaque valor={valor} status="liberado" />
+      <ValorPagamentoRetidoDestaque valor={valor} status="liberado" />
 
-      <IndicadorProvedorEscrow />
+      <IndicadorProvedorPagamentoRetido />
 
       <div className="space-y-3 border-t border-cinza-200 pt-4">
         <p className="text-texto-secundario text-sm font-normal">
@@ -83,6 +83,6 @@ export function ResumoPagamentoLiberado({
           }}
         />
       </div>
-    </CardEscrow>
+    </CardPagamentoRetido>
   );
 }

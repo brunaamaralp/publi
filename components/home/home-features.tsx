@@ -1,7 +1,7 @@
 import {
   BarChart3,
-  GraduationCap,
   Handshake,
+  Search,
   Shield,
 } from "lucide-react";
 
@@ -23,10 +23,10 @@ const RECURSOS = [
     borda: "border-l-lilas-escuro",
   },
   {
-    titulo: "Treinamentos",
+    titulo: "Busca ativa dos dois lados",
     descricao:
-      "Trilhas de precificação, negociação e storytelling que elevam o nível do criador e sua visibilidade nas oportunidades.",
-    icone: GraduationCap,
+      "Empresa busca criador, criador busca empresa — ninguém precisa esperar proposta chegar para começar uma conversa.",
+    icone: Search,
     borda: "border-l-lilas-escuro",
   },
   {
@@ -37,6 +37,16 @@ const RECURSOS = [
     borda: "border-l-verde-neon",
   },
 ] as const;
+
+/* Card anterior — reativar se voltar o recurso de treinamentos na landing:
+{
+  titulo: "Treinamentos",
+  descricao:
+    "Trilhas de precificação, negociação e storytelling que elevam o nível do criador e sua visibilidade nas oportunidades.",
+  icone: GraduationCap,
+  borda: "border-l-lilas-escuro",
+},
+*/
 
 export function HomeFeatures() {
   return (

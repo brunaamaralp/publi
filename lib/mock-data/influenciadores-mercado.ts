@@ -25,6 +25,7 @@ function influenciadorBase(
     notaMediaAvaliacao: null,
     totalAvaliacoes: 0,
     tiposAtuacao: ["influenciador"],
+    midias: [],
     ...partial,
   };
 }

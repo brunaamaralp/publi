@@ -79,6 +79,22 @@ export const USUARIOS_PENDENTES_MODERACAO_MOCK: UsuarioPendenteModeracao[] = [
         notaMediaAvaliacao: null,
         totalAvaliacoes: 0,
         tiposAtuacao: ["influenciador"],
+        midias: [
+          {
+            id: "mid-mod-marina-apres",
+            tipo: "video",
+            url: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+            legenda: "Apresentação para marcas de beleza",
+            categoria: "apresentacao",
+          },
+          {
+            id: "mid-mod-marina-1",
+            tipo: "foto",
+            url: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800&h=1000&fit=crop",
+            legenda: "Campanha skincare — look dia",
+            categoria: "trabalho_anterior",
+          },
+        ],
       },
       categorias: [
         { id: "cat-1", nome: "Beleza", tipo: "dominio" },
@@ -151,6 +167,7 @@ export const USUARIOS_PENDENTES_MODERACAO_MOCK: UsuarioPendenteModeracao[] = [
         notaMediaAvaliacao: null,
         totalAvaliacoes: 0,
         tiposAtuacao: ["influenciador"],
+        midias: [],
       },
       categorias: [
         { id: "cat-4", nome: "Tecnologia", tipo: "dominio" },
@@ -249,6 +266,7 @@ export const USUARIOS_PENDENTES_MODERACAO_MOCK: UsuarioPendenteModeracao[] = [
         notaMediaAvaliacao: null,
         totalAvaliacoes: 0,
         tiposAtuacao: ["influenciador"],
+        midias: [],
       },
       categorias: [
         { id: "cat-6", nome: "Fitness", tipo: "dominio" },
@@ -341,6 +359,7 @@ export const USUARIOS_PENDENTES_MODERACAO_MOCK: UsuarioPendenteModeracao[] = [
         notaMediaAvaliacao: null,
         totalAvaliacoes: 0,
         tiposAtuacao: ["influenciador"],
+        midias: [],
       },
       categorias: [
         { id: "cat-8", nome: "Viagens", tipo: "dominio" },

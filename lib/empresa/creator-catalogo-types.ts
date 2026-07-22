@@ -25,6 +25,8 @@ export type CreatorCatalogo = {
   /** Default implícito: `['influenciador']`. */
   tiposAtuacao: TipoAtuacao[];
   disponibilidade?: DisponibilidadeInfluenciador;
+  /** Nível de treinamento (cold-start = 1). Entra no score de match. */
+  nivelAtual?: number;
 };
 
 /** Cold-start: nota só após este mínimo de avaliações. */

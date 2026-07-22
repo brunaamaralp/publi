@@ -76,17 +76,29 @@ function scoreDisponibilidade(
 }
 
 /**
+ * Bônus de nível/treinamento no score de match (0–8 pts).
+ * Nível 1 = 0; nível 2 = 4; nível 3+ = 8.
+ */
+export function bonusScorePorNivel(nivelAtual: number | undefined): number {
+  if (!nivelAtual || nivelAtual <= 1) return 0;
+  if (nivelAtual === 2) return 4;
+  return 8;
+}
+
+/**
  * Compatibilidade para atuação como modelo: nicho + região + disponibilidade.
  * Não usa seguidores/engajamento — função separada do score de influenciador.
+ * Aceita `nivelAtual` opcional (mesmo bônus do score de influenciador).
  */
 export function calcularScoreModelo(
   demanda: DemandaParaScoreModelo,
-  perfil: PerfilParaScoreModelo,
+  perfil: PerfilParaScoreModelo & { nivelAtual?: number },
 ): number {
   const total =
     scoreNicho(demanda.nichoId, perfil.nichoId) +
     scoreRegiao(demanda.localidades, perfil.cidade, perfil.estado) +
-    scoreDisponibilidade(perfil.disponibilidade, demanda.prazo);
+    scoreDisponibilidade(perfil.disponibilidade, demanda.prazo) +
+    bonusScorePorNivel(perfil.nivelAtual);
 
   return Math.min(98, Math.max(40, Math.round(total)));
 }

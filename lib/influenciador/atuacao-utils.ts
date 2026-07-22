@@ -67,7 +67,17 @@ export function disponibilidadeCobrePrazo(
   disponibilidade: DisponibilidadeInfluenciador | undefined,
   prazoIso: string,
 ): boolean | null {
-  if (!disponibilidade?.diasSemana?.length) return null;
+  if (!disponibilidade) return null;
+
+  const dataIso = prazoIso.slice(0, 10);
+  if (disponibilidade.datasIndisponiveis?.includes(dataIso)) {
+    return false;
+  }
+
+  if (!disponibilidade.diasSemana?.length) {
+    return disponibilidade.datasIndisponiveis ? true : null;
+  }
+
   const dia = diaSemanaDeDataIso(prazoIso);
   if (!dia) return null;
   return disponibilidade.diasSemana.includes(dia);

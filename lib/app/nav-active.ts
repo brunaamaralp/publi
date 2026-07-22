@@ -9,6 +9,18 @@ export function isNavItemActive(
     return pathname === "/inicio";
   }
 
+  /** Painel do influenciador: só a rota exata (não /influenciador/[id] nem subpáginas). */
+  if (href === "/influenciador") {
+    if (pathname === "/influenciador" || pathname === "/inicio") return true;
+    return false;
+  }
+
+  /** Painel da empresa: só a rota exata (não /empresa/demandas etc.). */
+  if (href === "/empresa") {
+    if (pathname === "/empresa" || pathname === "/inicio") return true;
+    return false;
+  }
+
   const correspondeHref =
     pathname === href || pathname.startsWith(`${href}/`);
 

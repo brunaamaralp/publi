@@ -48,7 +48,7 @@ export function AvaliacaoDialog({
   const [enviado, setEnviado] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
-  const contratoCumprido = contrato.status === "cumprido";
+  const contratoCumprido = contrato.status === "concluida";
   const avaliacaoEnviada = avaliacaoDaParte(
     avaliacoesExistentes,
     contrato.id,
@@ -132,7 +132,7 @@ export function AvaliacaoDialog({
             </h2>
             <p className="text-lilas-escuro/90 text-sm font-normal leading-relaxed">
               Disponível quando o contrato for concluído (status{" "}
-              <strong className="font-medium">cumprido</strong>). Cada parte
+              <strong className="font-medium">concluída</strong>). Cada parte
               avalia a outra uma única vez por contrato.
             </p>
           </div>

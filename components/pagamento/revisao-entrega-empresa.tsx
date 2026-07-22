@@ -1,77 +1,117 @@
 "use client";
 
-import Image from "next/image";
+import { useState } from "react";
 import { Clock, ExternalLink } from "lucide-react";
 
+import { CampoTextoFiltrado } from "@/components/influenciador/portfolio/campo-texto-filtrado";
+import { AvisoContatoInline } from "@/components/negociacao/aviso-contato-inline";
 import {
-  IndicadorProvedorEscrow,
-  ValorEscrowDestaque,
-} from "@/components/pagamento/escrow-ui";
+  IndicadorProvedorPagamentoRetido,
+  ValorPagamentoRetidoDestaque,
+} from "@/components/pagamento/pagamento-retido-ui";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import type { Entrega } from "@/lib/types";
-import {
-  diasRestantesConfirmacaoAutomatica,
-  prazoConfirmacaoAutomaticaDias,
-} from "@/lib/pagamento/pagamento-utils";
 import { formatarDataRelativa } from "@/lib/avaliacao/utils";
+import { analisarTextoLivrePortfolio } from "@/lib/negociacao/filtro-contato";
+import {
+  DIAS_UTEIS_LIBERACAO_AUTOMATICA,
+  MAX_CICLOS_AJUSTE,
+  diasRestantesLiberacao,
+  podeSolicitarAjuste,
+} from "@/lib/pagamento/pagamento-utils";
+import type { CamposCicloEntrega } from "@/lib/types";
 
 type RevisaoEntregaEmpresaProps = {
-  entrega: Entrega;
+  ciclo: CamposCicloEntrega;
   influenciadorNome: string;
   valor: number;
   printPreview?: string;
-  onConfirmar: () => void;
+  onAprovar: () => void;
+  onSolicitarAjuste: (motivo: string) => void;
+  /** Na 3ª entrega (ciclos >= 2), alternativa ao aprovar. */
+  onReportarProblema?: () => void;
 };
 
 export function RevisaoEntregaEmpresa({
-  entrega,
+  ciclo,
   influenciadorNome,
   valor,
   printPreview,
-  onConfirmar,
+  onAprovar,
+  onSolicitarAjuste,
+  onReportarProblema,
 }: RevisaoEntregaEmpresaProps) {
-  const diasRestantes = diasRestantesConfirmacaoAutomatica();
+  const [modoAjuste, setModoAjuste] = useState(false);
+  const [motivo, setMotivo] = useState("");
+  const [avisoMotivo, setAvisoMotivo] = useState(false);
+
+  const diasRestantes = diasRestantesLiberacao(ciclo);
   const progresso =
-    ((prazoConfirmacaoAutomaticaDias() - diasRestantes) /
-      prazoConfirmacaoAutomaticaDias()) *
+    ((DIAS_UTEIS_LIBERACAO_AUTOMATICA - diasRestantes) /
+      DIAS_UTEIS_LIBERACAO_AUTOMATICA) *
     100;
+  const permiteAjuste = podeSolicitarAjuste(ciclo);
+  const limiteAtingido = ciclo.ciclosAjusteUsados >= MAX_CICLOS_AJUSTE;
+
+  function enviarAjuste() {
+    const analise = analisarTextoLivrePortfolio(motivo);
+    if (!motivo.trim()) return;
+    if (!analise.podeEnviar) {
+      setAvisoMotivo(true);
+      return;
+    }
+    setAvisoMotivo(false);
+    onSolicitarAjuste(motivo.trim());
+    setModoAjuste(false);
+    setMotivo("");
+  }
 
   return (
     <div className="secao-editavel space-y-4 border-l-[3px] border-l-lilas ring-0">
       <div>
         <h2 className="font-display text-base font-bold">
-          Entrega registrada — revisar e confirmar
+          Entrega registrada — revisar
         </h2>
         <p className="text-texto-secundario mt-1 text-sm font-normal">
-          {influenciadorNome} marcou a entrega{" "}
-          {formatarDataRelativa(entrega.dataEntrega)}. Confirme para liberar o
-          pagamento.
+          {influenciadorNome} registrou a entrega
+          {ciclo.dataEntrega
+            ? ` ${formatarDataRelativa(ciclo.dataEntrega)}`
+            : ""}
+          . Aprove para liberar o valor do pagamento retido ou solicite ajuste (se ainda
+          houver ciclos).
         </p>
       </div>
 
-      <ValorEscrowDestaque valor={valor} status="retido" tamanho="md" />
+      <ValorPagamentoRetidoDestaque valor={valor} status="retido" tamanho="md" />
 
-      <IndicadorProvedorEscrow />
+      <IndicadorProvedorPagamentoRetido />
 
-      <a
-        href={entrega.linkComprovante}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-lilas-escuro inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
-      >
-        Ver conteúdo publicado
-        <ExternalLink className="size-3.5" aria-hidden />
-      </a>
+      {ciclo.linkComprovante ? (
+        <a
+          href={ciclo.linkComprovante}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-lilas-escuro inline-flex items-center gap-1.5 text-sm font-medium hover:underline"
+        >
+          Ver conteúdo publicado
+          <ExternalLink className="size-3.5" aria-hidden />
+        </a>
+      ) : null}
 
-      {printPreview ? (
+      {ciclo.descricaoEntrega ? (
+        <p className="text-texto-secundario text-sm leading-relaxed font-normal">
+          {ciclo.descricaoEntrega}
+        </p>
+      ) : null}
+
+      {printPreview || ciclo.arquivoComprovanteUrl ? (
         <div className="relative aspect-video max-w-sm overflow-hidden rounded-card border border-cinza-200 bg-white">
-          <Image
-            src={printPreview}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={printPreview || ciclo.arquivoComprovanteUrl!}
             alt="Print enviado pelo influenciador"
-            fill
-            className="object-contain"
-            unoptimized
+            className="size-full object-contain"
           />
         </div>
       ) : null}
@@ -80,20 +120,79 @@ export function RevisaoEntregaEmpresa({
         <div className="text-lilas-escuro flex items-center gap-2 text-sm font-medium">
           <Clock className="size-4 shrink-0" aria-hidden />
           <span>
+            Libera automaticamente em{" "}
             <span className="font-data font-semibold">{diasRestantes}</span>{" "}
-            dias restantes para confirmação automática
+            dia{diasRestantes === 1 ? "" : "s"} útil
+            {diasRestantes === 1 ? "" : "eis"} se não houver resposta
           </span>
         </div>
-        <Progress value={progresso} className="h-1.5" />
+        <Progress value={Math.min(100, Math.max(0, progresso))} className="h-1.5" />
         <p className="text-lilas-escuro/80 text-xs font-normal">
-          Se não houver contestação, a entrega será confirmada automaticamente
-          ao fim do prazo.
+          Sem aprovação nem pedido de ajuste, o pagamento sai do pagamento retido ao fim
+          do prazo ({DIAS_UTEIS_LIBERACAO_AUTOMATICA} dias úteis).
         </p>
       </div>
 
-      <Button type="button" variant="cta" className="w-full" onClick={onConfirmar}>
-        Confirmar entrega
-      </Button>
+      {limiteAtingido ? (
+        <p className="text-texto-secundario rounded-card border border-cinza-200 bg-fundo-pagina p-3 text-sm font-normal">
+          Limite de solicitações de ajuste atingido para esta entrega. Você pode
+          aprovar, reportar um problema à Publi ou aguardar a liberação
+          automática por prazo.
+        </p>
+      ) : null}
+
+      {modoAjuste ? (
+        <div className="space-y-3">
+          <div className="space-y-2">
+            <Label htmlFor="motivo-ajuste">O que precisa ser corrigido?</Label>
+            <CampoTextoFiltrado
+              id="motivo-ajuste"
+              value={motivo}
+              onChange={setMotivo}
+              multiline
+              rows={3}
+              placeholder="Descreva o ajuste — sem telefone, @ ou PIX"
+            />
+            {avisoMotivo ? (
+              <AvisoContatoInline tipo="bloqueado_padrao" variante="inline" />
+            ) : null}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" variant="outline" onClick={() => setModoAjuste(false)}>
+              Cancelar
+            </Button>
+            <Button type="button" variant="cta" onClick={enviarAjuste}>
+              Enviar pedido de ajuste
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+          <Button type="button" variant="cta" className="flex-1" onClick={onAprovar}>
+            Aprovar entrega
+          </Button>
+          {permiteAjuste ? (
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1"
+              onClick={() => setModoAjuste(true)}
+            >
+              Solicitar ajuste
+            </Button>
+          ) : null}
+          {limiteAtingido && onReportarProblema ? (
+            <Button
+              type="button"
+              variant="destructive"
+              className="flex-1"
+              onClick={onReportarProblema}
+            >
+              Reportar problema
+            </Button>
+          ) : null}
+        </div>
+      )}
     </div>
   );
 }

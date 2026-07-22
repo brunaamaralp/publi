@@ -53,11 +53,11 @@ function NavLink({
       href={item.href}
       onClick={onNavigate}
       className={cn(
-        "flex items-center gap-2.5 rounded-button border-l-[3px] py-2 pr-2.5 text-sm font-normal transition-colors",
+        "flex items-center gap-2.5 rounded-button border-l-2 py-2 pr-2.5 text-sm font-normal transition-colors",
         item.aninhado ? "ml-4 pl-3" : "pl-2",
         ativo
-          ? "border-l-verde-neon bg-white/[0.04] font-medium text-white"
-          : "border-l-transparent text-zinc-400 hover:bg-white/[0.06] hover:text-white",
+          ? "border-l-verde-neon bg-verde-neon/[0.08] font-medium text-[var(--app-sidebar-fg)]"
+          : "border-l-transparent text-[var(--app-sidebar-muted)] hover:bg-white/[0.04] hover:text-[var(--app-sidebar-fg)]",
       )}
       aria-current={ativo ? "page" : undefined}
     >
@@ -84,7 +84,7 @@ export function AppSidebar({ onNavigate, className }: AppSidebarProps) {
   return (
     <aside
       className={cn(
-        "flex h-full flex-col border-r border-verde-carvao-claro/50 bg-verde-carvao text-white",
+        "app-sidebar flex h-full flex-col border-r border-white/10",
         className,
       )}
     >
@@ -92,20 +92,24 @@ export function AppSidebar({ onNavigate, className }: AppSidebarProps) {
         <Link
           href="/inicio"
           onClick={onNavigate}
-          className="font-display text-lg font-semibold"
+          className="font-display inline-flex items-center gap-2 text-lg font-semibold text-[var(--app-sidebar-fg)]"
         >
+          <span
+            className="size-2 shrink-0 rounded-full bg-verde-neon"
+            aria-hidden
+          />
           Publi
         </Link>
         {usuario ? (
           <>
-            <p className="mt-3 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
+            <p className="mt-3 text-[10px] font-semibold uppercase tracking-widest text-[var(--app-sidebar-muted)]/70">
               {LABEL_TIPO[usuario.tipo] ?? usuario.tipo}
-              <span className="text-zinc-600"> · </span>
-              <span className="text-zinc-400">
+              <span className="opacity-60"> · </span>
+              <span className="text-[var(--app-sidebar-muted)]">
                 {LABEL_STATUS[usuario.status] ?? usuario.status}
               </span>
             </p>
-            <p className="mt-2 truncate text-sm font-medium leading-snug">
+            <p className="mt-2 truncate text-sm font-medium leading-snug text-[var(--app-sidebar-fg)]">
               {usuario.email}
             </p>
           </>
@@ -124,7 +128,7 @@ export function AppSidebar({ onNavigate, className }: AppSidebarProps) {
 
           return (
             <div key={grupo.titulo} className="mb-5 last:mb-0">
-              <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">
+              <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-widest text-[var(--app-sidebar-muted)]/70">
                 {grupo.titulo}
               </p>
               <ul className="space-y-0.5">
@@ -150,7 +154,7 @@ export function AppSidebar({ onNavigate, className }: AppSidebarProps) {
           onClick={handleLogout}
           className={cn(
             buttonVariants({ variant: "ghost", size: "sm" }),
-            "w-full justify-start text-zinc-400 hover:bg-white/10 hover:text-white",
+            "w-full justify-start text-[var(--app-sidebar-muted)] hover:bg-white/[0.04] hover:text-[var(--app-sidebar-fg)]",
           )}
         >
           <LogOut className="size-4" aria-hidden />
@@ -161,7 +165,7 @@ export function AppSidebar({ onNavigate, className }: AppSidebarProps) {
           onClick={onNavigate}
           className={cn(
             buttonVariants({ variant: "ghost", size: "sm" }),
-            "w-full justify-start text-zinc-500 hover:bg-white/10 hover:text-white",
+            "w-full justify-start text-[var(--app-sidebar-muted)]/70 hover:bg-white/[0.04] hover:text-[var(--app-sidebar-fg)]",
           )}
         >
           Site institucional

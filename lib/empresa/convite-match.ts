@@ -11,7 +11,11 @@ import {
 } from "@/lib/negociacao/negociacao-constantes";
 import type { NegociacaoContexto } from "@/lib/negociacao/negociacao-types";
 import type { Match } from "@/lib/types";
-import { calcularScoreModelo } from "@/lib/utils/match-score";
+import { carregarPerfilInfluenciador } from "@/lib/influenciador/perfil-storage";
+import {
+  bonusScorePorNivel,
+  calcularScoreModelo,
+} from "@/lib/utils/match-score";
 
 const STORAGE_KEY = "matches-convite-v1";
 
@@ -45,8 +49,15 @@ function persistir(): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(memoria));
 }
 
+function nivelDoCreator(creator: CreatorCatalogo): number {
+  if (typeof creator.nivelAtual === "number") return creator.nivelAtual;
+  if (typeof window === "undefined") return 1;
+  const perfil = carregarPerfilInfluenciador(creator.usuarioId);
+  return perfil?.influenciador.nivelAtual ?? 1;
+}
+
 /**
- * Score de influenciador (engajamento / nicho / preço) — não usar para modelo.
+ * Score de influenciador (engajamento / nicho / preço / nível) — não usar para modelo.
  */
 function scoreInfluenciadorParaConvite(
   creator: CreatorCatalogo,
@@ -61,6 +72,7 @@ function scoreInfluenciadorParaConvite(
   if (creator.engajamentoMedio >= 5) score += 6;
   else if (creator.engajamentoMedio >= 3) score += 3;
   if (creator.precoPacoteMin <= item.demanda.orcamento * 0.4) score += 4;
+  score += bonusScorePorNivel(nivelDoCreator(creator));
   return Math.min(98, Math.max(55, Math.round(score)));
 }
 
@@ -84,6 +96,7 @@ function scoreParaConvite(
         cidade: creator.cidade,
         estado: creator.estado,
         disponibilidade: creator.disponibilidade,
+        nivelAtual: nivelDoCreator(creator),
       },
     );
   }

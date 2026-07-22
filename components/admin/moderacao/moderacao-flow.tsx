@@ -1,10 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { RefreshCw, ShieldCheck } from "lucide-react";
+import { RefreshCw, Scale, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 import { DetalheUsuarioSheet } from "@/components/admin/moderacao/detalhe-usuario-sheet";
+import { DisputasModeracao } from "@/components/admin/moderacao/disputas-moderacao";
 import { FiltrosModeracao } from "@/components/admin/moderacao/filtros-moderacao";
 import { RejeitarDialog } from "@/components/admin/moderacao/rejeitar-dialog";
 import { TabelaPendentes } from "@/components/admin/moderacao/tabela-pendentes";
@@ -23,10 +24,14 @@ import {
   type FiltroTipoUsuario,
   type ModeracaoEstado,
 } from "@/lib/moderacao/moderacao-utils";
+import { cn } from "@/lib/utils";
+
+type AbaAdmin = "cadastros" | "disputas";
 
 export function ModeracaoFlow() {
   const [estado, setEstado] = useState<ModeracaoEstado | null>(null);
   const [carregado, setCarregado] = useState(false);
+  const [aba, setAba] = useState<AbaAdmin>("cadastros");
   const [filtroTipo, setFiltroTipo] = useState<FiltroTipoUsuario>("todos");
   const [filtroData, setFiltroData] = useState<FiltroDataCadastro>("todos");
   const [selecionado, setSelecionado] = useState<UsuarioPendenteModeracao | null>(
@@ -34,6 +39,7 @@ export function ModeracaoFlow() {
   );
   const [sheetAberto, setSheetAberto] = useState(false);
   const [rejeitarAberto, setRejeitarAberto] = useState(false);
+  const [disputasKey, setDisputasKey] = useState(0);
 
   useEffect(() => {
     setEstado(carregarEstadoModeracao());
@@ -100,6 +106,7 @@ export function ModeracaoFlow() {
     setFiltroTipo("todos");
     setFiltroData("todos");
     fecharRevisao();
+    setDisputasKey((k) => k + 1);
     toast.message("Lista de pendentes restaurada.");
   }
 
@@ -121,9 +128,7 @@ export function ModeracaoFlow() {
               <p className="text-[10px] font-medium uppercase tracking-widest text-zinc-400">
                 Admin interno
               </p>
-              <h1 className="font-display text-sm font-semibold">
-                Moderação de cadastros
-              </h1>
+              <h1 className="font-display text-sm font-semibold">Moderação</h1>
             </div>
           </div>
           <Button
@@ -138,16 +143,51 @@ export function ModeracaoFlow() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl">
-        <FiltrosModeracao
-          tipo={filtroTipo}
-          data={filtroData}
-          total={itensFiltrados.length}
-          onTipoChange={setFiltroTipo}
-          onDataChange={setFiltroData}
-        />
+      <div className="border-b bg-background">
+        <div className="mx-auto flex max-w-6xl gap-1 px-4 pt-3 sm:px-6">
+          <button
+            type="button"
+            onClick={() => setAba("cadastros")}
+            className={cn(
+              "rounded-t-button px-3 py-2 text-xs font-medium transition-colors",
+              aba === "cadastros"
+                ? "bg-muted text-foreground"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            Cadastros
+          </button>
+          <button
+            type="button"
+            onClick={() => setAba("disputas")}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-t-button px-3 py-2 text-xs font-medium transition-colors",
+              aba === "disputas"
+                ? "bg-muted text-foreground"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            <Scale className="size-3.5" aria-hidden />
+            Disputas
+          </button>
+        </div>
+      </div>
 
-        <TabelaPendentes itens={itensFiltrados} onRevisar={abrirRevisao} />
+      <main className="mx-auto max-w-6xl">
+        {aba === "cadastros" ? (
+          <>
+            <FiltrosModeracao
+              tipo={filtroTipo}
+              data={filtroData}
+              total={itensFiltrados.length}
+              onTipoChange={setFiltroTipo}
+              onDataChange={setFiltroData}
+            />
+            <TabelaPendentes itens={itensFiltrados} onRevisar={abrirRevisao} />
+          </>
+        ) : (
+          <DisputasModeracao refreshKey={disputasKey} />
+        )}
       </main>
 
       <DetalheUsuarioSheet

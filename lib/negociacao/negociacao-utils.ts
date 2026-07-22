@@ -1,4 +1,5 @@
 import type { Contrato } from "@/lib/types";
+import { camposCicloEntregaIniciais } from "@/lib/types/contrato";
 
 import {
   criarMensagensIniciais,
@@ -87,6 +88,7 @@ export function gerarContratoRascunho(
     valor: dados.valor,
     prazoEntrega: dados.prazoEntrega,
     status: "rascunho",
+    ...camposCicloEntregaIniciais(),
   };
 
   return {
@@ -129,8 +131,8 @@ export function assinarContratoInfluenciador(
 export const LABELS_STATUS_CONTRATO: Record<Contrato["status"], string> = {
   rascunho: "Rascunho",
   assinado: "Assinado",
-  em_execucao: "Em execução",
-  cumprido: "Cumprido",
+  em_andamento: "Em andamento",
+  concluida: "Concluída",
   cancelado: "Cancelado",
   em_disputa: "Em disputa",
 };

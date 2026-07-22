@@ -128,6 +128,7 @@ export function montarPayload(
       notaMediaAvaliacao: existente?.influenciador.notaMediaAvaliacao ?? null,
       totalAvaliacoes: existente?.influenciador.totalAvaliacoes ?? 0,
       tiposAtuacao: normalizarTiposAtuacao(draft.tiposAtuacao),
+      midias: existente?.influenciador.midias ?? [],
       ...(draft.disponibilidade &&
       normalizarTiposAtuacao(draft.tiposAtuacao).includes("modelo")
         ? { disponibilidade: draft.disponibilidade }

@@ -1,9 +1,10 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Image from "next/image";
 import { Package, Upload } from "lucide-react";
 
+import { CampoTextoFiltrado } from "@/components/influenciador/portfolio/campo-texto-filtrado";
+import { AvisoContatoInline } from "@/components/negociacao/aviso-contato-inline";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,55 +16,82 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { analisarTextoLivrePortfolio } from "@/lib/negociacao/filtro-contato";
+import type { DadosRegistroEntrega } from "@/lib/pagamento/pagamento-utils";
 
 type FormularioEntregaDialogProps = {
   aberto: boolean;
   onOpenChange: (aberto: boolean) => void;
-  onRegistrar: (link: string, printPreview?: string) => void;
+  onRegistrar: (dados: DadosRegistroEntrega) => void;
+  titulo?: string;
+  /** Quando reenvio após ajuste. */
+  motivoAjuste?: string;
 };
 
+/**
+ * Link e arquivo NÃO passam pelo filtro de contato (exceção documentada).
+ * A descrição em texto livre passa pelo filtro.
+ */
 export function FormularioEntregaDialog({
   aberto,
   onOpenChange,
   onRegistrar,
+  titulo = "Registrar entrega",
+  motivoAjuste,
 }: FormularioEntregaDialogProps) {
   const [link, setLink] = useState("");
+  const [descricao, setDescricao] = useState("");
   const [printPreview, setPrintPreview] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+  const [avisoDescricao, setAvisoDescricao] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   function resetar() {
     setLink("");
+    setDescricao("");
     setPrintPreview(null);
     setErro(null);
-  }
-
-  function validarLink(valor: string): string | null {
-    const trimmed = valor.trim();
-    if (!trimmed) return "Informe o link do post ou story publicado";
-
-    try {
-      const url = trimmed.startsWith("http") ? trimmed : `https://${trimmed}`;
-      new URL(url);
-      return null;
-    } catch {
-      return "Informe uma URL válida";
-    }
+    setAvisoDescricao(false);
   }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const erroLink = validarLink(link);
-    if (erroLink) {
-      setErro(erroLink);
+    const trimmedLink = link.trim();
+    if (!trimmedLink && !printPreview) {
+      setErro("Informe o link do conteúdo ou envie um arquivo/print de prova.");
       return;
     }
 
-    const url = link.trim().startsWith("http")
-      ? link.trim()
-      : `https://${link.trim()}`;
+    if (trimmedLink) {
+      try {
+        const url = trimmedLink.startsWith("http")
+          ? trimmedLink
+          : `https://${trimmedLink}`;
+        new URL(url);
+      } catch {
+        setErro("Informe uma URL válida");
+        return;
+      }
+    }
 
-    onRegistrar(url, printPreview ?? undefined);
+    const analise = analisarTextoLivrePortfolio(descricao);
+    if (!analise.podeEnviar) {
+      setAvisoDescricao(true);
+      return;
+    }
+    setAvisoDescricao(false);
+
+    const url = trimmedLink
+      ? trimmedLink.startsWith("http")
+        ? trimmedLink
+        : `https://${trimmedLink}`
+      : undefined;
+
+    onRegistrar({
+      linkComprovante: url,
+      arquivoComprovanteUrl: printPreview ?? undefined,
+      descricao: descricao.trim(),
+    });
     onOpenChange(false);
     resetar();
   }
@@ -73,9 +101,9 @@ export function FormularioEntregaDialog({
       setPrintPreview(null);
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => setPrintPreview(reader.result as string);
-    reader.readAsDataURL(file);
+    const objectUrl = URL.createObjectURL(file);
+    if (printPreview?.startsWith("blob:")) URL.revokeObjectURL(printPreview);
+    setPrintPreview(objectUrl);
   }
 
   return (
@@ -90,18 +118,26 @@ export function FormularioEntregaDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Package className="size-4" aria-hidden />
-            Marcar como entregue
+            {titulo}
           </DialogTitle>
           <DialogDescription>
-            Informe o link do conteúdo publicado. A empresa revisará e confirmará
-            a entrega para liberar o pagamento.
+            Envie o link do conteúdo publicado e/ou um print. A descrição passa
+            pelo filtro de contato; o link e o arquivo são aceitos como prova de
+            entrega.
           </DialogDescription>
         </DialogHeader>
+
+        {motivoAjuste ? (
+          <div className="rounded-card border border-ambar/35 bg-lilas-claro p-3 text-sm text-lilas-escuro">
+            <p className="font-medium">Ajuste solicitado pela empresa</p>
+            <p className="mt-1 font-normal leading-relaxed">{motivoAjuste}</p>
+          </div>
+        ) : null}
 
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div className="space-y-2">
             <Label htmlFor="link-entrega">
-              Link do post/story <span className="text-destructive">*</span>
+              Link do conteúdo publicado (opcional se houver arquivo)
             </Label>
             <Input
               id="link-entrega"
@@ -114,20 +150,19 @@ export function FormularioEntregaDialog({
               }}
               aria-invalid={!!erro}
             />
-            {erro ? (
-              <p role="alert" className="text-destructive text-sm">
-                {erro}
-              </p>
-            ) : null}
+            <p className="text-texto-secundario text-xs font-normal">
+              Este campo não passa pelo filtro de contato — é a prova da
+              publicação.
+            </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="print-entrega">Print de comprovante (opcional)</Label>
+            <Label htmlFor="print-entrega">Arquivo / print (opcional)</Label>
             <input
               ref={fileRef}
               id="print-entrega"
               type="file"
-              accept="image/*"
+              accept="image/*,video/*"
               className="sr-only"
               onChange={(e) => handlePrintChange(e.target.files?.[0] ?? null)}
             />
@@ -138,23 +173,47 @@ export function FormularioEntregaDialog({
               onClick={() => fileRef.current?.click()}
             >
               <Upload className="size-4" aria-hidden />
-              Enviar print
+              Enviar arquivo
             </Button>
             {printPreview ? (
               <div className="border-border relative mt-2 aspect-video overflow-hidden rounded-card border">
-                <Image
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={printPreview}
                   alt="Preview do comprovante de entrega"
-                  fill
-                  className="object-contain"
-                  unoptimized
+                  className="size-full object-contain"
                 />
               </div>
             ) : null}
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="desc-entrega">Descrição curta da entrega</Label>
+            <CampoTextoFiltrado
+              id="desc-entrega"
+              value={descricao}
+              onChange={setDescricao}
+              multiline
+              rows={3}
+              placeholder="O que foi entregue — sem telefone, @ ou PIX"
+            />
+            {avisoDescricao ? (
+              <AvisoContatoInline tipo="bloqueado_padrao" variante="inline" />
+            ) : null}
+          </div>
+
+          {erro ? (
+            <p role="alert" className="text-destructive text-sm">
+              {erro}
+            </p>
+          ) : null}
+
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancelar
             </Button>
             <Button type="submit">Registrar entrega</Button>

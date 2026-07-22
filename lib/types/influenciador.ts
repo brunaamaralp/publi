@@ -1,6 +1,6 @@
 export type TipoAtuacao = "influenciador" | "modelo";
 
-/** Dias da semana em que o creator topa ensaios/gravações (MVP — sem calendário). */
+/** Dias da semana em que o creator topa ensaios/gravações. */
 export type DiaSemana =
   | "dom"
   | "seg"
@@ -13,6 +13,20 @@ export type DiaSemana =
 export type DisponibilidadeInfluenciador = {
   diasSemana: DiaSemana[];
   observacao?: string;
+  /**
+   * Datas ISO (`YYYY-MM-DD`) bloqueadas na agenda (dia inteiro).
+   * Complementa `diasSemana` — ocupadas por contratos ou bloqueio manual.
+   */
+  datasIndisponiveis?: string[];
+};
+
+/** Mídia própria do portfólio (foto/vídeo) — sem links externos de rede social. */
+export type Midia = {
+  id: string;
+  tipo: "foto" | "video";
+  url: string;
+  legenda?: string;
+  categoria: "apresentacao" | "trabalho_anterior";
 };
 
 export type Influenciador = {
@@ -33,6 +47,11 @@ export type Influenciador = {
   tiposAtuacao: TipoAtuacao[];
   /** Só relevante quando `tiposAtuacao` inclui `'modelo'`. */
   disponibilidade?: DisponibilidadeInfluenciador;
+  /**
+   * Galeria pública: vídeo de apresentação + fotos/vídeos de trabalhos.
+   * Nunca inclui URL de perfil em rede social externa.
+   */
+  midias: Midia[];
 };
 
 export type Categoria = {

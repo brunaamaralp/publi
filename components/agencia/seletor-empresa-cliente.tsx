@@ -31,7 +31,9 @@ export function SeletorEmpresaCliente({
       <p
         className={cn(
           "text-xs font-normal",
-          sidebar ? "text-zinc-400" : "text-texto-secundario",
+          sidebar
+            ? "text-[var(--app-sidebar-muted,#B9C2BC)]"
+            : "text-texto-secundario",
         )}
       >
         Você está gerenciando
@@ -46,7 +48,7 @@ export function SeletorEmpresaCliente({
           className={cn(
             "w-full",
             sidebar &&
-              "border-white/15 bg-verde-carvao-claro/60 text-white hover:bg-white/5 data-placeholder:text-zinc-400 [&_svg]:text-zinc-400",
+              "border-white/15 bg-verde-carvao-claro/50 text-[var(--app-sidebar-fg,#F7F6F2)] hover:bg-white/[0.04] data-placeholder:text-[var(--app-sidebar-muted,#B9C2BC)] [&_svg]:text-[var(--app-sidebar-muted,#B9C2BC)]",
           )}
           aria-label="Selecionar empresa-cliente"
         >
@@ -55,7 +57,7 @@ export function SeletorEmpresaCliente({
         <SelectContent
           className={cn(
             sidebar &&
-              "border-white/10 bg-verde-carvao text-white ring-white/10",
+              "border-white/10 bg-verde-carvao-escuro text-[var(--app-sidebar-fg,#F7F6F2)] ring-white/10",
           )}
         >
           {empresasClientes.map((empresa) => (
@@ -64,7 +66,7 @@ export function SeletorEmpresaCliente({
               value={empresa.id}
               className={cn(
                 sidebar &&
-                  "text-white focus:bg-white/10 focus:text-white data-highlighted:bg-white/10",
+                  "text-[var(--app-sidebar-fg,#F7F6F2)] focus:bg-verde-neon/[0.08] focus:text-[var(--app-sidebar-fg,#F7F6F2)] data-highlighted:bg-verde-neon/[0.08]",
               )}
             >
               <span className="flex flex-col items-start">
@@ -72,7 +74,9 @@ export function SeletorEmpresaCliente({
                 <span
                   className={cn(
                     "text-xs font-normal",
-                    sidebar ? "text-zinc-400" : "text-texto-secundario",
+                    sidebar
+                      ? "text-[var(--app-sidebar-muted,#B9C2BC)]"
+                      : "text-texto-secundario",
                   )}
                 >
                   {empresa.criadaPelaAgencia

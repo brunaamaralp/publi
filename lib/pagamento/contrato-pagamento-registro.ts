@@ -36,7 +36,7 @@ function documentoTipoParaMatch(matchId: string): DocumentoTipo {
 
 /**
  * Persiste o contexto de pagamento a partir do contrato assinado na negociação,
- * para o escrow usar os mesmos valor/escopo/prazo/status.
+ * para o pagamento retido usar os mesmos valor/escopo/prazo/status.
  */
 export function registrarContextoPagamentoDeNegociacao(
   contrato: Contrato,
@@ -58,6 +58,32 @@ export function registrarContextoPagamentoDeNegociacao(
       documentoTipo: documentoTipoParaMatch(contexto.match.id),
     },
     demandaTitulo: contexto.demanda.titulo,
+  };
+
+  memoria[contrato.id] = registro;
+  persistir();
+  return registro;
+}
+
+/**
+ * Persiste contexto de pagamento para contratação direta do portfólio
+ * (sem passar pela negociação com paywall).
+ */
+export function registrarContextoPagamentoDireto(
+  contrato: Contrato,
+  partes: {
+    empresa: ContratoPagamentoContexto["empresa"];
+    influenciador: ContratoPagamentoContexto["influenciador"];
+    demandaTitulo: string;
+  },
+): ContratoPagamentoContexto {
+  hidratar();
+
+  const registro: ContratoPagamentoContexto = {
+    contrato: { ...contrato },
+    empresa: { ...partes.empresa },
+    influenciador: { ...partes.influenciador },
+    demandaTitulo: partes.demandaTitulo,
   };
 
   memoria[contrato.id] = registro;

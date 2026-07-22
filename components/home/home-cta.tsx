@@ -21,8 +21,8 @@ export function HomeCta() {
             <span className="destaque-neon-escuro">parceria certa</span>?
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-zinc-400 sm:text-base">
-            Crie seu perfil em minutos e acesse oportunidades, negociação e pagamento
-            seguro — tudo em um só lugar.
+            Crie seu perfil em minutos — busca ativa, negociação sem taxa e
+            pagamento protegido, tudo em um só lugar.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link

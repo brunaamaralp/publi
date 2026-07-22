@@ -27,7 +27,7 @@ export function AppShell({ children }: AppShellProps) {
       <Sheet open={menuAberto} onOpenChange={setMenuAberto}>
         <SheetContent
           side="left"
-          className="w-72 max-w-[85vw] border-r-0 bg-verde-carvao p-0 text-white"
+          className="w-72 max-w-[85vw] border-r-0 bg-verde-carvao-escuro p-0 text-[#F7F6F2]"
           showCloseButton
         >
           <SheetTitle className="sr-only">Menu de navegação</SheetTitle>

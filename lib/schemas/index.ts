@@ -47,10 +47,14 @@ export {
 } from "./demanda";
 
 export {
+  aditivoSchema,
+  camposCicloEntregaSchema,
   contratoFormSchema,
   contratoSchema,
   conversaSchema,
   entregaSchema,
+  pagamentoRetidoItemSchema,
+  pagamentoRetidoSchema,
   mensagemSchema,
   pagamentoSchema,
   rpaSchema,

@@ -1,4 +1,5 @@
 import type { CreatorCatalogo } from "@/lib/empresa/creator-catalogo-types";
+import { isoDiasAPartirDeHoje } from "@/lib/influenciador/agenda-utils";
 import type {
   DiaSemana,
   DisponibilidadeInfluenciador,
@@ -439,12 +440,51 @@ const ATUACAO_POR_ID: Record<string, AtuacaoOverride> = {
     disponibilidade: {
       diasSemana: ["seg", "ter", "qua", "qui"] as DiaSemana[],
       observacao: "Ensaios em SP capital",
+      datasIndisponiveis: [
+        isoDiasAPartirDeHoje(3),
+        isoDiasAPartirDeHoje(10),
+        isoDiasAPartirDeHoje(17),
+      ],
+    },
+  },
+  "inf-cat-001": {
+    tiposAtuacao: ["influenciador"],
+    disponibilidade: {
+      diasSemana: [],
+      datasIndisponiveis: [
+        isoDiasAPartirDeHoje(2),
+        isoDiasAPartirDeHoje(8),
+        isoDiasAPartirDeHoje(22),
+      ],
+    },
+  },
+  "inf-cat-002": {
+    tiposAtuacao: ["influenciador"],
+    disponibilidade: {
+      diasSemana: [],
+      datasIndisponiveis: [
+        isoDiasAPartirDeHoje(5),
+        isoDiasAPartirDeHoje(6),
+        isoDiasAPartirDeHoje(14),
+        isoDiasAPartirDeHoje(28),
+      ],
     },
   },
   "inf-cat-003": {
     tiposAtuacao: ["influenciador", "modelo"],
     disponibilidade: {
       diasSemana: ["ter", "qui", "sab"] as DiaSemana[],
+      datasIndisponiveis: [
+        isoDiasAPartirDeHoje(4),
+        isoDiasAPartirDeHoje(18),
+      ],
+    },
+  },
+  "inf-cat-004": {
+    tiposAtuacao: ["influenciador"],
+    disponibilidade: {
+      diasSemana: [],
+      datasIndisponiveis: [isoDiasAPartirDeHoje(1), isoDiasAPartirDeHoje(12)],
     },
   },
   "inf-cat-005": {
@@ -452,24 +492,36 @@ const ATUACAO_POR_ID: Record<string, AtuacaoOverride> = {
     disponibilidade: {
       diasSemana: ["seg", "qua", "sex"] as DiaSemana[],
       observacao: "Disponível para food styling e aparições",
+      datasIndisponiveis: [
+        isoDiasAPartirDeHoje(7),
+        isoDiasAPartirDeHoje(21),
+        isoDiasAPartirDeHoje(35),
+      ],
     },
   },
   "inf-cat-007": {
     tiposAtuacao: ["influenciador", "modelo"],
     disponibilidade: {
       diasSemana: ["seg", "ter", "qua", "qui", "sex"] as DiaSemana[],
+      datasIndisponiveis: [isoDiasAPartirDeHoje(9), isoDiasAPartirDeHoje(16)],
     },
   },
   "inf-cat-013": {
     tiposAtuacao: ["modelo"],
     disponibilidade: {
       diasSemana: ["sab", "dom"] as DiaSemana[],
+      datasIndisponiveis: [isoDiasAPartirDeHoje(11)],
     },
   },
   "inf-cat-017": {
     tiposAtuacao: ["influenciador", "modelo"],
     disponibilidade: {
       diasSemana: ["qua", "qui", "sex", "sab"] as DiaSemana[],
+      datasIndisponiveis: [
+        isoDiasAPartirDeHoje(3),
+        isoDiasAPartirDeHoje(15),
+        isoDiasAPartirDeHoje(25),
+      ],
     },
   },
   "inf-cat-021": {
@@ -477,12 +529,18 @@ const ATUACAO_POR_ID: Record<string, AtuacaoOverride> = {
     disponibilidade: {
       diasSemana: ["ter", "qua", "qui"] as DiaSemana[],
       observacao: "Foco em beauty e moda editorial",
+      datasIndisponiveis: [isoDiasAPartirDeHoje(6), isoDiasAPartirDeHoje(20)],
     },
   },
   "inf-cat-023": {
     tiposAtuacao: ["influenciador", "modelo"],
     disponibilidade: {
       diasSemana: ["seg", "sex", "sab"] as DiaSemana[],
+      datasIndisponiveis: [
+        isoDiasAPartirDeHoje(2),
+        isoDiasAPartirDeHoje(13),
+        isoDiasAPartirDeHoje(27),
+      ],
     },
   },
 };

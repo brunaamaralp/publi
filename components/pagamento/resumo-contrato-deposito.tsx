@@ -1,9 +1,9 @@
 import { formatarPrazo } from "@/lib/demandas/utils";
 import {
-  CardEscrow,
-  IndicadorProvedorEscrow,
-  ValorEscrowDestaque,
-} from "@/components/pagamento/escrow-ui";
+  CardPagamentoRetido,
+  IndicadorProvedorPagamentoRetido,
+  ValorPagamentoRetidoDestaque,
+} from "@/components/pagamento/pagamento-retido-ui";
 import type { ContratoPagamentoContexto } from "@/lib/pagamento/pagamento-types";
 
 type ResumoContratoDepositoProps = {
@@ -14,7 +14,7 @@ export function ResumoContratoDeposito({ contexto }: ResumoContratoDepositoProps
   const { contrato, influenciador, demandaTitulo } = contexto;
 
   return (
-    <CardEscrow status="aguardando_deposito" className="space-y-4 p-4">
+    <CardPagamentoRetido status="aguardando_deposito" className="space-y-4 p-4">
       <div>
         <h2 className="font-display text-lg font-bold">{demandaTitulo}</h2>
         <p className="text-texto-secundario text-sm font-normal">
@@ -22,13 +22,13 @@ export function ResumoContratoDeposito({ contexto }: ResumoContratoDepositoProps
         </p>
       </div>
 
-      <ValorEscrowDestaque
+      <ValorPagamentoRetidoDestaque
         valor={contrato.valor}
         status="aguardando_deposito"
         tamanho="md"
       />
 
-      <IndicadorProvedorEscrow />
+      <IndicadorProvedorPagamentoRetido />
 
       <dl className="space-y-2 border-t border-cinza-200 pt-3 text-sm">
         <div className="flex justify-between gap-4">
@@ -46,6 +46,6 @@ export function ResumoContratoDeposito({ contexto }: ResumoContratoDepositoProps
       <p className="text-texto-secundario border-t border-cinza-200 pt-3 text-xs leading-relaxed font-normal">
         {contrato.escopo}
       </p>
-    </CardEscrow>
+    </CardPagamentoRetido>
   );
 }

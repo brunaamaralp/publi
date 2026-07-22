@@ -2,8 +2,11 @@ import type { Demanda } from "@/lib/types";
 import type { TipoServico } from "@/lib/influenciador/cadastro-utils";
 
 import {
+  CONTRATO_AJUSTE_ID,
+  CONTRATO_APROVADO_ID,
   CONTRATO_CNPJ_ID,
   CONTRATO_CPF_ID,
+  CONTRATO_ENTREGUE_ID,
 } from "@/lib/mock-data/contratos-pagamento";
 
 export type ReceitaMensal = {
@@ -60,14 +63,30 @@ export const RESUMO_FINANCEIRO_MOCK: ResumoFinanceiro = {
 export const TRANSACOES_RECENTES_MOCK: TransacaoFinanceira[] = [
   {
     id: "tx-001",
-    data: "2026-07-11T14:30:00.000Z",
-    empresaNome: "Glow Cosmetics",
-    valor: 7565,
+    data: "2026-07-14T16:00:00.000Z",
+    empresaNome: "Sabor & Arte",
+    valor: 5200,
     statusPagamento: "liberado",
-    contratoId: CONTRATO_CPF_ID,
+    contratoId: CONTRATO_APROVADO_ID,
   },
   {
     id: "tx-002",
+    data: "2026-07-18T11:00:00.000Z",
+    empresaNome: "Urban Style",
+    valor: 3500,
+    statusPagamento: "retido",
+    contratoId: CONTRATO_AJUSTE_ID,
+  },
+  {
+    id: "tx-003",
+    data: "2026-07-19T10:00:00.000Z",
+    empresaNome: "Nexa Solutions",
+    valor: 2800,
+    statusPagamento: "retido",
+    contratoId: CONTRATO_ENTREGUE_ID,
+  },
+  {
+    id: "tx-004",
     data: "2026-07-08T11:00:00.000Z",
     empresaNome: "Nexa Solutions",
     valor: 4200,
@@ -75,15 +94,15 @@ export const TRANSACOES_RECENTES_MOCK: TransacaoFinanceira[] = [
     contratoId: CONTRATO_CNPJ_ID,
   },
   {
-    id: "tx-003",
-    data: "2026-07-03T09:15:00.000Z",
-    empresaNome: "Urban Style",
-    valor: 3200,
-    statusPagamento: "liberado",
-    contratoId: "ctr-mock-002",
+    id: "tx-005",
+    data: "2026-07-11T14:30:00.000Z",
+    empresaNome: "Glow Cosmetics",
+    valor: 8500,
+    statusPagamento: "retido",
+    contratoId: CONTRATO_CPF_ID,
   },
   {
-    id: "tx-004",
+    id: "tx-006",
     data: "2026-06-28T16:45:00.000Z",
     empresaNome: "Sabor & Arte",
     valor: 5400,
@@ -91,7 +110,7 @@ export const TRANSACOES_RECENTES_MOCK: TransacaoFinanceira[] = [
     contratoId: "ctr-mock-003",
   },
   {
-    id: "tx-005",
+    id: "tx-007",
     data: "2026-06-22T10:20:00.000Z",
     empresaNome: "Pixel Games",
     valor: 2800,
@@ -99,44 +118,12 @@ export const TRANSACOES_RECENTES_MOCK: TransacaoFinanceira[] = [
     contratoId: "ctr-mock-004",
   },
   {
-    id: "tx-006",
+    id: "tx-008",
     data: "2026-06-15T13:00:00.000Z",
     empresaNome: "InvestFácil",
     valor: 6100,
     statusPagamento: "liberado",
     contratoId: "ctr-mock-005",
-  },
-  {
-    id: "tx-007",
-    data: "2026-06-08T08:30:00.000Z",
-    empresaNome: "Glow Cosmetics",
-    valor: 8500,
-    statusPagamento: "liberado",
-    contratoId: "ctr-mock-006",
-  },
-  {
-    id: "tx-008",
-    data: "2026-05-30T17:10:00.000Z",
-    empresaNome: "Nexa Solutions",
-    valor: 3900,
-    statusPagamento: "liberado",
-    contratoId: "ctr-mock-007",
-  },
-  {
-    id: "tx-009",
-    data: "2026-05-22T12:00:00.000Z",
-    empresaNome: "Urban Style",
-    valor: 4500,
-    statusPagamento: "liberado",
-    contratoId: "ctr-mock-008",
-  },
-  {
-    id: "tx-010",
-    data: "2026-05-14T15:40:00.000Z",
-    empresaNome: "Sabor & Arte",
-    valor: 3600,
-    statusPagamento: "liberado",
-    contratoId: "ctr-mock-009",
   },
 ];
 

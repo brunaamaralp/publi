@@ -9,6 +9,8 @@ import {
   PassoPacotesPrecificacao,
   type ContextoComparacaoMercado,
 } from "@/components/influenciador/cadastro/passo-pacotes-precificacao";
+import { AvisoContatoInline } from "@/components/negociacao/aviso-contato-inline";
+import { validarTextosLivresPortfolio } from "@/components/influenciador/portfolio/campo-texto-filtrado";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import {
@@ -61,6 +63,7 @@ export function SecoesPerfilPortfolio({
   const [emAnalise, setEmAnalise] = useState(false);
   const [salvandoMetricas, setSalvandoMetricas] = useState(false);
   const [salvandoPrecos, setSalvandoPrecos] = useState(false);
+  const [avisoContatoPacotes, setAvisoContatoPacotes] = useState(false);
 
   const recarregar = useCallback(() => {
     if (!usuario) {
@@ -211,6 +214,17 @@ export function SecoesPerfilPortfolio({
   const salvarPrecos = useCallback(() => {
     if (!usuario || !draft) return;
 
+    const pacotesFiltrados = draft.pacotes.filter((p) => p.nome.trim().length > 0);
+    const validacaoContato = validarTextosLivresPortfolio(
+      pacotesFiltrados.map((p) => p.descricao),
+    );
+    if (!validacaoContato.ok) {
+      setAvisoContatoPacotes(true);
+      toast.error("Remova telefones, e-mails e @ das descrições dos pacotes.");
+      return;
+    }
+    setAvisoContatoPacotes(false);
+
     const result = validarSecaoPrecos(dadosSecaoPrecos(draft));
     if (!result.success) {
       setErrorsPrecos(result.errors);
@@ -225,7 +239,7 @@ export function SecoesPerfilPortfolio({
     const payload = montarPayload(
       {
         ...draft,
-        pacotes: draft.pacotes.filter((p) => p.nome.trim().length > 0),
+        pacotes: pacotesFiltrados,
       },
       usuario,
       existente,
@@ -286,6 +300,9 @@ export function SecoesPerfilPortfolio({
       </section>
 
       <section id="precos" className="scroll-mt-24 space-y-4">
+        {avisoContatoPacotes ? (
+          <AvisoContatoInline tipo="bloqueado_padrao" variante="inline" />
+        ) : null}
         <PassoPacotesPrecificacao
           draft={draft}
           onChange={updateDraft}

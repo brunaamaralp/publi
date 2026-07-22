@@ -9,12 +9,28 @@ export const contratoSchema = z.object({
   status: z.enum([
     "rascunho",
     "assinado",
-    "em_execucao",
-    "cumprido",
+    "em_andamento",
+    "concluida",
     "cancelado",
     "em_disputa",
   ]),
   dataAssinatura: z.string().optional(),
+  statusEntrega: z
+    .enum([
+      "pendente",
+      "entregue",
+      "ajuste_solicitado",
+      "aprovado",
+      "em_disputa",
+    ])
+    .default("pendente"),
+  dataEntrega: z.string().optional(),
+  prazoLiberacaoAutomatica: z.string().optional(),
+  ciclosAjusteUsados: z.number().int().nonnegative().default(0),
+  descricaoEntrega: z.string().optional(),
+  linkComprovante: z.string().optional(),
+  arquivoComprovanteUrl: z.string().optional(),
+  motivoAjuste: z.string().optional(),
 });
 
 export const conversaSchema = z.object({
@@ -39,7 +55,7 @@ export const pagamentoSchema = z.object({
   id: z.string(),
   contratoId: z.string(),
   valor: z.number().positive(),
-  status: z.enum(["retido", "liberado", "estornado"]),
+  status: z.enum(["retido", "liberado", "estornado", "reembolsado"]),
 });
 
 export const rpaSchema = z.object({
@@ -59,14 +75,69 @@ export const rpaSchema = z.object({
 export const entregaSchema = z.object({
   id: z.string(),
   contratoId: z.string(),
-  linkComprovante: z.string().url("Link do comprovante deve ser uma URL válida"),
+  aditivoId: z.string().optional(),
+  linkComprovante: z.string().min(1),
   dataEntrega: z.string(),
+  descricao: z.string().optional(),
+  arquivoComprovanteUrl: z.string().optional(),
   statusConfirmacao: z.enum([
     "aguardando",
     "confirmada",
     "confirmada_automaticamente",
     "contestada",
   ]),
+});
+
+export const camposCicloEntregaSchema = z.object({
+  statusEntrega: z.enum([
+    "pendente",
+    "entregue",
+    "ajuste_solicitado",
+    "aprovado",
+    "em_disputa",
+  ]),
+  dataEntrega: z.string().optional(),
+  prazoLiberacaoAutomatica: z.string().optional(),
+  ciclosAjusteUsados: z.number().int().nonnegative(),
+  descricaoEntrega: z.string().optional(),
+  linkComprovante: z.string().optional(),
+  arquivoComprovanteUrl: z.string().optional(),
+  motivoAjuste: z.string().optional(),
+  disputa: z
+    .object({
+      motivo: z.string(),
+      evidencia: z.string().optional(),
+      reportadoEm: z.string(),
+      decisao: z
+        .enum(["liberado_influenciador", "reembolsado_empresa"])
+        .optional(),
+      decididoEm: z.string().optional(),
+    })
+    .optional(),
+});
+
+export const aditivoSchema = camposCicloEntregaSchema.extend({
+  id: z.string(),
+  contratoId: z.string(),
+  valor: z.number().positive(),
+  escopo: z.string().min(1),
+  prazoEntrega: z.string().min(1),
+  criadoEm: z.string(),
+  status: z.enum(["proposto", "aceito", "ativo", "cancelado"]),
+});
+
+export const pagamentoRetidoItemSchema = z.object({
+  id: z.string(),
+  origem: z.enum(["contrato", "aditivo"]),
+  referenciaId: z.string(),
+  valor: z.number().positive(),
+  status: z.enum(["retido", "liberado", "estornado", "reembolsado"]),
+});
+
+export const pagamentoRetidoSchema = z.object({
+  id: z.string(),
+  contratoId: z.string(),
+  itens: z.array(pagamentoRetidoItemSchema),
 });
 
 /** Formulário de contrato (campos preenchidos pelo usuário). */

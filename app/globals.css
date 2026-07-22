@@ -207,6 +207,29 @@
     color: var(--banner-alerta-text);
   }
 
+  /**
+   * Sidebar do portal — identidade escura (charcoal-green) + grid sutil.
+   * Grid bem discreto (textura de fundo, não marketing do hero).
+   */
+  .app-sidebar {
+    --app-sidebar-fg: #f7f6f2;
+    --app-sidebar-muted: #b9c2bc;
+    color: var(--app-sidebar-fg);
+    background-color: var(--verde-carvao-escuro);
+    background-image:
+      linear-gradient(
+        to right,
+        rgba(57, 255, 106, 0.045) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        rgba(57, 255, 106, 0.045) 1px,
+        transparent 1px
+      );
+    background-size: 22px 22px;
+  }
+
   /* Perfil do influenciador — hierarquia editável vs informativa */
   .secao-editavel {
     border-radius: var(--radius-card);

@@ -2,10 +2,10 @@ import Link from "next/link";
 import { ExternalLink } from "lucide-react";
 
 import {
-  BadgeStatusEscrow,
-  BORDA_LINHA_ESCROW,
+  BadgeStatusPagamentoRetido,
+  BORDA_LINHA_PAGAMENTO_RETIDO,
   LinhaHistoricoPagamento,
-} from "@/components/pagamento/escrow-ui";
+} from "@/components/pagamento/pagamento-retido-ui";
 import type { TransacaoFinanceira } from "@/lib/mock-data/financeiro";
 import { formatarMoeda } from "@/lib/influenciador/cadastro-utils";
 import {
@@ -54,7 +54,7 @@ export function ListaTransacoesRecentes({
                   key={tx.id}
                   className={cn(
                     "border-b border-cinza-200 last:border-0",
-                    BORDA_LINHA_ESCROW[tx.statusPagamento],
+                    BORDA_LINHA_PAGAMENTO_RETIDO[tx.statusPagamento],
                   )}
                 >
                   <td className="text-texto-secundario px-4 py-3 font-normal">
@@ -67,7 +67,7 @@ export function ListaTransacoesRecentes({
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <BadgeStatusEscrow status={tx.statusPagamento} />
+                    <BadgeStatusPagamentoRetido status={tx.statusPagamento} />
                   </td>
                   <td className="px-4 py-3 text-right">
                     <Link

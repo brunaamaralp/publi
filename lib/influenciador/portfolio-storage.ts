@@ -11,10 +11,11 @@ import {
   type TrabalhoAnterior,
 } from "@/lib/influenciador/portfolio-types";
 import { CREATORS_CATALOGO_MOCK } from "@/lib/mock-data/creators-catalogo";
+import { midiasSeedParaCreator } from "@/lib/mock-data/portfolio-midias";
 import {
   statusContaInfluenciador,
 } from "@/lib/mock-data/influenciadores-status";
-import type { PacoteServico } from "@/lib/types";
+import type { Midia, PacoteServico } from "@/lib/types";
 import type { Usuario } from "@/lib/types/usuario";
 
 const STORAGE_PREFIX = "influenciador-portfolio";
@@ -50,31 +51,75 @@ function pacotePadrao(creator: CreatorCatalogo): PacoteServico {
   };
 }
 
-function trabalhosSeed(creator: CreatorCatalogo): TrabalhoAnterior[] {
-  return [
-    {
-      id: novoIdLocal("trab"),
-      titulo: `Campanha ${creator.nichoId.replace("cat-", "")}`,
-      marca: "Marca parceira",
-      tipoConteudo: "Reels",
-    },
-  ];
+function trabalhosSeed(
+  creator: CreatorCatalogo,
+  midias: Midia[],
+): TrabalhoAnterior[] {
+  const midiasTrabalho = midias.filter((m) => m.categoria === "trabalho_anterior");
+  if (midiasTrabalho.length === 0) {
+    return [
+      {
+        id: novoIdLocal("trab"),
+        titulo: `Campanha ${creator.nichoId.replace("cat-", "")}`,
+        marca: "Marca parceira",
+        tipoConteudo: "Reels",
+      },
+    ];
+  }
+  return midiasTrabalho.slice(0, 2).map((midia, i) => ({
+    id: `trab-${creator.id}-${i + 1}`,
+    titulo:
+      i === 0
+        ? `Campanha ${creator.nichoId.replace("cat-", "")}`
+        : "Conteúdo parceiro",
+    marca: i === 0 ? "Marca parceira" : "Cliente anterior",
+    tipoConteudo: midia.tipo === "video" ? "Reels" : "Foto / ensaio",
+    midiaId: midia.id,
+  }));
 }
 
-function redesSeed(handle: string): RedeSocialPortfolio[] {
-  const limpo = handle.replace(/^@/, "");
+function redesSeed(): RedeSocialPortfolio[] {
   return [
     {
       id: novoIdLocal("rede"),
       plataforma: "instagram",
-      handle: `@${limpo}`,
     },
   ];
+}
+
+/** Normaliza portfólios antigos (sem midias / com link em trabalhos). */
+export function normalizarPortfolio(
+  raw: PortfolioInfluenciador & {
+    trabalhos?: Array<TrabalhoAnterior & { link?: string }>;
+  },
+): PortfolioInfluenciador {
+  const midias = Array.isArray(raw.midias) ? raw.midias : [];
+  const trabalhos = (raw.trabalhos ?? []).map((t) => {
+    const comLink = t as TrabalhoAnterior & { link?: string };
+    return {
+      id: comLink.id,
+      titulo: comLink.titulo,
+      marca: comLink.marca,
+      tipoConteudo: comLink.tipoConteudo,
+      midiaId: comLink.midiaId,
+    };
+  });
+  return {
+    ...raw,
+    midias,
+    trabalhos,
+    redes: (raw.redes ?? []).map((r) => ({
+      id: r.id,
+      plataforma: r.plataforma,
+    })),
+    tiposAtuacao: normalizarTiposAtuacao(raw.tiposAtuacao),
+  };
 }
 
 export function portfolioFromCatalogo(
   creator: CreatorCatalogo,
 ): PortfolioInfluenciador {
+  const midias = midiasSeedParaCreator(creator.id);
   return {
     id: creator.id,
     usuarioId: creator.usuarioId,
@@ -84,13 +129,14 @@ export function portfolioFromCatalogo(
     fotoPerfilUrl: creator.fotoUrl,
     fotoCapaUrl: null,
     nichoIds: [creator.nichoId],
-    redes: redesSeed(creator.handle),
+    redes: redesSeed(),
     cidade: creator.cidade,
     estado: creator.estado,
     seguidores: creator.seguidores,
     engajamentoMedio: creator.engajamentoMedio,
     pacotes: [pacotePadrao(creator)],
-    trabalhos: trabalhosSeed(creator),
+    trabalhos: trabalhosSeed(creator, midias),
+    midias,
     notaMediaAvaliacao: creator.notaMediaAvaliacao,
     totalAvaliacoes: creator.totalAvaliacoes,
     plano: "pro",
@@ -132,6 +178,7 @@ function portfolioFromCadastro(
     engajamentoMedio: perfil.metricaPerfil.engajamentoMedio,
     pacotes: perfil.pacotes,
     trabalhos: [],
+    midias: perfil.influenciador.midias ?? [],
     notaMediaAvaliacao: perfil.influenciador.notaMediaAvaliacao,
     totalAvaliacoes: perfil.influenciador.totalAvaliacoes,
     plano: perfil.influenciador.plano,
@@ -158,6 +205,7 @@ function portfolioVazio(usuarioId: string, portfolioId: string): PortfolioInflue
     engajamentoMedio: 0,
     pacotes: [],
     trabalhos: [],
+    midias: [],
     notaMediaAvaliacao: null,
     totalAvaliacoes: 0,
     plano: "basico",
@@ -168,7 +216,10 @@ function portfolioVazio(usuarioId: string, portfolioId: string): PortfolioInflue
 
 export function salvarPortfolio(portfolio: PortfolioInfluenciador): void {
   if (typeof window === "undefined") return;
-  const next = { ...portfolio, atualizadoEm: new Date().toISOString() };
+  const next = normalizarPortfolio({
+    ...portfolio,
+    atualizadoEm: new Date().toISOString(),
+  });
   localStorage.setItem(chave(next.id), JSON.stringify(next));
   const index = lerIndex();
   index[next.usuarioId] = next.id;
@@ -182,7 +233,12 @@ export function carregarPortfolioPorId(
 
   try {
     const raw = localStorage.getItem(chave(id));
-    if (raw) return JSON.parse(raw) as PortfolioInfluenciador;
+    if (raw) {
+      const salvo = normalizarPortfolio(
+        JSON.parse(raw) as PortfolioInfluenciador,
+      );
+      return mesclarSeedMidiasSeVazio(mesclarDisponibilidadeDoCatalogo(salvo));
+    }
   } catch {
     // fall through to seed
   }
@@ -195,6 +251,62 @@ export function carregarPortfolioPorId(
   }
 
   return null;
+}
+
+/**
+ * Se o portfólio local ainda não tem `datasIndisponiveis`, herda do catálogo mock
+ * para a agenda de demo não aparecer sempre 100% livre.
+ */
+function mesclarDisponibilidadeDoCatalogo(
+  portfolio: PortfolioInfluenciador,
+): PortfolioInfluenciador {
+  const jaTemDatas =
+    (portfolio.disponibilidade?.datasIndisponiveis?.length ?? 0) > 0;
+  if (jaTemDatas) return portfolio;
+
+  const catalogo = CREATORS_CATALOGO_MOCK.find((c) => c.id === portfolio.id);
+  const doCatalogo = catalogo?.disponibilidade;
+  if (!doCatalogo?.datasIndisponiveis?.length) return portfolio;
+
+  return {
+    ...portfolio,
+    disponibilidade: {
+      diasSemana:
+        portfolio.disponibilidade?.diasSemana?.length
+          ? portfolio.disponibilidade.diasSemana
+          : (doCatalogo.diasSemana ?? []),
+      observacao:
+        portfolio.disponibilidade?.observacao ?? doCatalogo.observacao,
+      datasIndisponiveis: [...doCatalogo.datasIndisponiveis],
+    },
+  };
+}
+
+/** Injeta mídias de exemplo em portfólios antigos sem galeria. */
+function mesclarSeedMidiasSeVazio(
+  portfolio: PortfolioInfluenciador,
+): PortfolioInfluenciador {
+  if (portfolio.midias.length > 0) return portfolio;
+  const seedMidias = midiasSeedParaCreator(portfolio.id);
+  if (seedMidias.length === 0) return portfolio;
+
+  const catalogo = CREATORS_CATALOGO_MOCK.find((c) => c.id === portfolio.id);
+  const midiasTrabalho = seedMidias.filter(
+    (m) => m.categoria === "trabalho_anterior",
+  );
+  const trabalhos =
+    portfolio.trabalhos.length > 0
+      ? portfolio.trabalhos.map((t, i) => ({
+          ...t,
+          midiaId: t.midiaId ?? midiasTrabalho[i]?.id,
+        }))
+      : catalogo
+        ? trabalhosSeed(catalogo, seedMidias)
+        : portfolio.trabalhos;
+
+  const next = { ...portfolio, midias: seedMidias, trabalhos };
+  salvarPortfolio(next);
+  return next;
 }
 
 /**
@@ -229,6 +341,7 @@ export function portfolioParaCreatorCatalogo(
 ): CreatorCatalogo {
   const status = statusContaInfluenciador(portfolio.id) ?? "ativo";
   const precoMin = precoPacoteMinimo(portfolio.pacotes);
+  const perfil = carregarPerfilInfluenciador(portfolio.usuarioId);
   return {
     id: portfolio.id,
     usuarioId: portfolio.usuarioId,
@@ -247,6 +360,7 @@ export function portfolioParaCreatorCatalogo(
     status,
     tiposAtuacao: normalizarTiposAtuacao(portfolio.tiposAtuacao),
     disponibilidade: portfolio.disponibilidade,
+    nivelAtual: perfil?.influenciador.nivelAtual,
   };
 }
 

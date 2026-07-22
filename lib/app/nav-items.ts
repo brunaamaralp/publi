@@ -175,5 +175,38 @@ const GRUPOS_POR_TIPO: Record<Usuario["tipo"], string[]> = {
 
 export function navGruposParaUsuario(tipo: Usuario["tipo"]): NavGrupo[] {
   const permitidos = new Set(GRUPOS_POR_TIPO[tipo]);
-  return NAV_GRUPOS.filter((grupo) => permitidos.has(grupo.titulo));
+  return NAV_GRUPOS.filter((grupo) => permitidos.has(grupo.titulo)).map(
+    (grupo) => {
+      if (grupo.titulo !== "Geral") return grupo;
+      if (tipo === "influenciador") {
+        return {
+          ...grupo,
+          itens: grupo.itens.map((item) =>
+            item.href === "/inicio"
+              ? {
+                  ...item,
+                  href: "/influenciador",
+                  rotasRelacionadas: ["/inicio"],
+                }
+              : item,
+          ),
+        };
+      }
+      if (tipo === "empresa") {
+        return {
+          ...grupo,
+          itens: grupo.itens.map((item) =>
+            item.href === "/inicio"
+              ? {
+                  ...item,
+                  href: "/empresa",
+                  rotasRelacionadas: ["/inicio"],
+                }
+              : item,
+          ),
+        };
+      }
+      return grupo;
+    },
+  );
 }

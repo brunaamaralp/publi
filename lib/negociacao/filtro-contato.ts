@@ -37,3 +37,16 @@ export function analisarTextoMensagem(texto: string): ResultadoFiltroContato {
 
   return { podeEnviar: true, flag: "nenhum" };
 }
+
+/**
+ * Mesma regra do chat para campos opcionais do portfólio (bio, legendas, descrições).
+ * Texto vazio é permitido (não bloqueia).
+ */
+export function analisarTextoLivrePortfolio(
+  texto: string,
+): ResultadoFiltroContato {
+  if (!texto.trim()) {
+    return { podeEnviar: true, flag: "nenhum" };
+  }
+  return analisarTextoMensagem(texto);
+}

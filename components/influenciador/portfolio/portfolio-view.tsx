@@ -2,25 +2,30 @@
 
 import {
   Briefcase,
-  ExternalLink,
   MapPin,
   Package,
+  Play,
   Star,
   Users,
   Zap,
 } from "lucide-react";
 
+import { AgendaDisponibilidade } from "@/components/influenciador/portfolio/agenda-disponibilidade";
 import { BadgeSemantico } from "@/components/ui/badge-semantico";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { creatorExibeNota } from "@/lib/empresa/creator-catalogo-types";
 import { formatarFaixaSeguidores } from "@/lib/empresa/busca-creators";
 import { nomeNicho } from "@/lib/empresa/orcamento-nicho";
 import { formatarMoeda } from "@/lib/influenciador/cadastro-utils";
 import {
   LABELS_PLATAFORMA_REDE,
+  midiasTrabalhoAnterior,
   precoPacoteMinimo,
+  videoApresentacao,
   type PortfolioInfluenciador,
 } from "@/lib/influenciador/portfolio-types";
+import type { Midia, PacoteServico } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 type PortfolioViewProps = {
@@ -29,6 +34,10 @@ type PortfolioViewProps = {
   ocultarHandlesRedes?: boolean;
   className?: string;
   acoes?: React.ReactNode;
+  /** Visão empresa: botão Contratar por pacote. */
+  onContratarPacote?: (pacote: PacoteServico) => void;
+  /** Exibe a seção de agenda (próximos dias). */
+  exibirAgenda?: boolean;
 };
 
 function iniciais(nome: string): string {
@@ -40,11 +49,49 @@ function iniciais(nome: string): string {
     .join("");
 }
 
+function CardMidia({ midia }: { midia: Midia }) {
+  return (
+    <li className="overflow-hidden rounded-card border border-cinza-200 bg-white">
+      <div className="bg-verde-carvao relative aspect-[4/5]">
+        {midia.tipo === "video" ? (
+          <video
+            src={midia.url}
+            controls
+            playsInline
+            preload="metadata"
+            className="size-full object-cover"
+          />
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={midia.url}
+            alt={midia.legenda?.trim() || "Trabalho anterior"}
+            className="size-full object-cover"
+          />
+        )}
+        {midia.tipo === "video" ? (
+          <span className="pointer-events-none absolute left-2 top-2 inline-flex items-center gap-1 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-medium text-white">
+            <Play className="size-3" aria-hidden />
+            Vídeo
+          </span>
+        ) : null}
+      </div>
+      {midia.legenda ? (
+        <p className="text-texto-secundario p-3 text-sm leading-relaxed font-normal">
+          {midia.legenda}
+        </p>
+      ) : null}
+    </li>
+  );
+}
+
 export function PortfolioView({
   portfolio,
   ocultarHandlesRedes = true,
   className,
   acoes,
+  onContratarPacote,
+  exibirAgenda = true,
 }: PortfolioViewProps) {
   const exibeNota = creatorExibeNota({
     totalAvaliacoes: portfolio.totalAvaliacoes,
@@ -52,6 +99,8 @@ export function PortfolioView({
   });
   const pacotesAtivos = portfolio.pacotes.filter((p) => p.ativo);
   const precoMin = precoPacoteMinimo(portfolio.pacotes);
+  const apresentacao = videoApresentacao(portfolio.midias ?? []);
+  const galeria = midiasTrabalhoAnterior(portfolio.midias ?? []);
 
   return (
     <div className={cn("space-y-6", className)}>
@@ -87,11 +136,6 @@ export function PortfolioView({
                 <h1 className="font-display text-2xl font-bold tracking-tight">
                   {portfolio.nome || "Sem nome"}
                 </h1>
-                {portfolio.handle ? (
-                  <p className="text-texto-secundario text-sm font-normal">
-                    {portfolio.handle}
-                  </p>
-                ) : null}
               </div>
             </div>
             {acoes}
@@ -177,7 +221,7 @@ export function PortfolioView({
               </ul>
               {ocultarHandlesRedes ? (
                 <p className="text-texto-secundario mt-2 text-xs font-normal">
-                  Handles e contatos ficam ocultos até o match e o chat
+                  Contatos e perfis externos ficam ocultos até o match e o chat
                   filtrado.
                 </p>
               ) : null}
@@ -185,6 +229,45 @@ export function PortfolioView({
           ) : null}
         </div>
       </section>
+
+      {apresentacao ? (
+        <section className="space-y-3">
+          <h2 className="font-display text-lg font-bold">
+            Vídeo de apresentação
+          </h2>
+          <div className="overflow-hidden rounded-card border border-cinza-200 bg-verde-carvao">
+            <video
+              src={apresentacao.url}
+              controls
+              playsInline
+              preload="metadata"
+              className="aspect-video w-full object-contain"
+            />
+          </div>
+          {apresentacao.legenda ? (
+            <p className="text-texto-secundario text-sm leading-relaxed font-normal">
+              {apresentacao.legenda}
+            </p>
+          ) : null}
+        </section>
+      ) : null}
+
+      {galeria.length > 0 ? (
+        <section className="space-y-3">
+          <h2 className="font-display text-lg font-bold">
+            Fotos e vídeos de trabalhos
+          </h2>
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {galeria.map((midia) => (
+              <CardMidia key={midia.id} midia={midia} />
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {exibirAgenda ? (
+        <AgendaDisponibilidade disponibilidade={portfolio.disponibilidade} />
+      ) : null}
 
       <section className="space-y-3">
         <h2 className="font-display text-lg font-bold">Pacotes e serviços</h2>
@@ -212,6 +295,17 @@ export function PortfolioView({
                     ))}
                   </ul>
                 ) : null}
+                {onContratarPacote ? (
+                  <Button
+                    type="button"
+                    variant="cta"
+                    size="sm"
+                    className="mt-2 w-full"
+                    onClick={() => onContratarPacote(pacote)}
+                  >
+                    Contratar
+                  </Button>
+                ) : null}
               </li>
             ))}
           </ul>
@@ -229,25 +323,49 @@ export function PortfolioView({
           </p>
         ) : (
           <ul className="grid gap-3 sm:grid-cols-2">
-            {portfolio.trabalhos.map((trab) => (
-              <li key={trab.id} className="rounded-card border border-cinza-200 bg-white p-4">
-                <p className="font-display font-bold">{trab.titulo}</p>
-                <p className="text-texto-secundario mt-1 text-sm font-normal">
-                  {trab.marca} · {trab.tipoConteudo}
-                </p>
-                {trab.link ? (
-                  <a
-                    href={trab.link}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-verde-acao mt-2 inline-flex items-center gap-1 text-xs font-medium hover:underline"
-                  >
-                    Ver referência
-                    <ExternalLink className="size-3" aria-hidden />
-                  </a>
-                ) : null}
-              </li>
-            ))}
+            {portfolio.trabalhos.map((trab) => {
+              const midia = trab.midiaId
+                ? portfolio.midias.find((m) => m.id === trab.midiaId)
+                : undefined;
+              return (
+                <li
+                  key={trab.id}
+                  className="overflow-hidden rounded-card border border-cinza-200 bg-white"
+                >
+                  {midia ? (
+                    <div className="bg-muted aspect-video">
+                      {midia.tipo === "video" ? (
+                        <video
+                          src={midia.url}
+                          controls
+                          playsInline
+                          preload="metadata"
+                          className="size-full object-cover"
+                        />
+                      ) : (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={midia.url}
+                          alt={midia.legenda || trab.titulo}
+                          className="size-full object-cover"
+                        />
+                      )}
+                    </div>
+                  ) : null}
+                  <div className="p-4">
+                    <p className="font-display font-bold">{trab.titulo}</p>
+                    <p className="text-texto-secundario mt-1 text-sm font-normal">
+                      {trab.marca} · {trab.tipoConteudo}
+                    </p>
+                    {midia?.legenda ? (
+                      <p className="text-texto-secundario mt-2 text-xs leading-relaxed">
+                        {midia.legenda}
+                      </p>
+                    ) : null}
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>

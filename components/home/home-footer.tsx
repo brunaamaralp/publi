@@ -17,7 +17,7 @@ export function HomeFooter() {
           <PubliLogo variant="dark" size="md" className="mb-3" />
           <p className="max-w-xs text-sm leading-relaxed font-normal">
             Marketplace que conecta influenciadores digitais a empresas de
-            publicação.
+            publicidade.
           </p>
         </div>
 

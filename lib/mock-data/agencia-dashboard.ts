@@ -161,7 +161,7 @@ export const CONTRATOS_AGENCIA_MOCK: ContratoAgenciaResumo[] = [
     empresaId: "emp-plat-001",
     campanhaTitulo: "Campanha hidratante facial",
     valor: 6200,
-    status: "em_execucao",
+    status: "em_andamento",
     dataAssinatura: "2026-07-03T10:00:00.000Z",
   },
   {
@@ -177,7 +177,7 @@ export const CONTRATOS_AGENCIA_MOCK: ContratoAgenciaResumo[] = [
     empresaId: "emp-plat-005",
     campanhaTitulo: "Receita com linha premium",
     valor: 7500,
-    status: "em_execucao",
+    status: "em_andamento",
     dataAssinatura: "2026-07-08T09:30:00.000Z",
   },
   {

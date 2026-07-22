@@ -1,11 +1,16 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Camera, Eye, Plus, Trash2 } from "lucide-react";
+import { Camera, Eye, Plus, Trash2, Video } from "lucide-react";
 import { toast } from "sonner";
 
+import {
+  CampoTextoFiltrado,
+  validarTextosLivresPortfolio,
+} from "@/components/influenciador/portfolio/campo-texto-filtrado";
 import { SecoesPerfilPortfolio } from "@/components/influenciador/portfolio/secoes-perfil-portfolio";
 import { PortfolioView } from "@/components/influenciador/portfolio/portfolio-view";
+import { AvisoContatoInline } from "@/components/negociacao/aviso-contato-inline";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -17,7 +22,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import {
   DIAS_SEMANA,
   ehSomenteModelo,
@@ -37,11 +41,12 @@ import {
 import {
   LABELS_PLATAFORMA_REDE,
   novoIdLocal,
+  videoApresentacao,
   type PortfolioInfluenciador,
   type RedeSocialPortfolio,
   type TrabalhoAnterior,
 } from "@/lib/influenciador/portfolio-types";
-import type { DiaSemana, TipoAtuacao } from "@/lib/types/influenciador";
+import type { DiaSemana, Midia, TipoAtuacao } from "@/lib/types/influenciador";
 import { cn } from "@/lib/utils";
 
 type PortfolioEditorProps = {
@@ -54,7 +59,12 @@ function comTiposPadrao(
   return {
     ...portfolio,
     tiposAtuacao: normalizarTiposAtuacao(portfolio.tiposAtuacao),
+    midias: portfolio.midias ?? [],
   };
+}
+
+function revokeSeBlob(url: string | null | undefined) {
+  if (url?.startsWith("blob:")) URL.revokeObjectURL(url);
 }
 
 export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
@@ -63,8 +73,10 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
   );
   const [salvando, setSalvando] = useState(false);
   const [preview, setPreview] = useState(false);
+  const [avisoSalvar, setAvisoSalvar] = useState(false);
   const fotoPerfilRef = useRef<HTMLInputElement>(null);
   const fotoCapaRef = useRef<HTMLInputElement>(null);
+  const videoApresRef = useRef<HTMLInputElement>(null);
 
   function patch(partial: Partial<PortfolioInfluenciador>) {
     setDraft((prev) => ({ ...prev, ...partial }));
@@ -75,12 +87,107 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
     campo: "fotoPerfilUrl" | "fotoCapaUrl",
   ) {
     const atual = draft[campo];
-    if (atual?.startsWith("blob:")) URL.revokeObjectURL(atual);
+    revokeSeBlob(atual);
     if (!file) {
       patch({ [campo]: null });
       return;
     }
     patch({ [campo]: URL.createObjectURL(file) });
+  }
+
+  function setVideoApresentacao(file: File | null) {
+    const atual = videoApresentacao(draft.midias);
+    revokeSeBlob(atual?.url);
+    const semApres = draft.midias.filter((m) => m.categoria !== "apresentacao");
+    if (!file) {
+      patch({ midias: semApres });
+      return;
+    }
+    const nova: Midia = {
+      id: atual?.id ?? novoIdLocal("mid"),
+      tipo: "video",
+      url: URL.createObjectURL(file),
+      legenda: atual?.legenda,
+      categoria: "apresentacao",
+    };
+    patch({ midias: [...semApres, nova] });
+  }
+
+  function setLegendaApresentacao(legenda: string) {
+    const atual = videoApresentacao(draft.midias);
+    if (!atual) return;
+    patch({
+      midias: draft.midias.map((m) =>
+        m.id === atual.id ? { ...m, legenda: legenda || undefined } : m,
+      ),
+    });
+  }
+
+  function midiaDoTrabalho(trab: TrabalhoAnterior): Midia | undefined {
+    if (!trab.midiaId) return undefined;
+    return draft.midias.find((m) => m.id === trab.midiaId);
+  }
+
+  function setMidiaTrabalho(
+    trabId: string,
+    file: File | null,
+    tipo: Midia["tipo"],
+  ) {
+    const trab = draft.trabalhos.find((t) => t.id === trabId);
+    if (!trab) return;
+    const existente = midiaDoTrabalho(trab);
+    revokeSeBlob(existente?.url);
+
+    if (!file) {
+      patch({
+        midias: draft.midias.filter((m) => m.id !== existente?.id),
+        trabalhos: draft.trabalhos.map((t) =>
+          t.id === trabId ? { ...t, midiaId: undefined } : t,
+        ),
+      });
+      return;
+    }
+
+    const midiaId = existente?.id ?? novoIdLocal("mid");
+    const nova: Midia = {
+      id: midiaId,
+      tipo,
+      url: URL.createObjectURL(file),
+      legenda: existente?.legenda,
+      categoria: "trabalho_anterior",
+    };
+    const midias = existente
+      ? draft.midias.map((m) => (m.id === midiaId ? nova : m))
+      : [...draft.midias, nova];
+    patch({
+      midias,
+      trabalhos: draft.trabalhos.map((t) =>
+        t.id === trabId ? { ...t, midiaId } : t,
+      ),
+    });
+  }
+
+  function setLegendaTrabalho(trabId: string, legenda: string) {
+    const trab = draft.trabalhos.find((t) => t.id === trabId);
+    const midia = trab ? midiaDoTrabalho(trab) : undefined;
+    if (!midia) return;
+    patch({
+      midias: draft.midias.map((m) =>
+        m.id === midia.id ? { ...m, legenda: legenda || undefined } : m,
+      ),
+    });
+  }
+
+  function removerTrabalho(trabId: string) {
+    const trab = draft.trabalhos.find((t) => t.id === trabId);
+    const midia = trab ? midiaDoTrabalho(trab) : undefined;
+    revokeSeBlob(midia?.url);
+    patch({
+      trabalhos: draft.trabalhos.filter((t) => t.id !== trabId),
+      midias: midia
+        ? draft.midias.filter((m) => m.id !== midia.id)
+        : draft.midias,
+    });
   }
 
   function salvar() {
@@ -92,6 +199,21 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
       toast.error("A bio precisa ter pelo menos 20 caracteres.");
       return;
     }
+
+    const legendas = draft.midias.map((m) => m.legenda ?? "");
+    const descricoesPacotes = draft.pacotes.map((p) => p.descricao);
+    const validacao = validarTextosLivresPortfolio([
+      draft.bio,
+      ...legendas,
+      ...descricoesPacotes,
+    ]);
+    if (!validacao.ok) {
+      setAvisoSalvar(true);
+      toast.error("Remova telefones, e-mails e @ dos textos do portfólio.");
+      return;
+    }
+    setAvisoSalvar(false);
+
     if (
       draft.tiposAtuacao.includes("modelo") &&
       (!draft.disponibilidade || draft.disponibilidade.diasSemana.length === 0)
@@ -128,6 +250,7 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
       influenciador: {
         ...perfil.influenciador,
         tiposAtuacao: tipos,
+        midias: portfolio.midias,
         ...(tipos.includes("modelo") && portfolio.disponibilidade
           ? { disponibilidade: portfolio.disponibilidade }
           : { disponibilidade: undefined }),
@@ -144,7 +267,6 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
     const nova: RedeSocialPortfolio = {
       id: novoIdLocal("rede"),
       plataforma: "instagram",
-      handle: "",
     };
     patch({ redes: [...draft.redes, nova] });
   }
@@ -155,7 +277,6 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
       titulo: "",
       marca: "",
       tipoConteudo: "Reels",
-      link: "",
     };
     patch({ trabalhos: [...draft.trabalhos, novo] });
   }
@@ -169,12 +290,14 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
     });
   }
 
+  const apresentacao = videoApresentacao(draft.midias);
+
   if (preview) {
     return (
       <div className="mx-auto max-w-3xl space-y-4 px-4 py-6 sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-texto-secundario text-sm">
-            Pré-visualização (como visitante — sem handles de rede)
+            Pré-visualização (como visitante — sem contatos externos)
           </p>
           <Button type="button" variant="outline" onClick={() => setPreview(false)}>
             Voltar à edição
@@ -194,8 +317,9 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
             Meu portfólio
           </h1>
           <p className="text-texto-secundario mt-2 max-w-xl text-sm font-normal">
-            Edite sua vitrine pública, métricas e preços. Empresas veem esta
-            página ao clicar no seu card na busca.
+            Edite sua vitrine pública com mídia própria, métricas e preços.
+            Empresas veem esta página ao clicar no seu card na busca — sem links
+            ou @ de outras redes.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -220,6 +344,10 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
           </Button>
         </div>
       </header>
+
+      {avisoSalvar ? (
+        <AvisoContatoInline tipo="bloqueado_padrao" variante="inline" />
+      ) : null}
 
       {/* Capa + foto */}
       <section className="secao-editavel space-y-4 ring-0">
@@ -310,6 +438,74 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
         </div>
       </section>
 
+      {/* Vídeo de apresentação */}
+      <section className="secao-editavel space-y-4 ring-0">
+        <div>
+          <h2 className="font-display text-sm font-bold">
+            Vídeo de apresentação
+          </h2>
+          <p className="text-texto-secundario mt-1 text-xs font-normal leading-relaxed">
+            Um vídeo curto se apresentando para marcas — fale sobre seu
+            trabalho, não inclua contatos pessoais
+          </p>
+        </div>
+        <input
+          ref={videoApresRef}
+          type="file"
+          accept="video/*"
+          className="sr-only"
+          onChange={(e) =>
+            setVideoApresentacao(e.target.files?.[0] ?? null)
+          }
+        />
+        {apresentacao ? (
+          <div className="space-y-3">
+            <video
+              src={apresentacao.url}
+              controls
+              playsInline
+              preload="metadata"
+              className="aspect-video w-full overflow-hidden rounded-card bg-verde-carvao object-contain"
+            />
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => videoApresRef.current?.click()}
+              >
+                Trocar vídeo
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setVideoApresentacao(null)}
+              >
+                Remover
+              </Button>
+            </div>
+            <div className="space-y-2">
+              <Label>Legenda (opcional)</Label>
+              <CampoTextoFiltrado
+                value={apresentacao.legenda ?? ""}
+                onChange={setLegendaApresentacao}
+                placeholder="Resumo curto — sem @ ou telefone"
+              />
+            </div>
+          </div>
+        ) : (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => videoApresRef.current?.click()}
+          >
+            <Video className="size-4" aria-hidden />
+            Enviar vídeo de apresentação
+          </Button>
+        )}
+      </section>
+
       {/* Dados básicos */}
       <section className="secao-editavel space-y-4 ring-0">
         <h2 className="font-display text-sm font-bold">Dados básicos</h2>
@@ -320,16 +516,6 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
               id="pf-nome"
               value={draft.nome}
               onChange={(e) => patch({ nome: e.target.value })}
-              className="border-cinza-200 bg-white"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="pf-handle">Handle</Label>
-            <Input
-              id="pf-handle"
-              value={draft.handle}
-              onChange={(e) => patch({ handle: e.target.value })}
-              placeholder="@seuuser"
               className="border-cinza-200 bg-white"
             />
           </div>
@@ -356,21 +542,21 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
           </div>
           <div className="space-y-2 sm:col-span-2">
             <Label htmlFor="pf-bio">Bio</Label>
-            <Textarea
+            <CampoTextoFiltrado
               id="pf-bio"
               value={draft.bio}
-              onChange={(e) => patch({ bio: e.target.value })}
+              onChange={(bio) => patch({ bio })}
+              multiline
               rows={4}
-              className="border-cinza-200 bg-white"
             />
             <p className="text-texto-secundario text-xs">
-              {draft.bio.length}/20 caracteres mínimos
+              {draft.bio.length}/20 caracteres mínimos — sem @, telefone ou
+              e-mail
             </p>
           </div>
         </div>
       </section>
 
-      {/* Atuação como modelo */}
       <SecaoAtuacaoModelo draft={draft} onPatch={patch} />
 
       {/* Nichos */}
@@ -398,13 +584,14 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
         </div>
       </section>
 
-      {/* Redes */}
+      {/* Redes — só plataforma, sem @/handle */}
       <section className="secao-editavel space-y-4 ring-0">
         <div className="flex items-center justify-between gap-2">
           <div>
-            <h2 className="font-display text-sm font-bold">Redes sociais</h2>
+            <h2 className="font-display text-sm font-bold">Presença nas redes</h2>
             <p className="text-texto-secundario text-xs font-normal">
-              No modo público só aparece a plataforma — sem link de DM.
+              Informe só a plataforma. Handles e links de perfil não entram na
+              vitrine — o contato fica no chat filtrado.
             </p>
           </div>
           <Button type="button" variant="outline" size="sm" onClick={addRede}>
@@ -416,7 +603,7 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
           {draft.redes.map((rede) => (
             <li
               key={rede.id}
-              className="grid gap-2 rounded-card border border-cinza-200 p-3 sm:grid-cols-[140px_1fr_auto]"
+              className="grid gap-2 rounded-card border border-cinza-200 p-3 sm:grid-cols-[1fr_auto]"
             >
               <Select
                 value={rede.plataforma}
@@ -440,7 +627,9 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
                 </SelectTrigger>
                 <SelectContent>
                   {(
-                    Object.keys(LABELS_PLATAFORMA_REDE) as RedeSocialPortfolio["plataforma"][]
+                    Object.keys(
+                      LABELS_PLATAFORMA_REDE,
+                    ) as RedeSocialPortfolio["plataforma"][]
                   ).map((key) => (
                     <SelectItem key={key} value={key}>
                       {LABELS_PLATAFORMA_REDE[key]}
@@ -448,18 +637,6 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
                   ))}
                 </SelectContent>
               </Select>
-              <Input
-                value={rede.handle}
-                placeholder="@seuuser"
-                onChange={(e) =>
-                  patch({
-                    redes: draft.redes.map((r) =>
-                      r.id === rede.id ? { ...r, handle: e.target.value } : r,
-                    ),
-                  })
-                }
-                className="border-cinza-200 bg-white"
-              />
               <Button
                 type="button"
                 variant="ghost"
@@ -478,7 +655,6 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
         </ul>
       </section>
 
-      {/* Métricas, equipamentos, tabela de preços e pacotes (pós-cadastro) */}
       <SecoesPerfilPortfolio
         onPerfilAtualizado={() => {
           const atualizado = carregarPortfolioPorId(draft.id);
@@ -493,10 +669,17 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
         }}
       />
 
-      {/* Trabalhos */}
+      {/* Trabalhos anteriores — mídia própria, sem link externo */}
       <section id="trabalhos" className="secao-editavel space-y-4 ring-0">
         <div className="flex items-center justify-between gap-2">
-          <h2 className="font-display text-sm font-bold">Trabalhos anteriores</h2>
+          <div>
+            <h2 className="font-display text-sm font-bold">
+              Trabalhos anteriores
+            </h2>
+            <p className="text-texto-secundario text-xs font-normal">
+              Envie foto ou vídeo do trabalho. Sem links de redes sociais.
+            </p>
+          </div>
           <Button
             type="button"
             variant="outline"
@@ -507,93 +690,23 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
             Adicionar
           </Button>
         </div>
-        <ul className="space-y-3">
+        <ul className="space-y-4">
           {draft.trabalhos.map((trab) => (
-            <li
+            <TrabalhoEditorItem
               key={trab.id}
-              className="grid gap-3 rounded-card border border-cinza-200 p-4 sm:grid-cols-2"
-            >
-              <div className="space-y-2">
-                <Label>Título</Label>
-                <Input
-                  value={trab.titulo}
-                  onChange={(e) =>
-                    patch({
-                      trabalhos: draft.trabalhos.map((t) =>
-                        t.id === trab.id
-                          ? { ...t, titulo: e.target.value }
-                          : t,
-                      ),
-                    })
-                  }
-                  className="border-cinza-200 bg-white"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Marca</Label>
-                <Input
-                  value={trab.marca}
-                  onChange={(e) =>
-                    patch({
-                      trabalhos: draft.trabalhos.map((t) =>
-                        t.id === trab.id ? { ...t, marca: e.target.value } : t,
-                      ),
-                    })
-                  }
-                  className="border-cinza-200 bg-white"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Tipo de conteúdo</Label>
-                <Input
-                  value={trab.tipoConteudo}
-                  onChange={(e) =>
-                    patch({
-                      trabalhos: draft.trabalhos.map((t) =>
-                        t.id === trab.id
-                          ? { ...t, tipoConteudo: e.target.value }
-                          : t,
-                      ),
-                    })
-                  }
-                  className="border-cinza-200 bg-white"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Link (opcional)</Label>
-                <div className="flex gap-2">
-                  <Input
-                    value={trab.link ?? ""}
-                    onChange={(e) =>
-                      patch({
-                        trabalhos: draft.trabalhos.map((t) =>
-                          t.id === trab.id
-                            ? { ...t, link: e.target.value || undefined }
-                            : t,
-                        ),
-                      })
-                    }
-                    placeholder="https://"
-                    className="border-cinza-200 bg-white"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() =>
-                      patch({
-                        trabalhos: draft.trabalhos.filter(
-                          (t) => t.id !== trab.id,
-                        ),
-                      })
-                    }
-                    aria-label="Remover trabalho"
-                  >
-                    <Trash2 className="size-4" aria-hidden />
-                  </Button>
-                </div>
-              </div>
-            </li>
+              trab={trab}
+              midia={midiaDoTrabalho(trab)}
+              onPatchTrabalho={(partial) =>
+                patch({
+                  trabalhos: draft.trabalhos.map((t) =>
+                    t.id === trab.id ? { ...t, ...partial } : t,
+                  ),
+                })
+              }
+              onMidia={(file, tipo) => setMidiaTrabalho(trab.id, file, tipo)}
+              onLegenda={(legenda) => setLegendaTrabalho(trab.id, legenda)}
+              onRemover={() => removerTrabalho(trab.id)}
+            />
           ))}
         </ul>
       </section>
@@ -607,6 +720,162 @@ export function PortfolioEditor({ inicial }: PortfolioEditorProps) {
         </Button>
       </div>
     </div>
+  );
+}
+
+function TrabalhoEditorItem({
+  trab,
+  midia,
+  onPatchTrabalho,
+  onMidia,
+  onLegenda,
+  onRemover,
+}: {
+  trab: TrabalhoAnterior;
+  midia: Midia | undefined;
+  onPatchTrabalho: (partial: Partial<TrabalhoAnterior>) => void;
+  onMidia: (file: File | null, tipo: Midia["tipo"]) => void;
+  onLegenda: (legenda: string) => void;
+  onRemover: () => void;
+}) {
+  const fotoRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLInputElement>(null);
+
+  return (
+    <li className="space-y-3 rounded-card border border-cinza-200 p-4">
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label>Título</Label>
+          <Input
+            value={trab.titulo}
+            onChange={(e) => onPatchTrabalho({ titulo: e.target.value })}
+            className="border-cinza-200 bg-white"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Marca</Label>
+          <Input
+            value={trab.marca}
+            onChange={(e) => onPatchTrabalho({ marca: e.target.value })}
+            className="border-cinza-200 bg-white"
+          />
+        </div>
+        <div className="space-y-2 sm:col-span-2">
+          <Label>Tipo de conteúdo</Label>
+          <Input
+            value={trab.tipoConteudo}
+            onChange={(e) => onPatchTrabalho({ tipoConteudo: e.target.value })}
+            className="border-cinza-200 bg-white"
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label>Mídia do trabalho</Label>
+        <input
+          ref={fotoRef}
+          type="file"
+          accept="image/*"
+          className="sr-only"
+          onChange={(e) => onMidia(e.target.files?.[0] ?? null, "foto")}
+        />
+        <input
+          ref={videoRef}
+          type="file"
+          accept="video/*"
+          className="sr-only"
+          onChange={(e) => onMidia(e.target.files?.[0] ?? null, "video")}
+        />
+        {midia ? (
+          <div className="space-y-2">
+            {midia.tipo === "video" ? (
+              <video
+                src={midia.url}
+                controls
+                playsInline
+                preload="metadata"
+                className="aspect-video w-full rounded-card bg-verde-carvao object-contain"
+              />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={midia.url}
+                alt={midia.legenda || trab.titulo || "Trabalho"}
+                className="aspect-video w-full rounded-card object-cover"
+              />
+            )}
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fotoRef.current?.click()}
+              >
+                Trocar foto
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => videoRef.current?.click()}
+              >
+                Trocar vídeo
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => onMidia(null, midia.tipo)}
+              >
+                Remover mídia
+              </Button>
+            </div>
+            <div className="space-y-2">
+              <Label>Legenda curta (opcional)</Label>
+              <CampoTextoFiltrado
+                value={midia.legenda ?? ""}
+                onChange={onLegenda}
+                placeholder="Descreva o trabalho — sem @ ou telefone"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => fotoRef.current?.click()}
+            >
+              <Camera className="size-4" aria-hidden />
+              Enviar foto
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => videoRef.current?.click()}
+            >
+              <Video className="size-4" aria-hidden />
+              Enviar vídeo
+            </Button>
+          </div>
+        )}
+      </div>
+
+      <div className="flex justify-end">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={onRemover}
+          aria-label="Remover trabalho"
+        >
+          <Trash2 className="size-4" aria-hidden />
+          Remover trabalho
+        </Button>
+      </div>
+    </li>
   );
 }
 
@@ -627,8 +896,6 @@ function SecaoAtuacaoModelo({
         new Set<TipoAtuacao>([...draft.tiposAtuacao, "modelo"]),
       );
       if (!tiposAtuacao.includes("influenciador") && tiposAtuacao.length === 1) {
-        // Mantém influenciador no portfólio a menos que a pessoa remova depois
-        // via fluxo de cadastro “só modelo” — aqui o default é híbrido.
         tiposAtuacao = ["influenciador", "modelo"];
       }
     } else {

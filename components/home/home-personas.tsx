@@ -9,11 +9,11 @@ const PERSONAS = [
   {
     titulo: "Influenciadores",
     descricao:
-      "Receba demandas compatíveis com seu perfil, evolua com trilhas de treinamento e acompanhe sua receita em um painel dedicado.",
+      "Cadastro em 2 passos, apareça em buscas por compatibilidade e receba seu pagamento garantido, mesmo se a marca sumir.",
     beneficios: [
-      "Oportunidades com score de compatibilidade",
-      "Treinamentos e níveis Pro / Elite",
-      "Financeiro e resultados de campanha",
+      "Busca ativa e passiva — apareça em buscas ou candidate-se a demandas",
+      "CPF já basta para começar",
+      "Pagamento garantido com liberação automática",
     ],
     href: "/cadastro",
     cta: "Criar perfil de criador",
@@ -24,11 +24,11 @@ const PERSONAS = [
   {
     titulo: "Marcas e empresas",
     descricao:
-      "Publique campanhas com orientações claras, receba sugestões qualificadas e feche parcerias com contrato e pagamento protegido.",
+      "Busque o criador certo, converse antes de fechar sem nenhum custo, e pague com segurança — o valor só libera depois da entrega aprovada.",
     beneficios: [
-      "Publicação de demandas",
-      "Negociação e contrato digital",
-      "Pagamento protegido e solicitação de resultados",
+      "Busca ativa por nicho, região e disponibilidade",
+      "Chat sem taxa de desbloqueio, sempre disponível",
+      "Pagamento protegido, com disputa se algo der errado",
     ],
     href: "/cadastro",
     cta: "Cadastrar empresa",
@@ -39,7 +39,7 @@ const PERSONAS = [
   {
     titulo: "Agências",
     descricao:
-      "Gerencie várias empresas-clientes com visão consolidada — demandas, contratos e investimento sem trocar de conta o tempo todo.",
+      "Gerencie várias empresas-clientes com visão consolidada — as mesmas garantias de pagamento protegido e negociação sem taxa, em escala.",
     beneficios: [
       "Painel multi-cliente",
       "Seletor de contexto por marca",
@@ -68,7 +68,8 @@ export function HomePersonas() {
           </h2>
           <p className="text-texto-secundario mt-4 text-base leading-relaxed font-normal">
             Cada perfil tem ferramentas específicas, mas todos compartilham o
-            mesmo ecossistema de confiança e transparência.
+            mesmo ecossistema de confiança: pagamento retido, chat filtrado e
+            nunca uma taxa pra conversar.
           </p>
         </div>
 

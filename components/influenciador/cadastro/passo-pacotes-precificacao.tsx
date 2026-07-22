@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { CampoTextoFiltrado } from "@/components/influenciador/portfolio/campo-texto-filtrado";
 import { IndicadorMetrica } from "@/components/influenciador/cadastro/indicador-metrica";
 import {
   IndicadorPosicaoMercado,
@@ -21,7 +22,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
 import type { CadastroDraft } from "@/lib/influenciador/cadastro-types";
 import {
   formatarMoeda,
@@ -350,10 +350,11 @@ function PacoteCard({
         </div>
         <div className="space-y-2">
           <Label htmlFor={`pacote-desc-${pacote.id}`}>Descrição</Label>
-          <Textarea
+          <CampoTextoFiltrado
             id={`pacote-desc-${pacote.id}`}
             value={pacote.descricao}
-            onChange={(e) => onChange({ descricao: e.target.value })}
+            onChange={(descricao) => onChange({ descricao })}
+            multiline
             rows={2}
           />
         </div>

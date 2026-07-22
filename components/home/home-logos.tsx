@@ -1,3 +1,4 @@
+/** Comentado em `app/page.tsx` até haver marcas reais autorizadas a aparecer. */
 import { EMPRESAS_PLATAFORMA_MOCK } from "@/lib/mock-data/empresas";
 
 const MARCAS_EXIBIDAS = EMPRESAS_PLATAFORMA_MOCK.slice(0, 8);

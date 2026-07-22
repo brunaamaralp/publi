@@ -153,51 +153,32 @@ export function Hero() {
       </nav>
 
       {/* Hero Section */}
-      <main className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-1 flex-col items-center justify-center px-4 pb-32 pt-8 md:pb-48 md:pt-12">
-        <div className="relative z-10 mx-auto mb-16 mt-4 flex w-full max-w-5xl flex-col items-center justify-center text-center">
-          <div className="relative z-10 flex w-full flex-col items-center space-y-2 md:space-y-4">
-            <div className="relative z-30 flex w-full justify-start pl-[10%] md:pl-[25%]">
-              <h1
-                className="m-0 p-0 text-[clamp(4.5rem,12vw,160px)] font-black uppercase leading-[0.85] tracking-tighter text-verde-neon"
+      <main className="relative z-10 mx-auto flex w-full max-w-[1440px] flex-1 flex-col items-center justify-center px-4 pb-40 pt-8 md:pb-52 md:pt-12">
+        <div className="relative z-10 mx-auto mb-8 mt-4 flex min-h-[28rem] w-full max-w-5xl flex-col items-center justify-center text-center md:min-h-[32rem] md:mb-12">
+          <div className="relative z-10 flex w-full flex-col items-center gap-4 md:gap-6">
+            <div className="relative z-30 flex w-full justify-center">
+              <p
+                className="m-0 p-0 text-[clamp(3.5rem,10vw,120px)] font-black uppercase leading-[0.85] tracking-tighter text-verde-neon"
                 style={DISPLAY_FONT}
               >
                 #PUBLI
-              </h1>
+              </p>
             </div>
 
-            <div className="relative z-20 flex w-full justify-center">
-              <h1
-                className="m-0 p-0 text-[clamp(5rem,15vw,220px)] font-black uppercase leading-[0.85] tracking-tighter text-white"
-                style={DISPLAY_FONT}
-              >
-                MATCHES
-              </h1>
-            </div>
-
-            <div className="relative z-10 flex w-full justify-start pl-[15%] md:pl-[30%]">
-              <h1
-                className="m-0 p-0 text-[clamp(4.5rem,12vw,160px)] font-black uppercase leading-[0.85] tracking-tighter text-white"
-                style={DISPLAY_FONT}
-              >
-                QUE FECHAM
-              </h1>
-            </div>
+            <h1 className="relative z-20 m-0 max-w-3xl px-4 p-0 text-[clamp(1.5rem,3.5vw,2.75rem)] font-bold leading-tight tracking-tight text-balance text-white md:leading-snug">
+              A plataforma que junta marcas e criadores
+            </h1>
           </div>
-
-          <p className="relative z-20 mt-8 max-w-md text-sm font-medium leading-relaxed text-white/75 md:text-base">
-            Marketplace de influência — da sugestão à negociação, contrato,
-            pagamento seguro e resultados.
-          </p>
 
           {/* Absolute Overlays */}
           <div className="pointer-events-none absolute inset-0 h-full w-full">
             <motion.div
               animate={{ y: [0, -15, 0] }}
               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-              className="pointer-events-auto absolute bottom-[10%] left-[5%] z-30 md:left-[20%]"
+              className="pointer-events-auto absolute bottom-[8%] left-[2%] z-30 md:bottom-[12%] md:left-[8%]"
             >
-              <div className="flex aspect-[3/3.5] w-40 rotate-[-12deg] flex-col items-center justify-center rounded-[2rem] border border-white/40 bg-white/20 p-5 shadow-2xl backdrop-blur-md transition-transform duration-500 hover:rotate-0 md:w-52">
-                <div className="mb-4 flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-[3px] border-white/50 bg-[#D2B48C] shadow-inner md:h-24 md:w-24">
+              <div className="flex aspect-[3/3.5] w-36 rotate-[-12deg] flex-col items-center justify-center rounded-[2rem] border border-white/40 bg-white/20 p-5 shadow-2xl backdrop-blur-md transition-transform duration-500 hover:rotate-0 md:w-48">
+                <div className="mb-4 flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border-[3px] border-white/50 bg-[#D2B48C] shadow-inner md:h-20 md:w-20">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=faces"
@@ -224,10 +205,10 @@ export function Hero() {
                 ease: "easeInOut",
                 delay: 1,
               }}
-              className="pointer-events-auto absolute right-[5%] top-[15%] z-30 md:right-[22%]"
+              className="pointer-events-auto absolute right-[2%] top-[6%] z-30 md:right-[10%] md:top-[10%]"
             >
-              <div className="flex aspect-[3/3.5] w-40 rotate-[12deg] flex-col items-center justify-center rounded-[2rem] border border-white/40 bg-white/20 p-5 shadow-2xl backdrop-blur-md transition-transform duration-500 hover:rotate-0 md:w-52">
-                <div className="mb-4 flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-[3px] border-white/50 bg-[#2C3E50] shadow-inner md:h-24 md:w-24">
+              <div className="flex aspect-[3/3.5] w-36 rotate-[12deg] flex-col items-center justify-center rounded-[2rem] border border-white/40 bg-white/20 p-5 shadow-2xl backdrop-blur-md transition-transform duration-500 hover:rotate-0 md:w-48">
+                <div className="mb-4 flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border-[3px] border-white/50 bg-[#2C3E50] shadow-inner md:h-20 md:w-20">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=faces"
@@ -246,15 +227,15 @@ export function Hero() {
               </div>
             </motion.div>
 
-            <div className="absolute bottom-[0%] left-[0%] z-20 h-24 w-24 md:left-[10%] md:h-32 md:w-32">
+            <div className="absolute bottom-[2%] left-[0%] z-20 h-20 w-20 md:left-[4%] md:h-28 md:w-28">
               <ArrowGreenLeft />
             </div>
 
-            <div className="absolute right-[0%] top-[5%] z-20 h-24 w-24 md:right-[10%] md:h-32 md:w-32">
+            <div className="absolute right-[0%] top-[2%] z-20 h-20 w-20 md:right-[4%] md:h-28 md:w-28">
               <ArrowGreenRight />
             </div>
 
-            <div className="pointer-events-auto absolute bottom-[-10%] right-[0%] z-40 md:right-[15%]">
+            <div className="pointer-events-auto absolute bottom-[-6%] right-[0%] z-40 md:bottom-[-4%] md:right-[8%]">
               <CircularBadge />
             </div>
           </div>
@@ -274,7 +255,7 @@ export function Hero() {
               seu perfil
             </h3>
             <p className="mb-auto text-[10px] font-bold text-black/60 md:text-xs">
-              influenciador, marca ou agência em minutos
+              Influenciador, modelo, marca ou agência em minutos
             </p>
 
             <div className="relative mt-6 flex w-full justify-center">
@@ -308,12 +289,13 @@ export function Hero() {
 
           <div className="relative flex h-64 flex-col items-center rounded-[2rem] border border-gray-100 bg-[#F8F9FA] p-8 text-center">
             <h3 className="mb-2 text-xl font-black uppercase leading-tight md:text-2xl">
-              Receba
+              Busque ou
               <br />
-              matches reais
+              seja encontrado
             </h3>
             <p className="mb-auto text-[10px] font-bold text-black/60 md:text-xs">
-              score de compatibilidade antes de investir tempo
+              Score de compatibilidade nos dois sentidos, sem esperar proposta
+              chegar
             </p>
 
             <div className="relative mt-6 flex w-full justify-center">
@@ -350,7 +332,8 @@ export function Hero() {
               receba seguro
             </h3>
             <p className="mb-auto text-[10px] font-bold text-black/60 md:text-xs">
-              contrato digital e valor liberado após entrega
+              Converse antes de fechar, sem custo; pagamento só libera após a
+              entrega aprovada
             </p>
 
             <div className="relative mt-6 flex w-full max-w-[200px] flex-col items-center rounded-[2rem] bg-verde-neon px-6 py-4 text-verde-carvao shadow-lg">

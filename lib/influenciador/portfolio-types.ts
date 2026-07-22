@@ -1,4 +1,4 @@
-import type { PacoteServico } from "@/lib/types";
+import type { Midia, PacoteServico } from "@/lib/types";
 import type {
   DisponibilidadeInfluenciador,
   Influenciador,
@@ -8,8 +8,8 @@ import type {
 export type RedeSocialPortfolio = {
   id: string;
   plataforma: "instagram" | "tiktok" | "youtube" | "outro";
-  /** @handle — no modo público não geramos link de DM. */
-  handle: string;
+  /** @deprecated Não exibir na vitrine pública — contato só no chat filtrado. */
+  handle?: string;
 };
 
 export type TrabalhoAnterior = {
@@ -17,7 +17,11 @@ export type TrabalhoAnterior = {
   titulo: string;
   marca: string;
   tipoConteudo: string;
-  link?: string;
+  /**
+   * Id da mídia em `PortfolioInfluenciador.midias` (categoria trabalho_anterior).
+   * Substitui o antigo campo de link externo.
+   */
+  midiaId?: string;
 };
 
 /**
@@ -40,6 +44,8 @@ export type PortfolioInfluenciador = {
   engajamentoMedio: number;
   pacotes: PacoteServico[];
   trabalhos: TrabalhoAnterior[];
+  /** Galeria: vídeo de apresentação + mídias de trabalhos anteriores. */
+  midias: Midia[];
   notaMediaAvaliacao: number | null;
   totalAvaliacoes: number;
   plano: Influenciador["plano"];
@@ -69,4 +75,14 @@ export function precoPacoteMinimo(pacotes: PacoteServico[]): number {
   const ativos = pacotes.filter((p) => p.ativo && p.preco > 0);
   if (ativos.length === 0) return 0;
   return Math.min(...ativos.map((p) => p.preco));
+}
+
+export function videoApresentacao(
+  midias: Midia[],
+): Midia | undefined {
+  return midias.find((m) => m.categoria === "apresentacao" && m.tipo === "video");
+}
+
+export function midiasTrabalhoAnterior(midias: Midia[]): Midia[] {
+  return midias.filter((m) => m.categoria === "trabalho_anterior");
 }

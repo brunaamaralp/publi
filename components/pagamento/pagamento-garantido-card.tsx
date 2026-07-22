@@ -1,10 +1,10 @@
 import { Clock } from "lucide-react";
 
 import {
-  CardEscrow,
-  IndicadorProvedorEscrow,
-  ValorEscrowDestaque,
-} from "@/components/pagamento/escrow-ui";
+  CardPagamentoRetido,
+  IndicadorProvedorPagamentoRetido,
+  ValorPagamentoRetidoDestaque,
+} from "@/components/pagamento/pagamento-retido-ui";
 import { cn } from "@/lib/utils";
 
 type PagamentoGarantidoCardProps = {
@@ -17,7 +17,7 @@ export function PagamentoGarantidoCard({
   className,
 }: PagamentoGarantidoCardProps) {
   return (
-    <CardEscrow status="retido" className={cn("space-y-4 p-4", className)}>
+    <CardPagamentoRetido status="retido" className={cn("space-y-4 p-4", className)}>
       <div className="flex items-start gap-3">
         <div className="bg-lilas-claro flex size-9 shrink-0 items-center justify-center rounded-full">
           <Clock className="text-lilas-escuro size-4" aria-hidden />
@@ -32,14 +32,14 @@ export function PagamentoGarantidoCard({
         </div>
       </div>
 
-      <ValorEscrowDestaque valor={valor} status="retido" />
+      <ValorPagamentoRetidoDestaque valor={valor} status="retido" />
 
-      <IndicadorProvedorEscrow />
+      <IndicadorProvedorPagamentoRetido />
 
       <p className="text-texto-secundario text-sm leading-relaxed font-normal">
         O valor já está reservado e será liberado para você após a empresa
         confirmar a entrega do conteúdo.
       </p>
-    </CardEscrow>
+    </CardPagamentoRetido>
   );
 }

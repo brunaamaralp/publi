@@ -13,7 +13,7 @@ const STATUS_DEMANDA_ATIVA = new Set([
   "em_negociacao",
   "em_andamento",
 ]);
-const STATUS_CONTRATO_ANDAMENTO = new Set(["assinado", "em_execucao"]);
+const STATUS_CONTRATO_ANDAMENTO = new Set(["assinado", "em_andamento"]);
 
 export type ResumoEmpresaCliente = {
   empresaId: string;
@@ -117,8 +117,8 @@ export function labelStatusContrato(
   const labels: Record<ContratoAgenciaResumo["status"], string> = {
     rascunho: "Rascunho",
     assinado: "Assinado",
-    em_execucao: "Em execução",
-    cumprido: "Cumprido",
+    em_andamento: "Em andamento",
+    concluida: "Concluída",
     cancelado: "Cancelado",
     em_disputa: "Em disputa",
   };

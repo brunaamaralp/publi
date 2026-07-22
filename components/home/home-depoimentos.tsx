@@ -1,5 +1,5 @@
+/* Depoimentos fictícios — reativar quando houver histórias reais autorizadas:
 import { Quote } from "lucide-react";
-
 import { cn } from "@/lib/utils";
 
 const DEPOIMENTOS = [
@@ -28,6 +28,7 @@ const DEPOIMENTOS = [
     fundo: "bg-lilas-claro/40",
   },
 ] as const;
+*/
 
 export function HomeDepoimentos() {
   return (
@@ -38,36 +39,11 @@ export function HomeDepoimentos() {
           <h2 className="font-display mt-2 text-3xl font-bold tracking-tight text-balance sm:text-4xl">
             Quem usa, <span className="destaque-lilas">recomenda</span>
           </h2>
+          <p className="text-texto-secundario mt-6 text-base leading-relaxed font-normal">
+            Estamos construindo a Publi com os primeiros criadores e marcas
+            parceiras — histórias reais chegam aqui em breve.
+          </p>
         </div>
-
-        <ul className="mt-12 grid gap-6 lg:grid-cols-3">
-          {DEPOIMENTOS.map((item) => (
-            <li key={item.nome}>
-              <blockquote
-                className={cn(
-                  "card-marketing flex h-full flex-col p-6",
-                  "border-l-[3px]",
-                  item.borda,
-                  item.fundo,
-                )}
-              >
-                <Quote
-                  className="text-lilas-escuro/35 size-8"
-                  aria-hidden
-                />
-                <p className="mt-4 flex-1 text-sm leading-relaxed font-normal">
-                  &ldquo;{item.texto}&rdquo;
-                </p>
-                <footer className="mt-6 border-t border-lilas/25 pt-4">
-                  <p className="font-display font-bold">{item.nome}</p>
-                  <p className="text-texto-secundario mt-0.5 text-sm font-normal">
-                    {item.papel}
-                  </p>
-                </footer>
-              </blockquote>
-            </li>
-          ))}
-        </ul>
       </div>
     </section>
   );

@@ -8,6 +8,7 @@ export type {
   Equipamento,
   Influenciador,
   MetricaPerfil,
+  Midia,
   PacoteServico,
   TabelaPreco,
   TipoAtuacao,
@@ -20,12 +21,29 @@ export type { Agencia, AgenciaCliente } from "./agencia";
 export type { Demanda, Match, PublicoAlvoDemanda } from "./demanda";
 
 export type {
+  Aditivo,
+  CamposCicloEntrega,
   Contrato,
   Conversa,
+  DecisaoDisputa,
+  DisputaEntrega,
   Entrega,
+  PagamentoRetido,
+  PagamentoRetidoItem,
+  LogisticaContrato,
   Mensagem,
+  OrigemContrato,
   Pagamento,
+  PropostaContratacaoMensagem,
   Rpa,
+  StatusAditivo,
+  StatusContrato,
+  StatusEntrega,
+} from "./contrato";
+export {
+  camposCicloEntregaIniciais,
+  STATUS_CONTRATO,
+  STATUS_CONTRATO_PERMITE_ADITIVO,
 } from "./contrato";
 
 export type { Avaliacao } from "./avaliacao";

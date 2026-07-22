@@ -6,6 +6,14 @@ export const categoriaSchema = z.object({
   tipo: z.enum(["dominio", "interesse"]),
 });
 
+export const midiaSchema = z.object({
+  id: z.string(),
+  tipo: z.enum(["foto", "video"]),
+  url: z.string().min(1),
+  legenda: z.string().optional(),
+  categoria: z.enum(["apresentacao", "trabalho_anterior"]),
+});
+
 export const influenciadorSchema = z.object({
   id: z.string(),
   usuarioId: z.string(),
@@ -26,8 +34,10 @@ export const influenciadorSchema = z.object({
         z.enum(["dom", "seg", "ter", "qua", "qui", "sex", "sab"]),
       ),
       observacao: z.string().optional(),
+      datasIndisponiveis: z.array(z.string()).optional(),
     })
     .optional(),
+  midias: z.array(midiaSchema).default([]),
 });
 
 /** Valida seleção de categorias: ao menos 1 domínio obrigatório; interesse é opcional. */

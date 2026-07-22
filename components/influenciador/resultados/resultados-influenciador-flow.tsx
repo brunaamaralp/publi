@@ -83,7 +83,7 @@ export function ResultadosInfluenciadorFlow() {
             aria-hidden
           />
           <p className="text-muted-foreground max-w-sm text-sm">
-            Nenhum contrato cumprido aguardando resultado no momento.
+            Nenhum contrato concluído aguardando resultado no momento.
           </p>
         </div>
       ) : (
