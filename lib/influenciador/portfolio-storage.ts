@@ -2,7 +2,10 @@ import {
   normalizarTiposAtuacao,
 } from "@/lib/influenciador/atuacao-utils";
 import type { CreatorCatalogo } from "@/lib/empresa/creator-catalogo-types";
-import { carregarPerfilInfluenciador } from "@/lib/influenciador/perfil-storage";
+import {
+  carregarPerfilInfluenciador,
+  garantirPerfilDemoCompleto,
+} from "@/lib/influenciador/perfil-storage";
 import {
   novoIdLocal,
   precoPacoteMinimo,
@@ -10,7 +13,14 @@ import {
   type RedeSocialPortfolio,
   type TrabalhoAnterior,
 } from "@/lib/influenciador/portfolio-types";
+import { INFLUENCIADOR_MOCK_ID } from "@/lib/mock-data/avaliacoes";
 import { CREATORS_CATALOGO_MOCK } from "@/lib/mock-data/creators-catalogo";
+import {
+  FOTO_CAPA_DEMO,
+  FOTO_PERFIL_DEMO,
+  PACOTES_DEMO,
+  ehUsuarioDemoInfluenciador,
+} from "@/lib/mock-data/perfil-influenciador-demo";
 import { midiasSeedParaCreator } from "@/lib/mock-data/portfolio-midias";
 import {
   statusContaInfluenciador,
@@ -51,10 +61,46 @@ function pacotePadrao(creator: CreatorCatalogo): PacoteServico {
   };
 }
 
+function pacotesSeed(creator: CreatorCatalogo): PacoteServico[] {
+  if (creator.id === INFLUENCIADOR_MOCK_ID) {
+    return PACOTES_DEMO.map((p) => ({ ...p }));
+  }
+  return [pacotePadrao(creator)];
+}
+
 function trabalhosSeed(
   creator: CreatorCatalogo,
   midias: Midia[],
 ): TrabalhoAnterior[] {
+  if (creator.id === INFLUENCIADOR_MOCK_ID) {
+    const midiasTrabalho = midias.filter(
+      (m) => m.categoria === "trabalho_anterior",
+    );
+    return [
+      {
+        id: "trab-ana-1",
+        titulo: "Lançamento sérum vitamina C",
+        marca: "Glow Cosmetics",
+        tipoConteudo: "Reels + Stories",
+        midiaId: midiasTrabalho[0]?.id,
+      },
+      {
+        id: "trab-ana-2",
+        titulo: "Rotina noturna pele sensível",
+        marca: "DermaLab Brasil",
+        tipoConteudo: "Reels",
+        midiaId: midiasTrabalho[1]?.id,
+      },
+      {
+        id: "trab-ana-3",
+        titulo: "Protetor solar verão — textura em 15s",
+        marca: "SunCare Co.",
+        tipoConteudo: "Reels",
+        midiaId: midiasTrabalho[2]?.id,
+      },
+    ];
+  }
+
   const midiasTrabalho = midias.filter((m) => m.categoria === "trabalho_anterior");
   if (midiasTrabalho.length === 0) {
     return [
@@ -78,7 +124,14 @@ function trabalhosSeed(
   }));
 }
 
-function redesSeed(): RedeSocialPortfolio[] {
+function redesSeed(creatorId: string): RedeSocialPortfolio[] {
+  if (creatorId === INFLUENCIADOR_MOCK_ID) {
+    return [
+      { id: "rede-ana-ig", plataforma: "instagram" },
+      { id: "rede-ana-tt", plataforma: "tiktok" },
+      { id: "rede-ana-yt", plataforma: "youtube" },
+    ];
+  }
   return [
     {
       id: novoIdLocal("rede"),
@@ -120,21 +173,22 @@ export function portfolioFromCatalogo(
   creator: CreatorCatalogo,
 ): PortfolioInfluenciador {
   const midias = midiasSeedParaCreator(creator.id);
+  const ehDemo = creator.id === INFLUENCIADOR_MOCK_ID;
   return {
     id: creator.id,
     usuarioId: creator.usuarioId,
     nome: creator.nome,
     handle: creator.handle,
     bio: creator.bio,
-    fotoPerfilUrl: creator.fotoUrl,
-    fotoCapaUrl: null,
-    nichoIds: [creator.nichoId],
-    redes: redesSeed(),
+    fotoPerfilUrl: creator.fotoUrl ?? (ehDemo ? FOTO_PERFIL_DEMO : null),
+    fotoCapaUrl: ehDemo ? FOTO_CAPA_DEMO : null,
+    nichoIds: ehDemo ? ["cat-beleza", "cat-saude"] : [creator.nichoId],
+    redes: redesSeed(creator.id),
     cidade: creator.cidade,
     estado: creator.estado,
     seguidores: creator.seguidores,
     engajamentoMedio: creator.engajamentoMedio,
-    pacotes: [pacotePadrao(creator)],
+    pacotes: pacotesSeed(creator),
     trabalhos: trabalhosSeed(creator, midias),
     midias,
     notaMediaAvaliacao: creator.notaMediaAvaliacao,
@@ -237,7 +291,9 @@ export function carregarPortfolioPorId(
       const salvo = normalizarPortfolio(
         JSON.parse(raw) as PortfolioInfluenciador,
       );
-      return mesclarSeedMidiasSeVazio(mesclarDisponibilidadeDoCatalogo(salvo));
+      return enriquecerPortfolioDemoSeIncompleto(
+        mesclarSeedMidiasSeVazio(mesclarDisponibilidadeDoCatalogo(salvo)),
+      );
     }
   } catch {
     // fall through to seed
@@ -310,11 +366,80 @@ function mesclarSeedMidiasSeVazio(
 }
 
 /**
+ * Completa portfólio da conta demo (Ana) quando o localStorage ficou vazio/parcial.
+ */
+function enriquecerPortfolioDemoSeIncompleto(
+  portfolio: PortfolioInfluenciador,
+): PortfolioInfluenciador {
+  const ehDemo =
+    portfolio.id === INFLUENCIADOR_MOCK_ID ||
+    ehUsuarioDemoInfluenciador(portfolio.usuarioId);
+  if (!ehDemo) return portfolio;
+
+  const catalogo = CREATORS_CATALOGO_MOCK.find(
+    (c) => c.id === INFLUENCIADOR_MOCK_ID,
+  );
+  if (!catalogo) return portfolio;
+
+  const seed = portfolioFromCatalogo(catalogo);
+  const incompleto =
+    !portfolio.fotoPerfilUrl ||
+    !portfolio.fotoCapaUrl ||
+    !portfolio.bio.trim() ||
+    portfolio.pacotes.length < 2 ||
+    portfolio.trabalhos.length < 2 ||
+    portfolio.midias.length === 0 ||
+    portfolio.redes.length < 2;
+
+  if (!incompleto) return portfolio;
+
+  const next: PortfolioInfluenciador = {
+    ...portfolio,
+    nome: portfolio.nome.trim() || seed.nome,
+    handle: portfolio.handle.trim() || seed.handle,
+    bio: portfolio.bio.trim() || seed.bio,
+    fotoPerfilUrl: portfolio.fotoPerfilUrl || seed.fotoPerfilUrl,
+    fotoCapaUrl: portfolio.fotoCapaUrl || seed.fotoCapaUrl,
+    nichoIds: portfolio.nichoIds.length > 0 ? portfolio.nichoIds : seed.nichoIds,
+    redes: portfolio.redes.length >= 2 ? portfolio.redes : seed.redes,
+    cidade: portfolio.cidade.trim() || seed.cidade,
+    estado: portfolio.estado.trim() || seed.estado,
+    seguidores: portfolio.seguidores > 0 ? portfolio.seguidores : seed.seguidores,
+    engajamentoMedio:
+      portfolio.engajamentoMedio > 0
+        ? portfolio.engajamentoMedio
+        : seed.engajamentoMedio,
+    pacotes: portfolio.pacotes.length >= 2 ? portfolio.pacotes : seed.pacotes,
+    trabalhos:
+      portfolio.trabalhos.length >= 2 ? portfolio.trabalhos : seed.trabalhos,
+    midias: portfolio.midias.length > 0 ? portfolio.midias : seed.midias,
+    notaMediaAvaliacao:
+      portfolio.notaMediaAvaliacao ?? seed.notaMediaAvaliacao,
+    totalAvaliacoes:
+      portfolio.totalAvaliacoes > 0
+        ? portfolio.totalAvaliacoes
+        : seed.totalAvaliacoes,
+    plano: portfolio.plano === "basico" ? "pro" : portfolio.plano,
+    tiposAtuacao:
+      portfolio.tiposAtuacao?.length > 0
+        ? portfolio.tiposAtuacao
+        : seed.tiposAtuacao,
+    disponibilidade: portfolio.disponibilidade ?? seed.disponibilidade,
+  };
+  salvarPortfolio(next);
+  return next;
+}
+
+/**
  * Resolve o portfólio do usuário logado (cria seed se necessário).
  */
 export function obterOuCriarPortfolioDoUsuario(
   usuarioId: string,
 ): PortfolioInfluenciador {
+  if (ehUsuarioDemoInfluenciador(usuarioId)) {
+    garantirPerfilDemoCompleto(usuarioId);
+  }
+
   const index = lerIndex();
   const indexedId = index[usuarioId];
   if (indexedId) {

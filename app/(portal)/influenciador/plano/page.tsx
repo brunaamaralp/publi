@@ -1,10 +1,11 @@
-import { PlanoInfluenciadorFlow } from "@/components/influenciador/plano/plano-influenciador-flow";
+import { redirect } from "next/navigation";
 
 export const metadata = {
   title: "Plano",
   description: "Escolha ou troque seu plano de assinatura.",
 };
 
+/** Rota legada — plano vive em Configurações da conta. */
 export default function PlanoInfluenciadorPage() {
-  return <PlanoInfluenciadorFlow />;
+  redirect("/influenciador/conta/plano");
 }

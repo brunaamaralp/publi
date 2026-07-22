@@ -7,8 +7,8 @@ export default function EmpresaPortalLayout({
 }) {
   return (
     <GuardTipo
-      permitidos={["empresa", "agencia"]}
-      mensagem="Esta área é exclusiva para empresas e agências."
+      permitidos={["empresa"]}
+      mensagem="Esta área é exclusiva para empresas."
     >
       {children}
     </GuardTipo>

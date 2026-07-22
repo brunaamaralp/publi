@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Building2, ChevronLeft, Sparkles } from "lucide-react";
+import { Briefcase, Building2, ChevronLeft, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,13 @@ const PAPEIS_LOGIN = [
     icone: Building2,
   },
   {
+    tipo: "agencia" as const,
+    titulo: "Sou agência",
+    descricao:
+      "Gerencie empresas-clientes, campanhas e resultados em um painel consolidado.",
+    icone: Briefcase,
+  },
+  {
     tipo: "influenciador" as const,
     titulo: "Sou influencer / creator",
     descricao:
@@ -29,6 +36,13 @@ const PAPEIS_LOGIN = [
     icone: Sparkles,
   },
 ] as const;
+
+function destinoPosLogin(tipo: Usuario["tipo"]): string {
+  if (tipo === "agencia") return "/agencia/dashboard";
+  if (tipo === "empresa") return "/empresa";
+  if (tipo === "influenciador") return "/influenciador";
+  return "/inicio";
+}
 
 export function LoginForm() {
   const router = useRouter();
@@ -40,14 +54,14 @@ export function LoginForm() {
 
   useEffect(() => {
     if (!isLoading && usuario) {
-      router.replace("/inicio");
+      router.replace(destinoPosLogin(usuario.tipo));
     }
   }, [isLoading, usuario, router]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!papel) {
-      toast.error("Escolha se você é empresa ou influencer.");
+      toast.error("Escolha o tipo de conta.");
       return;
     }
     if (!email.trim()) {
@@ -57,7 +71,7 @@ export function LoginForm() {
     setEnviando(true);
     login(email, senha, papel);
     toast.success("Login realizado!");
-    router.replace("/inicio");
+    router.replace(destinoPosLogin(papel));
     setEnviando(false);
   }
 
@@ -116,7 +130,11 @@ export function LoginForm() {
   }
 
   const rotuloPapel =
-    papel === "empresa" ? "empresa" : "influencer / creator";
+    papel === "empresa"
+      ? "empresa"
+      : papel === "agencia"
+        ? "agência"
+        : "influencer / creator";
 
   return (
     <div className="space-y-6">
@@ -197,6 +215,7 @@ export function LoginForm() {
           O tipo escolhido define quais telas você vê. Contas demo ainda
           funcionam:{" "}
           <span className="font-data">empresa@publi.app</span>,{" "}
+          <span className="font-data">agencia@publi.app</span>,{" "}
           <span className="font-data">influenciador@publi.app</span>.
         </p>
       </div>

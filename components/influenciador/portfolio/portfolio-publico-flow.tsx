@@ -57,11 +57,14 @@ export function PortfolioPublicoFlow({
     }
   }, [portfolioId]);
 
-  const voltaHref = isEmpresa
-    ? "/empresa/buscar-creators"
-    : isDono
-      ? "/influenciador/meu-portfolio"
-      : "/inicio";
+  const voltaHref =
+    usuario?.tipo === "agencia"
+      ? "/agencia/buscar-creators"
+      : usuario?.tipo === "empresa"
+        ? "/empresa/buscar-creators"
+        : isDono
+          ? "/influenciador/meu-portfolio"
+          : "/inicio";
 
   if (status === "carregando") {
     return (

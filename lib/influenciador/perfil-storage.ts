@@ -2,6 +2,10 @@ import type { CadastroPayload } from "@/lib/influenciador/cadastro-utils";
 import { perfilProntoParaAnalise } from "@/lib/influenciador/cadastro-utils";
 import { ehSomenteModelo } from "@/lib/influenciador/atuacao-utils";
 import type { TrabalhoAnterior } from "@/lib/influenciador/portfolio-types";
+import {
+  criarPerfilDemoCompleto,
+  ehUsuarioDemoInfluenciador,
+} from "@/lib/mock-data/perfil-influenciador-demo";
 
 const STORAGE_PREFIX = "influenciador-perfil";
 const SECOES_PREFIX = "influenciador-secoes-completas";
@@ -44,10 +48,53 @@ export function salvarPerfilInfluenciador(
   localStorage.setItem(chavePerfil(usuarioId), JSON.stringify(payload));
 }
 
+function marcarSecoesDemoCompletas(usuarioId: string) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(
+    chaveSecoes(usuarioId),
+    JSON.stringify({ metricas: true, precos: true, plano: true }),
+  );
+}
+
+/** Garante cadastro completo + checklist ok para a conta demo do influenciador. */
+export function garantirPerfilDemoCompleto(
+  usuarioId: string,
+): CadastroPayload | null {
+  if (typeof window === "undefined") return null;
+  if (!ehUsuarioDemoInfluenciador(usuarioId)) return null;
+
+  try {
+    const raw = localStorage.getItem(chavePerfil(usuarioId));
+    if (raw) {
+      const existente = JSON.parse(raw) as CadastroPayload;
+      const temPrint = Boolean(existente.metricaPerfil?.printUrl?.trim());
+      const temPacotes = (existente.pacotes?.length ?? 0) >= 2;
+      const temAudiencia = (existente.audiencia?.length ?? 0) > 0;
+      const temSeguidores = (existente.metricaPerfil?.seguidores ?? 0) > 0;
+      if (temPrint && temPacotes && temAudiencia && temSeguidores) {
+        marcarSecoesDemoCompletas(usuarioId);
+        return existente;
+      }
+    }
+  } catch {
+    // recria seed abaixo
+  }
+
+  const demo = criarPerfilDemoCompleto();
+  localStorage.setItem(chavePerfil(usuarioId), JSON.stringify(demo));
+  marcarSecoesDemoCompletas(usuarioId);
+  return demo;
+}
+
 export function carregarPerfilInfluenciador(
   usuarioId: string,
 ): CadastroPayload | null {
   if (typeof window === "undefined") return null;
+
+  if (ehUsuarioDemoInfluenciador(usuarioId)) {
+    return garantirPerfilDemoCompleto(usuarioId);
+  }
+
   try {
     const raw = localStorage.getItem(chavePerfil(usuarioId));
     if (!raw) return null;
@@ -162,7 +209,7 @@ export function checklistPerfilIncompleto(
     {
       id: "plano",
       label: "Escolher plano",
-      href: "/influenciador/plano",
+      href: "/influenciador/conta/plano",
       completo: secoes.plano,
     },
   ];

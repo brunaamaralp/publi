@@ -6,11 +6,11 @@ import {
   FileText,
   GraduationCap,
   Home,
-  LayoutDashboard,
   PlusCircle,
   Search,
   ShieldCheck,
   UserRound,
+  Users,
   Wallet,
 } from "lucide-react";
 
@@ -39,7 +39,7 @@ export const NAV_GRUPOS: NavGrupo[] = [
     itens: [{ href: "/inicio", label: "Início", icone: Home }],
   },
   {
-    titulo: "Influenciador",
+    titulo: "Trabalho",
     itens: [
       {
         href: "/influenciador/demandas",
@@ -48,6 +48,22 @@ export const NAV_GRUPOS: NavGrupo[] = [
         descricao: "Campanhas compatíveis com seu perfil",
         rotasRelacionadas: ["/negociacao"],
       },
+      {
+        href: "/influenciador/financeiro",
+        label: "Financeiro",
+        icone: Wallet,
+        rotasRelacionadas: ["/contrato"],
+      },
+      {
+        href: "/influenciador/resultados",
+        label: "Meus resultados",
+        icone: BarChart3,
+      },
+    ],
+  },
+  {
+    titulo: "Perfil",
+    itens: [
       {
         href: "/influenciador/meu-portfolio",
         label: "Meu portfólio",
@@ -64,17 +80,6 @@ export const NAV_GRUPOS: NavGrupo[] = [
         href: "/influenciador/treinamentos",
         label: "Treinamentos",
         icone: GraduationCap,
-      },
-      {
-        href: "/influenciador/financeiro",
-        label: "Financeiro",
-        icone: Wallet,
-        rotasRelacionadas: ["/contrato"],
-      },
-      {
-        href: "/influenciador/resultados",
-        label: "Meus resultados",
-        icone: BarChart3,
       },
     ],
   },
@@ -112,9 +117,10 @@ export const NAV_GRUPOS: NavGrupo[] = [
     titulo: "Agência",
     itens: [
       {
-        href: "/agencia/dashboard",
-        label: "Painel consolidado",
-        icone: LayoutDashboard,
+        href: "/agencia/clientes",
+        label: "Clientes",
+        icone: Users,
+        descricao: "Empresas gerenciadas pela agência",
       },
     ],
   },
@@ -122,25 +128,25 @@ export const NAV_GRUPOS: NavGrupo[] = [
     titulo: "Cliente ativo",
     itens: [
       {
-        href: "/empresa/demandas",
-        label: "Campanhas do cliente",
+        href: "/agencia/demandas",
+        label: "Campanhas",
         icone: Building2,
         rotasRelacionadas: ["/negociacao"],
       },
       {
-        href: "/empresa/demandas/nova",
+        href: "/agencia/demandas/nova",
         label: "Nova campanha",
         icone: PlusCircle,
         aninhado: true,
       },
       {
-        href: "/empresa/buscar-creators",
+        href: "/agencia/buscar-creators",
         label: "Buscar creators",
         icone: Search,
         rotasRelacionadas: ["/influenciador"],
       },
       {
-        href: "/empresa/resultados",
+        href: "/agencia/resultados",
         label: "Resultados",
         icone: BarChart3,
         rotasRelacionadas: ["/resultados"],
@@ -167,46 +173,46 @@ export const SESSAO_MOCK = {
 };
 
 const GRUPOS_POR_TIPO: Record<Usuario["tipo"], string[]> = {
-  influenciador: ["Geral", "Influenciador"],
+  influenciador: ["Geral", "Trabalho", "Perfil"],
   empresa: ["Geral", "Campanhas"],
   agencia: ["Geral", "Agência", "Cliente ativo"],
   admin: ["Geral", "Administração"],
 };
 
+/** Home do perfil no sidebar (evita /inicio paralelo no menu). */
+export function homeHrefParaUsuario(tipo: Usuario["tipo"]): string {
+  switch (tipo) {
+    case "influenciador":
+      return "/influenciador";
+    case "empresa":
+      return "/empresa";
+    case "agencia":
+      return "/agencia/dashboard";
+    default:
+      return "/inicio";
+  }
+}
+
 export function navGruposParaUsuario(tipo: Usuario["tipo"]): NavGrupo[] {
   const permitidos = new Set(GRUPOS_POR_TIPO[tipo]);
+  const homeHref = homeHrefParaUsuario(tipo);
+
   return NAV_GRUPOS.filter((grupo) => permitidos.has(grupo.titulo)).map(
     (grupo) => {
       if (grupo.titulo !== "Geral") return grupo;
-      if (tipo === "influenciador") {
-        return {
-          ...grupo,
-          itens: grupo.itens.map((item) =>
-            item.href === "/inicio"
-              ? {
-                  ...item,
-                  href: "/influenciador",
-                  rotasRelacionadas: ["/inicio"],
-                }
-              : item,
-          ),
-        };
-      }
-      if (tipo === "empresa") {
-        return {
-          ...grupo,
-          itens: grupo.itens.map((item) =>
-            item.href === "/inicio"
-              ? {
-                  ...item,
-                  href: "/empresa",
-                  rotasRelacionadas: ["/inicio"],
-                }
-              : item,
-          ),
-        };
-      }
-      return grupo;
+      return {
+        ...grupo,
+        itens: grupo.itens.map((item) =>
+          item.href === "/inicio"
+            ? {
+                ...item,
+                href: homeHref,
+                rotasRelacionadas:
+                  homeHref === "/inicio" ? undefined : ["/inicio"],
+              }
+            : item,
+        ),
+      };
     },
   );
 }

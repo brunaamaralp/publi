@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AlertTriangle, ArrowLeft, Clock, Package } from "lucide-react";
 import { toast } from "sonner";
 
@@ -21,7 +22,14 @@ import { SeletorPapelPagamento } from "@/components/pagamento/seletor-papel-paga
 import { ServicoAdicionalPainel } from "@/components/pagamento/servico-adicional-painel";
 import { buttonVariants } from "@/components/ui/button";
 import { Button } from "@/components/ui/button";
+import {
+  ModalCelebracao,
+  celebracaoContratoFechado,
+  celebracaoEntregaAprovada,
+  celebracaoPagamentoLiberado,
+} from "@/components/ui/modal-celebracao";
 import { useAuth } from "@/lib/auth-context";
+import { formatarMoeda } from "@/lib/influenciador/cadastro-utils";
 import { rotaVoltarPagamento } from "@/lib/app/voltar-por-papel";
 import {
   CONTRATO_AJUSTE_ID,
@@ -61,12 +69,20 @@ import {
 import { creditarSaldoDisponivel } from "@/lib/pagamento/saldo-influenciador";
 import { cn } from "@/lib/utils";
 
+type CelebracaoAtiva =
+  | { tipo: "contrato" }
+  | { tipo: "pagamento"; valor: number }
+  | { tipo: "entrega"; valor: number }
+  | { tipo: "auto-liberacao"; valor: number }
+  | null;
+
 type PagamentoFlowProps = {
   contratoId: string;
 };
 
 export function PagamentoFlow({ contratoId }: PagamentoFlowProps) {
   const { usuario } = useAuth();
+  const router = useRouter();
   const contexto = getContratoPagamentoContexto(contratoId);
   const rotaVoltar = usuario
     ? rotaVoltarPagamento(usuario.tipo)
@@ -76,6 +92,7 @@ export function PagamentoFlow({ contratoId }: PagamentoFlowProps) {
   const [papel, setPapel] = useState<PapelPagamento>("empresa");
   const [dialogEntregaAberto, setDialogEntregaAberto] = useState(false);
   const [dialogReporteAberto, setDialogReporteAberto] = useState(false);
+  const [celebracao, setCelebracao] = useState<CelebracaoAtiva>(null);
   const [alvoDialog, setAlvoDialog] = useState<AlvoEntrega>({
     origem: "contrato",
     id: contratoId,
@@ -113,6 +130,7 @@ export function PagamentoFlow({ contratoId }: PagamentoFlowProps) {
       }
       salvarPagamentoEstado(processado);
       toast.message("Pagamento liberado automaticamente pelo prazo.");
+      setCelebracao({ tipo: "auto-liberacao", valor: delta });
     }
 
     setEstado(processado);
@@ -185,22 +203,43 @@ export function PagamentoFlow({ contratoId }: PagamentoFlowProps) {
     cicloContrato.prazoEntrega,
   );
 
+  useEffect(() => {
+    if (!pagamentoLiberado || papel !== "influenciador") return;
+    if (celebracao) return;
+    const key = `celeb-entrega-inf-${contratoId}`;
+    try {
+      if (typeof sessionStorage !== "undefined" && sessionStorage.getItem(key)) {
+        return;
+      }
+      sessionStorage.setItem(key, "1");
+    } catch {
+      /* ignore */
+    }
+    setCelebracao({ tipo: "entrega", valor });
+  }, [pagamentoLiberado, papel, contratoId, celebracao, valor]);
+
   function abrirRegistro(alvo: AlvoEntrega) {
     setAlvoDialog(alvo);
     setDialogEntregaAberto(true);
   }
 
   function aoAprovar(alvo: AlvoEntrega) {
+    let valorLiberado = 0;
     persistir((prev) => {
       const retidoAntes = valorRetidoPagamentoRetido(prev);
       const next = aprovarEntrega(prev, alvo, false);
       const liberado = retidoAntes - valorRetidoPagamentoRetido(next);
+      valorLiberado = liberado;
       if (liberado > 0) {
         creditarSaldoDisponivel(contexto!.influenciador.id, liberado);
       }
       return next;
     });
     toast.success("Entrega aprovada — valor liberado do pagamento retido!");
+    setCelebracao({
+      tipo: "entrega",
+      valor: valorLiberado > 0 ? valorLiberado : valor,
+    });
   }
 
   function aoReportar(dados: { motivo: string; evidencia?: string }) {
@@ -267,6 +306,7 @@ export function PagamentoFlow({ contratoId }: PagamentoFlowProps) {
             onDepositoConfirmado={(municipioRpa) => {
               persistir((prev) => registrarDeposito(prev, contexto, municipioRpa));
               toast.success("Valor depositado com proteção!");
+              setCelebracao({ tipo: "contrato" });
             }}
           />
         ) : !estado.pagamento && papel === "influenciador" ? (
@@ -440,6 +480,50 @@ export function PagamentoFlow({ contratoId }: PagamentoFlowProps) {
             onDepositar={(id) => {
               persistir((prev) => registrarDepositoAditivo(prev, id));
               toast.success("Valor do aditivo depositado no pagamento retido.");
+            }}
+          />
+        ) : null}
+
+        {celebracao && contexto ? (
+          <ModalCelebracao
+            aberto={celebracao != null}
+            onOpenChange={(aberto) => {
+              if (!aberto) setCelebracao(null);
+            }}
+            {...(() => {
+              const nomeContraparte =
+                papel === "empresa"
+                  ? contexto.influenciador.nome
+                  : contexto.empresa.nome;
+              if (celebracao.tipo === "contrato") {
+                return celebracaoContratoFechado({
+                  valorFormatado: formatarMoeda(valor),
+                  nomeContraparte,
+                });
+              }
+              if (
+                celebracao.tipo === "pagamento" ||
+                (celebracao.tipo === "auto-liberacao" &&
+                  papel === "influenciador")
+              ) {
+                return celebracaoPagamentoLiberado({
+                  valorFormatado: formatarMoeda(celebracao.valor),
+                });
+              }
+              return celebracaoEntregaAprovada({
+                valorFormatado: formatarMoeda(celebracao.valor),
+                nomeContraparte,
+                papel,
+              });
+            })()}
+            aoConfirmar={() => {
+              if (
+                celebracao.tipo === "pagamento" ||
+                (celebracao.tipo === "auto-liberacao" &&
+                  papel === "influenciador")
+              ) {
+                router.push("/influenciador/financeiro");
+              }
             }}
           />
         ) : null}

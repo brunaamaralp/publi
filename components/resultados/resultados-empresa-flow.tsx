@@ -51,6 +51,9 @@ export function ResultadosEmpresaFlow({ contratoId }: ResultadosEmpresaFlowProps
 
   const registro = getResultadoPorContratoId(registros, contratoId);
   const isAgencia = !!agenciaCtx?.agencia && !!agenciaCtx.empresaAtiva;
+  const listaResultadosHref = agenciaCtx?.agencia
+    ? "/agencia/resultados"
+    : "/empresa/resultados";
   const empresaIdConsolidacao =
     isAgencia && agenciaCtx?.empresaAtivaId
       ? agenciaCtx.empresaAtivaId
@@ -108,7 +111,7 @@ export function ResultadosEmpresaFlow({ contratoId }: ResultadosEmpresaFlowProps
     <div className="mx-auto max-w-4xl space-y-8 px-4 py-8 sm:px-6">
       <header className="space-y-4">
         <Link
-          href="/empresa/resultados"
+          href={listaResultadosHref}
           className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "-ml-2 w-fit")}
         >
           <ArrowLeft className="size-4" aria-hidden />

@@ -6,8 +6,9 @@ export function rotaListaPorPapel(tipo: Usuario["tipo"]): string {
     case "influenciador":
       return "/influenciador/demandas";
     case "empresa":
-    case "agencia":
       return "/empresa/demandas";
+    case "agencia":
+      return "/agencia/demandas";
     default:
       return "/inicio";
   }
@@ -18,8 +19,9 @@ export function rotuloVoltarPorPapel(tipo: Usuario["tipo"]): string {
     case "influenciador":
       return "Voltar às oportunidades";
     case "empresa":
-    case "agencia":
       return "Voltar às campanhas";
+    case "agencia":
+      return "Voltar às campanhas do cliente";
     default:
       return "Voltar ao início";
   }
@@ -28,6 +30,7 @@ export function rotuloVoltarPorPapel(tipo: Usuario["tipo"]): string {
 /** Rota de retorno específica do fluxo de pagamento. */
 export function rotaVoltarPagamento(tipo: Usuario["tipo"]): string {
   if (tipo === "influenciador") return "/influenciador/financeiro";
-  if (tipo === "empresa" || tipo === "agencia") return "/empresa/demandas";
+  if (tipo === "empresa") return "/empresa/demandas";
+  if (tipo === "agencia") return "/agencia/demandas";
   return "/inicio";
 }

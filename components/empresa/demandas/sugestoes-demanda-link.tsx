@@ -128,8 +128,7 @@ export function SugestoesDemandaLink({
                   <MatchRing
                     score={match.score}
                     size="xs"
-                    darkBackdrop
-                    className="shrink-0 !px-1.5 !py-1"
+                    className="shrink-0"
                   />
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium">

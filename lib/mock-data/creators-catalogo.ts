@@ -23,8 +23,9 @@ const CREATORS_CATALOGO_BASE: CreatorCatalogoBase[] = [
     usuarioId: "usr-influ-neg-001",
     nome: "Ana Beatriz Silva",
     handle: "@anabeauty",
-    bio: "Skincare realista, rotinas e lançamentos de beleza com foco em pele sensível.",
-    fotoUrl: null,
+    bio: "Skincare realista, rotinas e lançamentos de beleza com foco em pele sensível. Já colaborei com marcas nacionais em campanhas de sérum, protetor solar e rotina noturna.",
+    fotoUrl:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
     nichoId: "cat-beleza",
     cidade: "São Paulo",
     estado: "SP",

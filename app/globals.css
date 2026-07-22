@@ -354,6 +354,24 @@
     background: var(--lilas-claro);
     color: var(--lilas-escuro);
   }
+
+  /* Modal de celebração — confete só na entrada (sem loop) */
+  .modal-celebracao-confete {
+    transform: translateY(0) rotate(var(--confete-rot, 0deg));
+    animation: modal-celebracao-confete-queda 700ms cubic-bezier(0.22, 1, 0.36, 1)
+      both;
+  }
+}
+
+@keyframes modal-celebracao-confete-queda {
+  from {
+    opacity: 0;
+    transform: translateY(-28px) rotate(var(--confete-rot, 0deg)) scale(0.55);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(var(--confete-rot, 0deg)) scale(1);
+  }
 }
 
 @layer base {

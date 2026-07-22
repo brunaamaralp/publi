@@ -120,7 +120,6 @@ export function DemandaDetalheFlow({ demandaId }: DemandaDetalheFlowProps) {
               size="lg"
               showLabel
               label={LABELS_FAIXA_MATCH[nivel]}
-              darkBackdrop
               className="mx-auto shrink-0 sm:mx-0"
             />
             <div className="min-w-0 flex-1 space-y-3 text-center sm:text-left">

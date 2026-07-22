@@ -191,7 +191,6 @@ export function DemandaCard({
           score={match.score}
           size="sm"
           showLabel
-          darkBackdrop
           className="shrink-0"
         />
         <div className="min-w-0 flex-1 space-y-1.5">

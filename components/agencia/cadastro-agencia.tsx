@@ -33,6 +33,7 @@ import {
   useAgencia,
   type EmpresaClienteVinculada,
 } from "@/lib/contexts/agencia-context";
+import { comModoAcesso } from "@/lib/agencia/modo-acesso";
 import {
   criarEmpresaCadastroInicial,
 } from "@/lib/empresa/cadastro-types";
@@ -92,10 +93,10 @@ export function CadastroAgencia({ onConcluido }: CadastroAgenciaProps) {
   }
 
   function vincularEmpresa(empresa: (typeof EMPRESAS_PLATAFORMA_MOCK)[number]) {
-    const vinculada: EmpresaClienteVinculada = {
+    const vinculada = comModoAcesso({
       ...empresa,
       criadaPelaAgencia: false,
-    };
+    });
     setSelecionadas((prev) =>
       prev.some((e) => e.id === empresa.id) ? prev : [...prev, vinculada],
     );
@@ -126,14 +127,14 @@ export function CadastroAgencia({ onConcluido }: CadastroAgenciaProps) {
       return;
     }
 
-    const nova: EmpresaClienteVinculada = {
+    const nova = comModoAcesso({
       id: crypto.randomUUID(),
       usuarioId: "usr-empresa-nova",
       razaoSocial: result.data.razaoSocial,
       segmento: result.data.segmento,
       nomeFantasia: result.data.razaoSocial,
       criadaPelaAgencia: true,
-    };
+    });
 
     setSelecionadas((prev) => [...prev, nova]);
     setNovaEmpresaDraft(criarEmpresaCadastroInicial());
@@ -407,7 +408,7 @@ export function PainelAgenciaConcluido() {
                 Segmento: {empresaAtiva.segmento}
               </p>
               <Link
-                href="/inicio"
+                href="/agencia/dashboard"
                 className={buttonVariants()}
               >
                 Ir para o início

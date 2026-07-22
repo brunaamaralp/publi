@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAgencia } from "@/lib/contexts/agencia-context";
+import { resolverModoAcesso } from "@/lib/agencia/modo-acesso";
 import { cn } from "@/lib/utils";
 
 type SeletorEmpresaClienteProps = {
@@ -79,9 +80,9 @@ export function SeletorEmpresaCliente({
                       : "text-texto-secundario",
                   )}
                 >
-                  {empresa.criadaPelaAgencia
-                    ? "Criada por você"
-                    : "Somente visualização"}
+                  {resolverModoAcesso(empresa) === "edicao"
+                    ? "Edição"
+                    : "Somente leitura"}
                 </span>
               </span>
             </SelectItem>

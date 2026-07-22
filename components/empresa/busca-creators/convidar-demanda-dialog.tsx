@@ -33,6 +33,7 @@ type ConvidarDemandaDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   tipoAtuacaoFiltro?: FiltroTipoAtuacaoBusca;
+  basePath?: "/empresa" | "/agencia";
 };
 
 export function ConvidarDemandaDialog({
@@ -40,6 +41,7 @@ export function ConvidarDemandaDialog({
   open,
   onOpenChange,
   tipoAtuacaoFiltro = "todos",
+  basePath = "/empresa",
 }: ConvidarDemandaDialogProps) {
   const router = useRouter();
   const publicador = useEmpresaPublicadora();
@@ -112,7 +114,7 @@ export function ConvidarDemandaDialog({
                 convidar este creator.
               </p>
               <Link
-                href="/empresa/demandas/nova"
+                href={`${basePath}/demandas/nova`}
                 className={cn(buttonVariants({ variant: "cta" }), "inline-flex")}
                 onClick={fechar}
               >

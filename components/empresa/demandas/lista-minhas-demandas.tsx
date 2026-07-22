@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AlertTriangle, Pencil, Plus } from "lucide-react";
 import { toast } from "sonner";
 
+import { BannerAcessoLeitura } from "@/components/agencia/banner-acesso-leitura";
 import { BadgeStatusDemanda, BORDA_LINHA_DEMANDA } from "@/components/empresa/demandas/badge-status-demanda";
 import { CabecalhoDemandasEmpresa } from "@/components/empresa/demandas/cabecalho-demandas-empresa";
 import { SugestoesDemandaLink } from "@/components/empresa/demandas/sugestoes-demanda-link";
@@ -50,9 +51,18 @@ const STATUS_EDITAVEL = new Set([
   "rascunho",
 ]);
 
-export function ListaMinhasDemandas() {
+type ListaMinhasDemandasProps = {
+  basePath?: "/empresa" | "/agencia";
+  somenteLeitura?: boolean;
+};
+
+export function ListaMinhasDemandas({
+  basePath = "/empresa",
+  somenteLeitura = false,
+}: ListaMinhasDemandasProps) {
   const publicador = useEmpresaPublicadora();
   const agenciaCtx = useAgenciaOpcional();
+  const podeMutar = !somenteLeitura;
   const [itens, setItens] = useState<MinhaDemandaItem[]>([]);
   const [cancelarId, setCancelarId] = useState<string | null>(null);
   const [editarItem, setEditarItem] = useState<MinhaDemandaItem | null>(null);
@@ -142,6 +152,7 @@ export function ListaMinhasDemandas() {
             titulo="Minhas demandas"
             descricao="Selecione um cliente no seletor de contexto para ver e gerenciar as demandas."
             mostrarCtaNova={false}
+            basePath={basePath}
           />
           <div className="flex flex-col items-center justify-center rounded-card border border-dashed px-6 py-16 text-center">
             <AlertTriangle
@@ -161,9 +172,14 @@ export function ListaMinhasDemandas() {
   return (
     <div className="min-h-full bg-fundo-pagina">
       <div className="mx-auto max-w-5xl space-y-8 px-4 py-8 sm:px-6">
+      {somenteLeitura ? (
+        <BannerAcessoLeitura nomeCliente={publicador.empresaNome} />
+      ) : null}
       <CabecalhoDemandasEmpresa
-        titulo="Minhas demandas"
+        titulo={basePath === "/agencia" ? "Campanhas do cliente" : "Minhas demandas"}
         descricao="Gerencie as campanhas publicadas. Em Sugestões, veja criadores ranqueados pelo score de compatibilidade com cada demanda."
+        mostrarCtaNova={podeMutar}
+        basePath={basePath}
       />
 
       {itens.length === 0 ? (
@@ -171,16 +187,18 @@ export function ListaMinhasDemandas() {
           <p className="text-muted-foreground max-w-sm text-sm leading-relaxed">
             Nenhuma demanda publicada ainda
           </p>
-          <Link
-            href="/empresa/demandas/nova"
-            className={cn(
-              buttonVariants(),
-              "mt-6 border-transparent bg-verde-carvao-escuro text-verde-neon shadow-none hover:bg-verde-carvao hover:text-verde-neon",
-            )}
-          >
-            <Plus className="size-4" aria-hidden />
-            Publicar primeira demanda
-          </Link>
+          {podeMutar ? (
+            <Link
+              href={`${basePath}/demandas/nova`}
+              className={cn(
+                buttonVariants(),
+                "mt-6 border-transparent bg-verde-carvao-escuro text-verde-neon shadow-none hover:bg-verde-carvao hover:text-verde-neon",
+              )}
+            >
+              <Plus className="size-4" aria-hidden />
+              Publicar primeira demanda
+            </Link>
+          ) : null}
         </div>
       ) : (
         <>
@@ -239,30 +257,32 @@ export function ListaMinhasDemandas() {
                         : "—"}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <div className="flex justify-end gap-1">
-                        {STATUS_EDITAVEL.has(item.demanda.status) ? (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => abrirEdicaoOrcamento(item)}
-                          >
-                            <Pencil className="size-3.5" aria-hidden />
-                            Orçamento
-                          </Button>
-                        ) : null}
-                        {item.demanda.status === "aberta" ? (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="text-destructive hover:text-destructive"
-                            onClick={() => setCancelarId(item.demanda.id)}
-                          >
-                            Cancelar
-                          </Button>
-                        ) : null}
-                      </div>
+                      {podeMutar ? (
+                        <div className="flex justify-end gap-1">
+                          {STATUS_EDITAVEL.has(item.demanda.status) ? (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => abrirEdicaoOrcamento(item)}
+                            >
+                              <Pencil className="size-3.5" aria-hidden />
+                              Orçamento
+                            </Button>
+                          ) : null}
+                          {item.demanda.status === "aberta" ? (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="text-destructive hover:text-destructive"
+                              onClick={() => setCancelarId(item.demanda.id)}
+                            >
+                              Cancelar
+                            </Button>
+                          ) : null}
+                        </div>
+                      ) : null}
                     </td>
                   </tr>
                 ))}
@@ -325,31 +345,33 @@ export function ListaMinhasDemandas() {
                       </p>
                     ) : null}
                   </CardContent>
-                  <CardFooter className="flex flex-col gap-2 border-t pt-4">
-                    {STATUS_EDITAVEL.has(item.demanda.status) ? (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="w-full"
-                        onClick={() => abrirEdicaoOrcamento(item)}
-                      >
-                        <Pencil className="size-3.5" aria-hidden />
-                        Editar orçamento
-                      </Button>
-                    ) : null}
-                    {item.demanda.status === "aberta" ? (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="text-destructive hover:text-destructive w-full"
-                        onClick={() => setCancelarId(item.demanda.id)}
-                      >
-                        Cancelar demanda
-                      </Button>
-                    ) : null}
-                  </CardFooter>
+                  {podeMutar ? (
+                    <CardFooter className="flex flex-col gap-2 border-t pt-4">
+                      {STATUS_EDITAVEL.has(item.demanda.status) ? (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                          onClick={() => abrirEdicaoOrcamento(item)}
+                        >
+                          <Pencil className="size-3.5" aria-hidden />
+                          Editar orçamento
+                        </Button>
+                      ) : null}
+                      {item.demanda.status === "aberta" ? (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="text-destructive hover:text-destructive w-full"
+                          onClick={() => setCancelarId(item.demanda.id)}
+                        >
+                          Cancelar demanda
+                        </Button>
+                      ) : null}
+                    </CardFooter>
+                  ) : null}
                 </Card>
               </li>
             ))}

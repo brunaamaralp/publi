@@ -21,6 +21,18 @@ export function isNavItemActive(
     return false;
   }
 
+  /** Painel da agência: só dashboard (não subpáginas). */
+  if (href === "/agencia/dashboard") {
+    if (
+      pathname === "/agencia/dashboard" ||
+      pathname === "/inicio" ||
+      pathname === "/agencia"
+    ) {
+      return true;
+    }
+    return false;
+  }
+
   const correspondeHref =
     pathname === href || pathname.startsWith(`${href}/`);
 

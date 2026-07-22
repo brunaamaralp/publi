@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { SearchX, Users } from "lucide-react";
 
+import { BannerAcessoLeitura } from "@/components/agencia/banner-acesso-leitura";
 import { CreatorCard } from "@/components/empresa/busca-creators/creator-card";
 import { ConvidarDemandaDialog } from "@/components/empresa/busca-creators/convidar-demanda-dialog";
 import { FiltrosBuscaCreatorsPainel } from "@/components/empresa/busca-creators/filtros-busca-creators";
@@ -20,7 +21,15 @@ import {
 import { useEmpresaPublicadora } from "@/lib/empresa/use-empresa-publicadora";
 import { cn } from "@/lib/utils";
 
-export function BuscaCreatorsFlow() {
+type BuscaCreatorsFlowProps = {
+  basePath?: "/empresa" | "/agencia";
+  somenteLeitura?: boolean;
+};
+
+export function BuscaCreatorsFlow({
+  basePath = "/empresa",
+  somenteLeitura = false,
+}: BuscaCreatorsFlowProps) {
   const publicador = useEmpresaPublicadora();
   const [filtros, setFiltros] = useState<FiltrosBuscaCreators>(
     FILTROS_BUSCA_CREATORS_INICIAIS,
@@ -53,12 +62,16 @@ export function BuscaCreatorsFlow() {
             </p>
           </div>
           <Link
-            href="/empresa/demandas"
+            href={`${basePath}/demandas`}
             className={cn(buttonVariants({ variant: "outline" }), "shrink-0")}
           >
-            Minhas campanhas
+            {basePath === "/agencia" ? "Campanhas do cliente" : "Minhas campanhas"}
           </Link>
         </div>
+
+        {somenteLeitura ? (
+          <BannerAcessoLeitura nomeCliente={publicador.empresaNome} />
+        ) : null}
 
         {publicador.modo === "agencia" ||
         publicador.modo === "agencia_sem_cliente" ? (
@@ -130,7 +143,7 @@ export function BuscaCreatorsFlow() {
                 <CreatorCard
                   creator={creator}
                   tipoAtuacaoFiltro={filtros.tipoAtuacao}
-                  onConvidar={setConvidar}
+                  onConvidar={somenteLeitura ? undefined : setConvidar}
                 />
               </li>
             ))}
@@ -152,14 +165,17 @@ export function BuscaCreatorsFlow() {
         </>
       )}
 
-      <ConvidarDemandaDialog
-        creator={convidar}
-        tipoAtuacaoFiltro={filtros.tipoAtuacao}
-        open={convidar !== null}
-        onOpenChange={(open) => {
-          if (!open) setConvidar(null);
-        }}
-      />
+      {!somenteLeitura ? (
+        <ConvidarDemandaDialog
+          creator={convidar}
+          tipoAtuacaoFiltro={filtros.tipoAtuacao}
+          open={convidar !== null}
+          onOpenChange={(open) => {
+            if (!open) setConvidar(null);
+          }}
+          basePath={basePath}
+        />
+      ) : null}
     </div>
   );
 }

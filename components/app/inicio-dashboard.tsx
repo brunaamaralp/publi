@@ -19,7 +19,7 @@ export function InicioDashboard() {
     case "empresa":
       return <InicioEmpresa nomeExibicao={nomeExibicao} />;
     case "agencia":
-      return <InicioAgencia nomeExibicao={nomeExibicao} />;
+      return <InicioAgencia />;
     case "admin":
       return <InicioAdmin nomeExibicao={nomeExibicao} />;
     case "influenciador":

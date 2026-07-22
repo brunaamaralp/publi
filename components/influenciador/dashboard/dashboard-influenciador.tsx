@@ -13,7 +13,10 @@ import {
 import { toast } from "sonner";
 
 import { BannerCompletarPerfil } from "@/components/influenciador/banner-completar-perfil";
-import { BadgeFormatoDemanda } from "@/components/influenciador/demandas/indicador-match";
+import {
+  BadgeFormatoDemanda,
+  IndicadorMatch,
+} from "@/components/influenciador/demandas/indicador-match";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,7 +28,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { MatchRing } from "@/components/ui/match-ring";
 import { formatarNomeExibicao } from "@/lib/app/formatar-nome-exibicao";
 import { useAuth } from "@/lib/auth-context";
 import { hrefDetalheDemanda, labelFormatoEntrega } from "@/lib/demandas/utils";
@@ -278,13 +280,16 @@ export function DashboardInfluenciador({
               <li key={item.demanda.id}>
                 <Link
                   href={hrefDetalheDemanda(item.demanda.id, "")}
-                  className="flex h-full flex-col gap-3 rounded-card border border-cinza-200 bg-white p-4 transition-colors hover:bg-fundo-pagina"
+                  className="group flex h-full flex-col gap-3 rounded-card border border-cinza-200 border-l-[3px] border-l-transparent bg-white p-4 transition-[border-color,background-color,box-shadow] hover:border-l-verde-neon hover:bg-fundo-pagina hover:shadow-[0_8px_24px_color-mix(in_srgb,var(--preto)_6%,transparent)]"
                 >
-                  <div className="flex items-start justify-between gap-2">
+                  <div className="flex flex-wrap items-center gap-1.5">
                     <BadgeFormatoDemanda>
                       {labelFormatoEntrega(item.demanda.formatoEntrega)}
                     </BadgeFormatoDemanda>
-                    <MatchRing score={item.match.score} size="sm" />
+                    <IndicadorMatch
+                      score={item.match.score}
+                      variante="compact"
+                    />
                   </div>
                   <div className="min-w-0 flex-1 space-y-1">
                     <p className="font-display line-clamp-2 text-sm font-bold leading-snug">
@@ -294,7 +299,7 @@ export function DashboardInfluenciador({
                       {item.empresaNome}
                     </p>
                   </div>
-                  <p className="font-data text-sm font-semibold">
+                  <p className="font-data text-sm font-semibold tracking-tight">
                     {formatarMoeda(item.demanda.orcamento)}
                   </p>
                 </Link>

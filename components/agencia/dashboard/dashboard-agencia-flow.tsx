@@ -72,11 +72,19 @@ export function DashboardAgenciaFlow() {
           </h1>
           <p className="text-muted-foreground max-w-2xl text-sm">
             {empresaAtiva
-              ? `Métricas do cliente ativo: ${empresaAtiva.nomeFantasia ?? empresaAtiva.razaoSocial}. Troque no seletor ou na lista abaixo.`
-              : "Métricas agregadas de todas as empresas-clientes. Selecione um cliente para filtrar demandas, resultados e o resumo financeiro."}
+              ? `Métricas do cliente ativo: ${empresaAtiva.nomeFantasia ?? empresaAtiva.razaoSocial}. Abra o workspace ou troque na lista abaixo.`
+              : "Portfólio de empresas-clientes com métricas agregadas. Selecione um cliente para operar campanhas e resultados."}
           </p>
         </div>
-        <AdicionarEmpresaCliente className="shrink-0" />
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/agencia/clientes"
+            className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+          >
+            Gerenciar clientes
+          </Link>
+          <AdicionarEmpresaCliente className="shrink-0" />
+        </div>
       </section>
 
         <CardsResumoAgencia
@@ -91,25 +99,25 @@ export function DashboardAgenciaFlow() {
                 Empresas-clientes
               </h2>
               <p className="text-muted-foreground text-sm">
-                Clique para definir o contexto ativo e abrir as demandas.
+                Clique para abrir o workspace do cliente.
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <Link
-                href="/empresa/demandas"
+                href="/agencia/demandas"
                 className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
               >
-                Ver demandas da empresa ativa
+                Campanhas do cliente ativo
               </Link>
               <Link
-                href="/empresa/resultados"
+                href="/agencia/resultados"
                 className={cn(
                   buttonVariants({ variant: "outline", size: "sm" }),
                   "gap-1.5",
                 )}
               >
                 <BarChart3 className="size-4" aria-hidden />
-                Resultados do cliente
+                Resultados
               </Link>
             </div>
           </div>

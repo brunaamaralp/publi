@@ -7,7 +7,11 @@ import { LogOut } from "lucide-react";
 import { SeletorEmpresaCliente } from "@/components/agencia/seletor-empresa-cliente";
 import { buttonVariants } from "@/components/ui/button";
 import { coletarHrefsGrupo, isNavItemActive } from "@/lib/app/nav-active";
-import { navGruposParaUsuario, type NavItem } from "@/lib/app/nav-items";
+import {
+  homeHrefParaUsuario,
+  navGruposParaUsuario,
+  type NavItem,
+} from "@/lib/app/nav-items";
 import { useAuth } from "@/lib/auth-context";
 import { useAgenciaOpcional } from "@/lib/contexts/agencia-context";
 import { cn } from "@/lib/utils";
@@ -74,6 +78,7 @@ export function AppSidebar({ onNavigate, className }: AppSidebarProps) {
   const agenciaCtx = useAgenciaOpcional();
 
   const grupos = usuario ? navGruposParaUsuario(usuario.tipo) : [];
+  const homeHref = usuario ? homeHrefParaUsuario(usuario.tipo) : "/inicio";
 
   function handleLogout() {
     logout();
@@ -90,7 +95,7 @@ export function AppSidebar({ onNavigate, className }: AppSidebarProps) {
     >
       <div className="border-b border-white/10 p-4">
         <Link
-          href="/inicio"
+          href={homeHref}
           onClick={onNavigate}
           className="font-display inline-flex items-center gap-2 text-lg font-semibold text-[var(--app-sidebar-fg)]"
         >

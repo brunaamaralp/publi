@@ -29,7 +29,16 @@ const idsClientesDemo = [
 export const EMPRESAS_CLIENTES_DEMO: EmpresaClienteVinculada[] =
   EMPRESAS_PLATAFORMA_MOCK.filter((e) =>
     (idsClientesDemo as readonly string[]).includes(e.id),
-  ).map((e) => ({ ...e, criadaPelaAgencia: false }));
+  ).map((e) => {
+    /** Dois clientes editáveis na demo; demais são vínculos somente leitura. */
+    const criadaPelaAgencia =
+      e.id === "emp-plat-001" || e.id === "emp-plat-006";
+    return {
+      ...e,
+      criadaPelaAgencia,
+      modoAcesso: criadaPelaAgencia ? ("edicao" as const) : ("leitura" as const),
+    };
+  });
 
 /** Demandas mock para empresas-clientes da agência demo. */
 export const DEMANDAS_AGENCIA_CLIENTES_MOCK: MinhaDemandaItem[] = [

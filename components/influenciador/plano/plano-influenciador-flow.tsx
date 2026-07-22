@@ -58,7 +58,14 @@ const PLANOS = [
   },
 ];
 
-export function PlanoInfluenciadorFlow() {
+type PlanoInfluenciadorFlowProps = {
+  /** Quando true, omite o header de página (já coberto pelo shell de Configurações). */
+  embutido?: boolean;
+};
+
+export function PlanoInfluenciadorFlow({
+  embutido = false,
+}: PlanoInfluenciadorFlowProps) {
   const { usuario, isLoading } = useAuth();
   const [draft, setDraft] = useState<CadastroDraft | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -108,7 +115,7 @@ export function PlanoInfluenciadorFlow() {
 
   if (isLoading) {
     return (
-      <div className="text-texto-secundario flex min-h-[40vh] items-center justify-center text-sm">
+      <div className="text-texto-secundario flex min-h-[20vh] items-center justify-center text-sm">
         Carregando…
       </div>
     );
@@ -116,26 +123,33 @@ export function PlanoInfluenciadorFlow() {
 
   if (!draft) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-        <p className="text-texto-secundario text-sm">
-          Complete o cadastro básico antes de escolher um plano.
-        </p>
-      </div>
+      <p className="text-texto-secundario text-sm">
+        Complete o cadastro básico antes de escolher um plano.
+      </p>
     );
   }
 
-  return (
-    <div className="mx-auto max-w-3xl space-y-8 px-4 py-6 sm:px-6 sm:py-10">
-      <header className="space-y-2">
-        <p className="text-texto-secundario text-sm font-medium">Assinatura</p>
-        <h1 className="font-display text-2xl font-bold tracking-tight">
-          Seu plano
-        </h1>
-        <p className="text-texto-secundario max-w-xl text-sm font-normal leading-relaxed">
-          Escolha ou troque o plano a qualquer momento. Você pode usar o app
-          mesmo antes de confirmar.
-        </p>
-      </header>
+  const conteudo = (
+    <>
+      {!embutido ? (
+        <header className="space-y-2">
+          <p className="text-texto-secundario text-sm font-medium">Assinatura</p>
+          <h1 className="font-display text-2xl font-bold tracking-tight">
+            Seu plano
+          </h1>
+          <p className="text-texto-secundario max-w-xl text-sm font-normal leading-relaxed">
+            Escolha ou troque o plano a qualquer momento. Você pode usar o app
+            mesmo antes de confirmar.
+          </p>
+        </header>
+      ) : (
+        <div className="space-y-1">
+          <h2 className="font-display text-lg font-bold">Seu plano</h2>
+          <p className="text-texto-secundario text-sm font-normal leading-relaxed">
+            Escolha ou troque o plano a qualquer momento.
+          </p>
+        </div>
+      )}
 
       {errors.plano ? (
         <p role="alert" className="text-destructive text-sm">
@@ -156,7 +170,9 @@ export function PlanoInfluenciadorFlow() {
               type="button"
               role="radio"
               aria-checked={selecionado}
-              onClick={() => setDraft((prev) => (prev ? { ...prev, plano: plano.id } : prev))}
+              onClick={() =>
+                setDraft((prev) => (prev ? { ...prev, plano: plano.id } : prev))
+              }
               className={cn(
                 "relative rounded-card border p-4 text-left transition-all outline-none",
                 "focus-visible:ring-3 focus-visible:ring-ring/50",
@@ -196,7 +212,10 @@ export function PlanoInfluenciadorFlow() {
         className="banner-informativo flex gap-3 rounded-card p-4"
         role="note"
       >
-        <ShieldCheck className="text-verde-neon mt-0.5 size-4 shrink-0" aria-hidden />
+        <ShieldCheck
+          className="text-verde-neon mt-0.5 size-4 shrink-0"
+          aria-hidden
+        />
         <p className="text-sm">
           A visibilidade em buscas depende da aprovação do perfil (status ativo),
           não só do plano escolhido.
@@ -213,6 +232,16 @@ export function PlanoInfluenciadorFlow() {
           Salvar plano
         </Button>
       </div>
+    </>
+  );
+
+  if (embutido) {
+    return <div className="space-y-8">{conteudo}</div>;
+  }
+
+  return (
+    <div className="mx-auto max-w-3xl space-y-8 px-4 py-6 sm:px-6 sm:py-10">
+      {conteudo}
     </div>
   );
 }

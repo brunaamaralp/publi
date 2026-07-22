@@ -27,19 +27,25 @@ export const LABELS_FAIXA_MATCH_CURTA: Record<MatchRingNivel, string> = {
 
 const RING_STYLES: Record<
   MatchRingNivel,
-  { stroke: string; label: string }
+  { stroke: string; label: string; wash: string; track: string }
 > = {
   alto: {
     stroke: "var(--verde-neon)",
-    label: "text-verde-neon",
+    label: "text-verde-acao",
+    wash: "bg-[color-mix(in_srgb,var(--verde-neon)_12%,white)]",
+    track: "color-mix(in srgb, var(--verde-neon) 22%, var(--cinza-200))",
   },
   medio: {
     stroke: "var(--verde-acao)",
     label: "text-verde-acao",
+    wash: "bg-[color-mix(in_srgb,var(--verde-acao)_10%,white)]",
+    track: "color-mix(in srgb, var(--verde-acao) 16%, var(--cinza-200))",
   },
   baixo: {
     stroke: "var(--cinza-500)",
     label: "text-cinza-500",
+    wash: "bg-cinza-200/45",
+    track: "var(--cinza-200)",
   },
 };
 
@@ -55,7 +61,10 @@ type MatchRingProps = {
   centerValue?: string;
   /** Texto do aria-label; padrão descreve score + faixa. */
   ariaLabel?: string;
-  /** Fundo verde-carvão realça o traço do anel. */
+  /**
+   * @deprecated Fundo escuro — preferir o anel claro (padrão).
+   * Mantido só para contextos que ainda pedem contraste invertido.
+   */
   darkBackdrop?: boolean;
 };
 
@@ -74,7 +83,7 @@ export function MatchRing({
   className,
   centerValue,
   ariaLabel,
-  darkBackdrop = true,
+  darkBackdrop = false,
 }: MatchRingProps) {
   const scoreArredondado = Math.round(Math.min(100, Math.max(0, score)));
   const nivel = nivelMatchRing(scoreArredondado);
@@ -86,12 +95,17 @@ export function MatchRing({
   const faixaCurta = LABELS_FAIXA_MATCH_CURTA[nivel];
   const legenda = label ?? faixaCurta;
   const valorCentro = centerValue ?? `${scoreArredondado}%`;
+  const trackStroke = darkBackdrop
+    ? "var(--verde-carvao-claro)"
+    : styles.track;
 
   return (
     <div
       className={cn(
         "inline-flex flex-col items-center gap-1",
-        darkBackdrop && "rounded-card bg-verde-carvao-escuro px-3 py-2",
+        darkBackdrop
+          ? "rounded-card bg-verde-carvao-escuro px-3 py-2"
+          : cn("rounded-full p-1.5", styles.wash),
         className,
       )}
       aria-label={
@@ -110,7 +124,7 @@ export function MatchRing({
             cy={center}
             r={dim.r}
             fill="none"
-            stroke="var(--verde-carvao-claro)"
+            stroke={trackStroke}
             strokeWidth={dim.stroke}
           />
           <circle
@@ -131,7 +145,7 @@ export function MatchRing({
             className={cn(
               "font-data leading-none font-bold tabular-nums",
               dim.text,
-              darkBackdrop ? "text-branco" : "text-foreground",
+              darkBackdrop ? "text-branco" : styles.label,
             )}
           >
             {valorCentro}

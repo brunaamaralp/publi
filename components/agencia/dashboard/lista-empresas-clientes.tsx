@@ -17,24 +17,28 @@ import {
   labelStatusContrato,
   obterResumoEmpresaCliente,
 } from "@/lib/agencia/dashboard-utils";
+import { resolverModoAcesso } from "@/lib/agencia/modo-acesso";
 import { cn } from "@/lib/utils";
 
 type ListaEmpresasClientesProps = {
   empresas: EmpresaClienteVinculada[];
   empresaAtivaId: string | null;
   onSelecionar: (empresaId: string) => void;
+  /** Destino após selecionar cliente. */
+  hrefAposSelecionar?: string;
 };
 
 export function ListaEmpresasClientes({
   empresas,
   empresaAtivaId,
   onSelecionar,
+  hrefAposSelecionar = "/agencia/clientes",
 }: ListaEmpresasClientesProps) {
   const router = useRouter();
 
   function handleClick(empresaId: string) {
     onSelecionar(empresaId);
-    router.push("/empresa/demandas");
+    router.push(`${hrefAposSelecionar}/${empresaId}`);
   }
 
   if (empresas.length === 0) {
@@ -50,6 +54,7 @@ export function ListaEmpresasClientes({
       {empresas.map((empresa) => {
         const resumo = obterResumoEmpresaCliente(empresa.id);
         const ativa = empresa.id === empresaAtivaId;
+        const modo = resolverModoAcesso(empresa);
 
         return (
           <li key={empresa.id}>
@@ -94,6 +99,9 @@ export function ListaEmpresasClientes({
                       {resumo.demandasAtivas === 1
                         ? "demanda ativa"
                         : "demandas ativas"}
+                    </Badge>
+                    <Badge variant="outline">
+                      {modo === "edicao" ? "Edição" : "Leitura"}
                     </Badge>
                     {ativa ? (
                       <Badge variant="default">Contexto ativo</Badge>

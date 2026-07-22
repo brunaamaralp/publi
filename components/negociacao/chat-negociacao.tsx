@@ -10,6 +10,12 @@ import { MensagemBolha } from "@/components/negociacao/mensagem-bolha";
 import { ResumoContratoBar } from "@/components/negociacao/resumo-contrato-bar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  ModalCelebracao,
+  celebracaoContratoFechado,
+} from "@/components/ui/modal-celebracao";
+import { useAuth } from "@/lib/auth-context";
+import { formatarMoeda } from "@/lib/influenciador/cadastro-utils";
 import { analisarTextoMensagem } from "@/lib/negociacao/filtro-contato";
 import type { Mensagem } from "@/lib/types";
 import type {
@@ -38,6 +44,7 @@ export function ChatNegociacao({
   onAssinarEmpresa,
   onAssinarInfluenciador,
 }: ChatNegociacaoProps) {
+  const { usuario } = useAuth();
   const [texto, setTexto] = useState("");
   const [avisoBloqueioVisivel, setAvisoBloqueioVisivel] = useState(false);
   const [formAviso, setFormAviso] = useState<string | null>(null);
@@ -47,10 +54,24 @@ export function ChatNegociacao({
   const [docContratoAberto, setDocContratoAberto] = useState(
     estado.etapaContrato === "documento",
   );
+  const [celebracaoAberta, setCelebracaoAberta] = useState(false);
   const fimListaRef = useRef<HTMLDivElement>(null);
 
   const contratoAssinado =
     estado.contrato?.status === "assinado" && estado.assinaturaInfluenciador;
+
+  const ehEmpresa =
+    usuario?.tipo === "empresa" || usuario?.tipo === "agencia";
+  const nomeContraparte = ehEmpresa
+    ? contexto.influenciador.nome
+    : contexto.empresa.nome;
+  const propsCelebracao =
+    estado.contrato != null
+      ? celebracaoContratoFechado({
+          valorFormatado: formatarMoeda(estado.contrato.valor),
+          nomeContraparte,
+        })
+      : null;
 
   useEffect(() => {
     fimListaRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -259,6 +280,18 @@ export function ChatNegociacao({
           onAssinarInfluenciador={() => {
             onAssinarInfluenciador();
             setDocContratoAberto(false);
+            setCelebracaoAberta(true);
+          }}
+        />
+      ) : null}
+
+      {propsCelebracao ? (
+        <ModalCelebracao
+          aberto={celebracaoAberta}
+          onOpenChange={setCelebracaoAberta}
+          {...propsCelebracao}
+          aoConfirmar={() => {
+            if (estado.contrato) setDocContratoAberto(true);
           }}
         />
       ) : null}

@@ -24,8 +24,8 @@ import {
 import { Input } from "@/components/ui/input";
 import {
   useAgencia,
-  type EmpresaClienteVinculada,
 } from "@/lib/contexts/agencia-context";
+import { comModoAcesso } from "@/lib/agencia/modo-acesso";
 import { criarEmpresaCadastroInicial } from "@/lib/empresa/cadastro-types";
 import { EMPRESAS_PLATAFORMA_MOCK } from "@/lib/mock-data/empresas";
 import { empresaCadastroFormSchema } from "@/lib/schemas/empresa-cadastro";
@@ -65,10 +65,10 @@ export function AdicionarEmpresaCliente({
   });
 
   function vincularEmpresa(empresa: (typeof EMPRESAS_PLATAFORMA_MOCK)[number]) {
-    const vinculada: EmpresaClienteVinculada = {
+    const vinculada = comModoAcesso({
       ...empresa,
       criadaPelaAgencia: false,
-    };
+    });
     adicionarEmpresaCliente(vinculada);
     toast.success(`${empresa.nomeFantasia ?? empresa.razaoSocial} vinculada.`);
     setAberto(false);
@@ -96,14 +96,14 @@ export function AdicionarEmpresaCliente({
       return;
     }
 
-    const nova: EmpresaClienteVinculada = {
+    const nova = comModoAcesso({
       id: crypto.randomUUID(),
       usuarioId: "usr-empresa-nova",
       razaoSocial: result.data.razaoSocial,
       segmento: result.data.segmento,
       nomeFantasia: result.data.razaoSocial,
       criadaPelaAgencia: true,
-    };
+    });
 
     adicionarEmpresaCliente(nova);
     setNovaEmpresaDraft(criarEmpresaCadastroInicial());

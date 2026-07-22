@@ -12,6 +12,8 @@ type CabecalhoDemandasEmpresaProps = {
   titulo: string;
   descricao?: string;
   mostrarCtaNova?: boolean;
+  /** Prefixo de rotas operacionais (`/empresa` ou `/agencia`). */
+  basePath?: "/empresa" | "/agencia";
   className?: string;
 };
 
@@ -19,6 +21,7 @@ export function CabecalhoDemandasEmpresa({
   titulo,
   descricao,
   mostrarCtaNova = true,
+  basePath = "/empresa",
   className,
 }: CabecalhoDemandasEmpresaProps) {
   const publicador = useEmpresaPublicadora();
@@ -39,7 +42,7 @@ export function CabecalhoDemandasEmpresa({
         </div>
         {mostrarCtaNova ? (
           <Link
-            href="/empresa/demandas/nova"
+            href={`${basePath}/demandas/nova`}
             className={cn(
               buttonVariants(),
               "shrink-0 border-transparent bg-verde-carvao-escuro text-verde-neon shadow-none hover:bg-verde-carvao hover:text-verde-neon",

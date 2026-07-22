@@ -40,7 +40,11 @@ import {
   TIPOS_SERVICO,
 } from "@/lib/influenciador/cadastro-utils";
 
-export function FormularioNovaDemanda() {
+export function FormularioNovaDemanda({
+  basePath = "/empresa",
+}: {
+  basePath?: "/empresa" | "/agencia";
+}) {
   const router = useRouter();
   const publicador = useEmpresaPublicadora();
   const [draft, setDraft] = useState<DemandaPublicacaoDraft>(
@@ -99,7 +103,7 @@ export function FormularioNovaDemanda() {
       toast.success(
         "Rascunho salvo. Ele não aparece na busca de influenciadores.",
       );
-      router.push("/empresa/demandas");
+      router.push(`${basePath}/demandas`);
     } finally {
       setEnviando(false);
     }
@@ -120,7 +124,7 @@ export function FormularioNovaDemanda() {
     try {
       publicarDemanda(draft, publicador.empresaId);
       toast.success("Demanda publicada com sucesso!");
-      router.push("/empresa/demandas");
+      router.push(`${basePath}/demandas`);
     } finally {
       setEnviando(false);
     }
@@ -375,7 +379,7 @@ export function FormularioNovaDemanda() {
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push("/empresa/demandas")}
+          onClick={() => router.push(`${basePath}/demandas`)}
         >
           Cancelar
         </Button>

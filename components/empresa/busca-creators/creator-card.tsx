@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils";
 
 type CreatorCardProps = {
   creator: CreatorCatalogo;
-  onConvidar: (creator: CreatorCatalogo) => void;
+  onConvidar?: (creator: CreatorCatalogo) => void;
   tipoAtuacaoFiltro?: FiltroTipoAtuacaoBusca;
   className?: string;
 };
@@ -177,17 +177,22 @@ export function CreatorCard({
       </p>
 
       <div className="mt-auto flex flex-col gap-2 sm:flex-row">
-        <Button
-          type="button"
-          variant="cta"
-          className="flex-1"
-          onClick={() => onConvidar(creator)}
-        >
-          Convidar para demanda
-        </Button>
+        {onConvidar ? (
+          <Button
+            type="button"
+            variant="cta"
+            className="flex-1"
+            onClick={() => onConvidar(creator)}
+          >
+            Convidar para demanda
+          </Button>
+        ) : null}
         <Link
           href={`/influenciador/${creator.id}`}
-          className={cn(buttonVariants({ variant: "outline" }), "flex-1")}
+          className={cn(
+            buttonVariants({ variant: "outline" }),
+            onConvidar ? "flex-1" : "w-full",
+          )}
         >
           Ver perfil
         </Link>
