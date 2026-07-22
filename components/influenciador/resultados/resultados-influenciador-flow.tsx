@@ -1,12 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { AlertCircle, ClipboardList } from "lucide-react";
 import { toast } from "sonner";
 
 import { FormularioResultadoDialog } from "@/components/resultados/formulario-resultado-dialog";
 import { BadgeStatusResultado } from "@/components/resultados/badge-status-resultado";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -57,34 +58,48 @@ export function ResultadosInfluenciadorFlow() {
 
   if (!carregado) {
     return (
-      <div className="text-muted-foreground flex min-h-[40vh] items-center justify-center text-sm">
+      <div className="text-texto-secundario flex min-h-[40vh] items-center justify-center text-sm">
         Carregando resultados…
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-8 px-4 py-8 sm:px-6">
-      <header>
-        <p className="text-primary text-sm font-medium">Campanhas</p>
-        <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight">
+    <div className="mx-auto max-w-5xl space-y-8 px-4 py-8 sm:px-6">
+      <header className="space-y-2">
+        <p className="text-texto-secundario text-sm font-medium">Campanhas</p>
+        <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
           Resultados de campanha
         </h1>
-        <p className="text-muted-foreground mt-2 text-sm">
+        <p className="text-texto-secundario max-w-2xl text-sm font-normal leading-relaxed">
           Cadastre métricas das campanhas concluídas para alimentar relatórios
           das marcas e agências parceiras.
         </p>
       </header>
 
       {pendentes.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-card border border-dashed px-6 py-16 text-center">
+        <div className="flex flex-col items-center justify-center rounded-card border border-dashed border-cinza-200 bg-white px-6 py-16 text-center">
           <ClipboardList
-            className="text-muted-foreground mb-4 size-10"
+            className="text-texto-secundario mb-4 size-10"
             aria-hidden
           />
-          <p className="text-muted-foreground max-w-sm text-sm">
-            Nenhum contrato concluído aguardando resultado no momento.
+          <p className="font-display text-base font-bold">
+            Nenhum resultado pendente
           </p>
+          <p className="text-texto-secundario mt-2 max-w-sm text-sm font-normal leading-relaxed">
+            Quando uma campanha for concluída, ela aparece aqui para você
+            cadastrar as métricas. Enquanto isso, acompanhe oportunidades e
+            contratos no painel.
+          </p>
+          <Link
+            href="/influenciador"
+            className={cn(
+              buttonVariants({ variant: "outline", size: "sm" }),
+              "mt-6 inline-flex",
+            )}
+          >
+            Voltar ao painel
+          </Link>
         </div>
       ) : (
         <div className="space-y-6">

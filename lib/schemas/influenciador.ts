@@ -35,6 +35,7 @@ export const influenciadorSchema = z.object({
       ),
       observacao: z.string().optional(),
       datasIndisponiveis: z.array(z.string()).optional(),
+      datasBloqueadas: z.array(z.string()).optional(),
     })
     .optional(),
   midias: z.array(midiaSchema).default([]),

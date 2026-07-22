@@ -157,12 +157,20 @@ export function DashboardEmpresa({
       </section>
 
       <section className="space-y-3" aria-labelledby="resumo-financeiro-empresa">
-        <h2
-          id="resumo-financeiro-empresa"
-          className="font-display text-lg font-bold"
-        >
-          Resumo financeiro
-        </h2>
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <h2
+            id="resumo-financeiro-empresa"
+            className="font-display text-lg font-bold"
+          >
+            Resumo financeiro
+          </h2>
+          <Link
+            href="/empresa/financeiro"
+            className="text-verde-acao text-sm font-medium hover:underline"
+          >
+            Ver financeiro
+          </Link>
+        </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <article className="rounded-card border border-cinza-200 bg-white p-4">
             <p className="text-texto-secundario flex items-center gap-1.5 text-xs font-normal">

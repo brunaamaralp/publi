@@ -1,4 +1,10 @@
-import type { Demanda } from "@/lib/types";
+import type {
+  FormatoDemandaIndicador,
+  ReceitaMensal,
+  RecomendacaoFinanceira,
+  ResumoFinanceiro,
+  TransacaoFinanceira,
+} from "@/lib/financeiro/types";
 import type { TipoServico } from "@/lib/influenciador/cadastro-utils";
 
 import {
@@ -9,41 +15,15 @@ import {
   CONTRATO_ENTREGUE_ID,
 } from "@/lib/mock-data/contratos-pagamento";
 
-export type ReceitaMensal = {
-  mesLabel: string;
-  mesAno: string;
-  receita: number;
+export type {
+  FormatoDemandaIndicador,
+  ReceitaMensal,
+  RecomendacaoFinanceira,
+  ResumoFinanceiro,
+  TransacaoFinanceira,
 };
 
-export type TransacaoFinanceira = {
-  id: string;
-  data: string;
-  empresaNome: string;
-  valor: number;
-  statusPagamento: "retido" | "liberado";
-  contratoId: string;
-};
-
-export type FormatoDemandaIndicador = {
-  formato: Demanda["formatoEntrega"];
-  percentual: number;
-  rotulo: string;
-};
-
-export type RecomendacaoFinanceira = {
-  id: string;
-  titulo: string;
-  descricao: string;
-};
-
-export type ResumoFinanceiro = {
-  ganhosMesAtual: number;
-  variacaoMesAnterior: number;
-  contratosConcluidosMes: number;
-  ticketMedio: number;
-};
-
-/** Receita dos últimos 6 meses — tendência de crescimento leve. */
+/** Receita dos últimos 6 meses — seed de fallback quando não há liberação live. */
 export const RECEITA_MENSAL_MOCK: ReceitaMensal[] = [
   { mesLabel: "Fev", mesAno: "2026-02", receita: 6200 },
   { mesLabel: "Mar", mesAno: "2026-03", receita: 7800 },
@@ -53,6 +33,16 @@ export const RECEITA_MENSAL_MOCK: ReceitaMensal[] = [
   { mesLabel: "Jul", mesAno: "2026-07", receita: 11850 },
 ];
 
+/** Investimento mensal da empresa — seed de fallback no gráfico. */
+export const GASTO_MENSAL_EMPRESA_MOCK: ReceitaMensal[] = [
+  { mesLabel: "Fev", mesAno: "2026-02", receita: 9800 },
+  { mesLabel: "Mar", mesAno: "2026-03", receita: 11200 },
+  { mesLabel: "Abr", mesAno: "2026-04", receita: 8900 },
+  { mesLabel: "Mai", mesAno: "2026-05", receita: 13400 },
+  { mesLabel: "Jun", mesAno: "2026-06", receita: 15100 },
+  { mesLabel: "Jul", mesAno: "2026-07", receita: 16800 },
+];
+
 export const RESUMO_FINANCEIRO_MOCK: ResumoFinanceiro = {
   ganhosMesAtual: 11850,
   variacaoMesAnterior: 16.2,
@@ -60,6 +50,7 @@ export const RESUMO_FINANCEIRO_MOCK: ResumoFinanceiro = {
   ticketMedio: 2962.5,
 };
 
+/** @deprecated Preferir ledger derivado de `agregarPainelFinanceiroInfluenciador`. */
 export const TRANSACOES_RECENTES_MOCK: TransacaoFinanceira[] = [
   {
     id: "tx-001",

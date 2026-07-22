@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { FormatoDemandaIndicador } from "@/lib/mock-data/financeiro";
+import type { FormatoDemandaIndicador } from "@/lib/financeiro/types";
 import { cn } from "@/lib/utils";
 
 type IndicadoresDemandaProps = {

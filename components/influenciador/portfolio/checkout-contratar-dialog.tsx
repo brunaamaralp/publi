@@ -164,8 +164,9 @@ export function CheckoutContratarDialog({
             <Label>Data na agenda</Label>
             <AgendaDisponibilidade
               disponibilidade={portfolio.disponibilidade}
-              diasVisiveis={45}
+              modo="selecao"
               selecionavel
+              ocultarCabecalho
               dataSelecionada={dataAgendada}
               onSelecionar={(d) => {
                 setDataAgendada(d);

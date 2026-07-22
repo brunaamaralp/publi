@@ -38,6 +38,9 @@ export function PortfolioPublicoFlow({
   const [pacoteCheckout, setPacoteCheckout] = useState<PacoteServico | null>(
     null,
   );
+  const [prefillCheckout, setPrefillCheckout] = useState<{
+    dataAgendada?: string;
+  } | null>(null);
   const [chatAberto, setChatAberto] = useState(false);
 
   const isEmpresa =
@@ -144,7 +147,26 @@ export function PortfolioPublicoFlow({
       <PortfolioView
         portfolio={portfolio}
         ocultarHandlesRedes
-        onContratarPacote={isEmpresa ? setPacoteCheckout : undefined}
+        ocultarStickyContratar={pacoteCheckout !== null || chatAberto}
+        onContratarPacote={
+          isEmpresa
+            ? (pacote) => {
+                setPrefillCheckout(null);
+                setPacoteCheckout(pacote);
+              }
+            : undefined
+        }
+        onSelecionarDataAgenda={
+          isEmpresa
+            ? (dataIso) => {
+                const primeiro =
+                  portfolio.pacotes.find((p) => p.ativo) ?? null;
+                if (!primeiro) return;
+                setPrefillCheckout({ dataAgendada: dataIso });
+                setPacoteCheckout(primeiro);
+              }
+            : undefined
+        }
         acoes={
           isEmpresa ? (
             <div className="flex flex-col gap-2 sm:items-end">
@@ -184,16 +206,21 @@ export function PortfolioPublicoFlow({
           <CheckoutContratarDialog
             aberto={pacoteCheckout !== null}
             onOpenChange={(open) => {
-              if (!open) setPacoteCheckout(null);
+              if (!open) {
+                setPacoteCheckout(null);
+                setPrefillCheckout(null);
+              }
             }}
             portfolio={portfolio}
             pacote={pacoteCheckout}
+            prefill={prefillCheckout}
             empresa={{
               usuarioId: usuario.id,
               nome: usuario.email,
             }}
             onContratoCriado={() => {
               setPacoteCheckout(null);
+              setPrefillCheckout(null);
               setPortfolio(carregarPortfolioPorId(portfolioId));
             }}
           />

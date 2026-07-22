@@ -436,7 +436,9 @@ function FormTermosAcordadosDialog({
             <Label>Data combinada</Label>
             <AgendaDisponibilidade
               disponibilidade={portfolio.disponibilidade}
+              modo="selecao"
               selecionavel
+              ocultarCabecalho
               dataSelecionada={dataAgendada}
               onSelecionar={(d) => {
                 setDataAgendada(d);

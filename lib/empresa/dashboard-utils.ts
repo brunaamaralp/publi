@@ -3,20 +3,12 @@
  * Não introduz fórmulas novas — só filtra, ordena e resume.
  */
 
-import {
-  carregarAvaliacoesContrato,
-  jaAvaliouContrato,
-} from "@/lib/avaliacao/utils";
-import { listarDemandasEmpresa } from "@/lib/empresa/demandas-utils";
+import { EMPRESA_MOCK_ID } from "@/lib/mock-data/avaliacoes";
+import { listarContextosEmpresa } from "@/lib/financeiro/contratos-empresa";
 import {
   listarTermosPendentesConfirmacao,
   type TermoPendenteConfirmacao,
 } from "@/lib/influenciador/contratacao-direta";
-import { EMPRESA_MOCK_ID } from "@/lib/mock-data/avaliacoes";
-import {
-  CONTRATOS_PAGAMENTO_MOCK,
-  getContratoPagamentoContexto,
-} from "@/lib/mock-data/contratos-pagamento";
 import { EMPRESA_NEGOCIACAO_USUARIO_ID } from "@/lib/negociacao/negociacao-constantes";
 import { hrefPagamentoContrato } from "@/lib/pagamento/contrato-pagamento-link";
 import type { ContratoPagamentoContexto } from "@/lib/pagamento/pagamento-types";
@@ -25,6 +17,11 @@ import {
   valorRetidoPagamentoRetido,
 } from "@/lib/pagamento/pagamento-utils";
 import type { Aditivo, Contrato } from "@/lib/types";
+import { listarDemandasEmpresa } from "@/lib/empresa/demandas-utils";
+import {
+  carregarAvaliacoesContrato,
+  jaAvaliouContrato,
+} from "@/lib/avaliacao/utils";
 
 export const MAX_ACOES_DASHBOARD_EMPRESA = 5;
 
@@ -65,19 +62,6 @@ export type DisputaDashboardEmpresa = {
   reportadoEm: string;
   href: string;
 };
-
-function listarContextosEmpresa(
-  empresaId: string,
-): ContratoPagamentoContexto[] {
-  const contextos: ContratoPagamentoContexto[] = [];
-  for (const id of Object.keys(CONTRATOS_PAGAMENTO_MOCK)) {
-    const ctx = getContratoPagamentoContexto(id);
-    if (ctx && ctx.empresa.id === empresaId) {
-      contextos.push(ctx);
-    }
-  }
-  return contextos;
-}
 
 function hrefContrato(contrato: Contrato): string {
   return hrefPagamentoContrato(contrato);
@@ -180,6 +164,7 @@ function acoesConfirmarTermos(
 export function listarAcoesPendentesDashboardEmpresa(
   empresaId: string = EMPRESA_MOCK_ID,
   empresaUsuarioId: string = EMPRESA_NEGOCIACAO_USUARIO_ID,
+  limite: number = MAX_ACOES_DASHBOARD_EMPRESA,
 ): { acoes: AcaoDashboardEmpresa[]; total: number } {
   const acoes: AcaoDashboardEmpresa[] = [];
 
@@ -202,7 +187,7 @@ export function listarAcoesPendentesDashboardEmpresa(
   );
   const total = acoes.length;
   return {
-    acoes: acoes.slice(0, MAX_ACOES_DASHBOARD_EMPRESA),
+    acoes: limite > 0 ? acoes.slice(0, limite) : acoes,
     total,
   };
 }

@@ -1,0 +1,31 @@
+import { INFLUENCIADOR_MOCK_ID } from "@/lib/mock-data/avaliacoes";
+import {
+  CONTRATOS_PAGAMENTO_MOCK,
+  getContratoPagamentoContexto,
+} from "@/lib/mock-data/contratos-pagamento";
+import { listarContextosPagamentoRegistrados } from "@/lib/pagamento/contrato-pagamento-registro";
+import type { ContratoPagamentoContexto } from "@/lib/pagamento/pagamento-types";
+
+/** Contextos de pagamento do influenciador (seeds + registros locais). */
+export function listarContextosInfluenciador(
+  influenciadorId: string = INFLUENCIADOR_MOCK_ID,
+): ContratoPagamentoContexto[] {
+  const porId = new Map<string, ContratoPagamentoContexto>();
+
+  for (const ctx of Object.values(CONTRATOS_PAGAMENTO_MOCK)) {
+    if (ctx.influenciador.id === influenciadorId) {
+      porId.set(ctx.contrato.id, ctx);
+    }
+  }
+
+  for (const ctx of listarContextosPagamentoRegistrados()) {
+    if (ctx.influenciador.id === influenciadorId) {
+      porId.set(
+        ctx.contrato.id,
+        getContratoPagamentoContexto(ctx.contrato.id) ?? ctx,
+      );
+    }
+  }
+
+  return Array.from(porId.values());
+}

@@ -17,19 +17,25 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { ReceitaMensal } from "@/lib/mock-data/financeiro";
+import type { ReceitaMensal } from "@/lib/financeiro/types";
 import { formatarMoeda } from "@/lib/influenciador/cadastro-utils";
 
 type GraficoReceitaMensalProps = {
   dados: ReceitaMensal[];
+  titulo?: string;
+  descricao?: string;
 };
 
-export function GraficoReceitaMensal({ dados }: GraficoReceitaMensalProps) {
+export function GraficoReceitaMensal({
+  dados,
+  titulo = "Receita mensal",
+  descricao = "Últimos 6 meses na plataforma",
+}: GraficoReceitaMensalProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Receita mensal</CardTitle>
-        <CardDescription>Últimos 6 meses na plataforma</CardDescription>
+        <CardTitle className="text-lg">{titulo}</CardTitle>
+        <CardDescription>{descricao}</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="h-[280px] w-full">

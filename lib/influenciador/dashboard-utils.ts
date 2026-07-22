@@ -10,6 +10,7 @@ import {
 import {
   dataEstaDisponivel,
   formatarDataAgendaCurta,
+  listarProximasDatasDisponiveis,
   listarProximosDiasIso,
 } from "@/lib/influenciador/agenda-utils";
 import { INFLUENCIADOR_MOCK_ID } from "@/lib/mock-data/avaliacoes";
@@ -32,6 +33,7 @@ import {
 } from "@/lib/pagamento/pagamento-utils";
 import { calcularSaldoInfluenciador } from "@/lib/pagamento/saldo-influenciador";
 import type { ContratoPagamentoContexto } from "@/lib/pagamento/pagamento-types";
+import { carregarPortfolioPorId } from "@/lib/influenciador/portfolio-storage";
 import type { Aditivo, Contrato } from "@/lib/types";
 import {
   compararPrecosComMercado,
@@ -64,8 +66,9 @@ export type AcaoDashboard = {
 
 export type ResumoAgendaDashboard = {
   diasOcupadosProximos: number;
+  diasLivresProximos: number;
   janelaDias: number;
-  proximasDatas: string[];
+  proximasDatasLivres: string[];
   texto: string;
 };
 
@@ -336,24 +339,33 @@ export function resumoAgendaDashboard(
   influenciadorId: string = INFLUENCIADOR_MOCK_ID,
   janelaDias = 14,
 ): ResumoAgendaDashboard {
-  const creator = CREATORS_CATALOGO_MOCK.find((c) => c.id === influenciadorId);
-  const disponibilidade = creator?.disponibilidade;
+  const portfolio = carregarPortfolioPorId(influenciadorId);
+  const catalogo = CREATORS_CATALOGO_MOCK.find((c) => c.id === influenciadorId);
+  const disponibilidade =
+    portfolio?.disponibilidade ?? catalogo?.disponibilidade;
   const dias = listarProximosDiasIso(janelaDias);
-  const ocupadas = dias.filter(
-    (dataIso) => !dataEstaDisponivel(disponibilidade, dataIso),
+  const livres = dias.filter((dataIso) =>
+    dataEstaDisponivel(disponibilidade, dataIso),
+  );
+  const ocupadas = dias.length - livres.length;
+  const proximasLivres = listarProximasDatasDisponiveis(
+    disponibilidade,
+    3,
+    janelaDias,
   );
 
   const texto =
-    ocupadas.length === 0
+    livres.length === dias.length
       ? `Agenda livre nos próximos ${janelaDias} dias`
-      : ocupadas.length === 1
-        ? `1 dia ocupado nos próximos ${janelaDias}`
-        : `${ocupadas.length} dias ocupados nos próximos ${janelaDias}`;
+      : livres.length === 0
+        ? `Sem datas livres nos próximos ${janelaDias} dias`
+        : `${livres.length} dias livres · ${ocupadas} indisponíveis`;
 
   return {
-    diasOcupadosProximos: ocupadas.length,
+    diasOcupadosProximos: ocupadas,
+    diasLivresProximos: livres.length,
     janelaDias,
-    proximasDatas: ocupadas.slice(0, 3).map(formatarDataAgendaCurta),
+    proximasDatasLivres: proximasLivres.map(formatarDataAgendaCurta),
     texto,
   };
 }

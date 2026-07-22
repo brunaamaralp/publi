@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import {
   Briefcase,
   MapPin,
@@ -24,6 +25,7 @@ import {
   precoPacoteMinimo,
   videoApresentacao,
   type PortfolioInfluenciador,
+  type TrabalhoAnterior,
 } from "@/lib/influenciador/portfolio-types";
 import type { Midia, PacoteServico } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -36,8 +38,12 @@ type PortfolioViewProps = {
   acoes?: React.ReactNode;
   /** Visão empresa: botão Contratar por pacote. */
   onContratarPacote?: (pacote: PacoteServico) => void;
+  /** Clique em data livre da agenda (ex.: pré-preenche checkout). */
+  onSelecionarDataAgenda?: (dataIso: string) => void;
   /** Exibe a seção de agenda (próximos dias). */
   exibirAgenda?: boolean;
+  /** Esconde a barra sticky (ex.: enquanto um modal de checkout está aberto). */
+  ocultarStickyContratar?: boolean;
 };
 
 function iniciais(nome: string): string {
@@ -49,40 +55,30 @@ function iniciais(nome: string): string {
     .join("");
 }
 
-function CardMidia({ midia }: { midia: Midia }) {
-  return (
-    <li className="overflow-hidden rounded-card border border-cinza-200 bg-white">
-      <div className="bg-verde-carvao relative aspect-[4/5]">
-        {midia.tipo === "video" ? (
-          <video
-            src={midia.url}
-            controls
-            playsInline
-            preload="metadata"
-            className="size-full object-cover"
-          />
-        ) : (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={midia.url}
-            alt={midia.legenda?.trim() || "Trabalho anterior"}
-            className="size-full object-cover"
-          />
-        )}
-        {midia.tipo === "video" ? (
-          <span className="pointer-events-none absolute left-2 top-2 inline-flex items-center gap-1 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-medium text-white">
-            <Play className="size-3" aria-hidden />
-            Vídeo
-          </span>
-        ) : null}
-      </div>
-      {midia.legenda ? (
-        <p className="text-texto-secundario p-3 text-sm leading-relaxed font-normal">
-          {midia.legenda}
-        </p>
-      ) : null}
-    </li>
+type ItemVitrineTrabalho =
+  | { kind: "trabalho"; trab: TrabalhoAnterior; midia?: Midia }
+  | { kind: "midia"; midia: Midia };
+
+/** Une trabalhos + mídias órfãs numa só lista (sem duplicar midiaId). */
+function itensTrabalhosUnificados(
+  portfolio: PortfolioInfluenciador,
+): ItemVitrineTrabalho[] {
+  const midias = portfolio.midias ?? [];
+  const usadas = new Set(
+    portfolio.trabalhos.map((t) => t.midiaId).filter(Boolean) as string[],
   );
+  const itens: ItemVitrineTrabalho[] = portfolio.trabalhos.map((trab) => ({
+    kind: "trabalho",
+    trab,
+    midia: trab.midiaId
+      ? midias.find((m) => m.id === trab.midiaId)
+      : undefined,
+  }));
+  for (const midia of midiasTrabalhoAnterior(midias)) {
+    if (usadas.has(midia.id)) continue;
+    itens.push({ kind: "midia", midia });
+  }
+  return itens;
 }
 
 export function PortfolioView({
@@ -91,7 +87,9 @@ export function PortfolioView({
   className,
   acoes,
   onContratarPacote,
+  onSelecionarDataAgenda,
   exibirAgenda = true,
+  ocultarStickyContratar = false,
 }: PortfolioViewProps) {
   const exibeNota = creatorExibeNota({
     totalAvaliacoes: portfolio.totalAvaliacoes,
@@ -100,10 +98,51 @@ export function PortfolioView({
   const pacotesAtivos = portfolio.pacotes.filter((p) => p.ativo);
   const precoMin = precoPacoteMinimo(portfolio.pacotes);
   const apresentacao = videoApresentacao(portfolio.midias ?? []);
-  const galeria = midiasTrabalhoAnterior(portfolio.midias ?? []);
+  const trabalhosUnificados = itensTrabalhosUnificados(portfolio);
+
+  const pacotesRef = useRef<HTMLElement>(null);
+  const [pacotesNoViewport, setPacotesNoViewport] = useState(true);
+  const mostrarStickyContratar =
+    Boolean(onContratarPacote) &&
+    pacotesAtivos.length > 0 &&
+    !pacotesNoViewport &&
+    !ocultarStickyContratar;
+
+  useEffect(() => {
+    if (!onContratarPacote || pacotesAtivos.length === 0) {
+      setPacotesNoViewport(true);
+      return;
+    }
+    const el = pacotesRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setPacotesNoViewport(entry?.isIntersecting ?? true);
+      },
+      { root: null, threshold: 0.12, rootMargin: "0px" },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [onContratarPacote, pacotesAtivos.length, portfolio.id]);
+
+  function acaoStickyContratar() {
+    if (!onContratarPacote || pacotesAtivos.length === 0) return;
+    if (pacotesAtivos.length === 1) {
+      onContratarPacote(pacotesAtivos[0]!);
+      return;
+    }
+    pacotesRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   return (
-    <div className={cn("space-y-6", className)}>
+    <div
+      className={cn(
+        "space-y-6",
+        mostrarStickyContratar && "pb-24 sm:pb-0",
+        className,
+      )}
+    >
       <section className="card-marketing overflow-hidden p-0">
         <div
           className="relative h-36 w-full bg-verde-carvao sm:h-44"
@@ -167,7 +206,7 @@ export function PortfolioView({
           {portfolio.bio ? (
             <p className="text-sm leading-relaxed font-normal">{portfolio.bio}</p>
           ) : (
-            <p className="text-texto-secundario text-sm italic">
+            <p className="text-texto-secundario text-sm">
               Bio ainda não preenchida.
             </p>
           )}
@@ -252,24 +291,12 @@ export function PortfolioView({
         </section>
       ) : null}
 
-      {galeria.length > 0 ? (
-        <section className="space-y-3">
-          <h2 className="font-display text-lg font-bold">
-            Fotos e vídeos de trabalhos
-          </h2>
-          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {galeria.map((midia) => (
-              <CardMidia key={midia.id} midia={midia} />
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {exibirAgenda ? (
-        <AgendaDisponibilidade disponibilidade={portfolio.disponibilidade} />
-      ) : null}
-
-      <section className="space-y-3">
+      {/* Funil: pacotes antes da agenda */}
+      <section
+        id="pacotes"
+        ref={pacotesRef}
+        className="scroll-mt-24 space-y-3"
+      >
         <h2 className="font-display text-lg font-bold">Pacotes e serviços</h2>
         {pacotesAtivos.length === 0 ? (
           <p className="text-texto-secundario text-sm">
@@ -312,29 +339,96 @@ export function PortfolioView({
         )}
       </section>
 
+      {exibirAgenda ? (
+        <div className="space-y-2">
+          <AgendaDisponibilidade
+            id="agenda"
+            disponibilidade={portfolio.disponibilidade}
+            modo="calendario"
+            selecionavel={Boolean(onSelecionarDataAgenda)}
+            onSelecionar={onSelecionarDataAgenda}
+          />
+          {onSelecionarDataAgenda ? (
+            <p className="text-texto-secundario text-xs font-normal">
+              Clique em uma data livre para iniciar a contratação com essa data.
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+
       <section className="space-y-3">
         <h2 className="font-display flex items-center gap-2 text-lg font-bold">
           <Briefcase className="size-5" aria-hidden />
           Trabalhos anteriores
         </h2>
-        {portfolio.trabalhos.length === 0 ? (
+        {trabalhosUnificados.length === 0 ? (
           <p className="text-texto-secundario text-sm">
             Nenhum trabalho listado ainda.
           </p>
         ) : (
           <ul className="grid gap-3 sm:grid-cols-2">
-            {portfolio.trabalhos.map((trab) => {
-              const midia = trab.midiaId
-                ? portfolio.midias.find((m) => m.id === trab.midiaId)
-                : undefined;
+            {trabalhosUnificados.map((item) => {
+              if (item.kind === "trabalho") {
+                const { trab, midia } = item;
+                return (
+                  <li
+                    key={trab.id}
+                    className="overflow-hidden rounded-card border border-cinza-200 bg-white"
+                  >
+                    {midia ? (
+                      <div className="bg-muted relative aspect-video">
+                        {midia.tipo === "video" ? (
+                          <>
+                            <video
+                              src={midia.url}
+                              controls
+                              playsInline
+                              preload="metadata"
+                              className="size-full object-cover"
+                            />
+                            <span className="pointer-events-none absolute left-2 top-2 inline-flex items-center gap-1 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-medium text-white">
+                              <Play className="size-3" aria-hidden />
+                              Vídeo
+                            </span>
+                          </>
+                        ) : (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={midia.url}
+                            alt={midia.legenda || trab.titulo}
+                            className="size-full object-cover"
+                          />
+                        )}
+                      </div>
+                    ) : null}
+                    <div className="p-4">
+                      <p className="font-display font-bold">
+                        {trab.titulo || "Trabalho"}
+                      </p>
+                      <p className="text-texto-secundario mt-1 text-sm font-normal">
+                        {[trab.marca, trab.tipoConteudo]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </p>
+                      {midia?.legenda ? (
+                        <p className="text-texto-secundario mt-2 text-xs leading-relaxed">
+                          {midia.legenda}
+                        </p>
+                      ) : null}
+                    </div>
+                  </li>
+                );
+              }
+
+              const { midia } = item;
               return (
                 <li
-                  key={trab.id}
+                  key={midia.id}
                   className="overflow-hidden rounded-card border border-cinza-200 bg-white"
                 >
-                  {midia ? (
-                    <div className="bg-muted aspect-video">
-                      {midia.tipo === "video" ? (
+                  <div className="bg-verde-carvao relative aspect-video">
+                    {midia.tipo === "video" ? (
+                      <>
                         <video
                           src={midia.url}
                           controls
@@ -342,33 +436,59 @@ export function PortfolioView({
                           preload="metadata"
                           className="size-full object-cover"
                         />
-                      ) : (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={midia.url}
-                          alt={midia.legenda || trab.titulo}
-                          className="size-full object-cover"
-                        />
-                      )}
-                    </div>
-                  ) : null}
-                  <div className="p-4">
-                    <p className="font-display font-bold">{trab.titulo}</p>
-                    <p className="text-texto-secundario mt-1 text-sm font-normal">
-                      {trab.marca} · {trab.tipoConteudo}
-                    </p>
-                    {midia?.legenda ? (
-                      <p className="text-texto-secundario mt-2 text-xs leading-relaxed">
-                        {midia.legenda}
-                      </p>
-                    ) : null}
+                        <span className="pointer-events-none absolute left-2 top-2 inline-flex items-center gap-1 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-medium text-white">
+                          <Play className="size-3" aria-hidden />
+                          Vídeo
+                        </span>
+                      </>
+                    ) : (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={midia.url}
+                        alt={midia.legenda?.trim() || "Trabalho anterior"}
+                        className="size-full object-cover"
+                      />
+                    )}
                   </div>
+                  {midia.legenda ? (
+                    <p className="text-texto-secundario p-3 text-sm leading-relaxed font-normal">
+                      {midia.legenda}
+                    </p>
+                  ) : null}
                 </li>
               );
             })}
           </ul>
         )}
       </section>
+
+      {mostrarStickyContratar ? (
+        <div
+          className="fixed inset-x-0 bottom-0 z-40 border-t border-cinza-200 bg-white/95 px-4 py-3 backdrop-blur sm:hidden"
+          role="region"
+          aria-label="Contratar creator"
+        >
+          <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-texto-secundario text-xs font-normal">
+                A partir de
+              </p>
+              <p className="font-data text-base font-semibold tracking-tight">
+                {precoMin > 0 ? formatarMoeda(precoMin) : "Ver pacotes"}
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="cta"
+              size="sm"
+              className="shrink-0"
+              onClick={acaoStickyContratar}
+            >
+              {pacotesAtivos.length === 1 ? "Contratar" : "Ver pacotes"}
+            </Button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

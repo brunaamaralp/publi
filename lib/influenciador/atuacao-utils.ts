@@ -73,9 +73,15 @@ export function disponibilidadeCobrePrazo(
   if (disponibilidade.datasIndisponiveis?.includes(dataIso)) {
     return false;
   }
+  if (disponibilidade.datasBloqueadas?.includes(dataIso)) {
+    return false;
+  }
 
   if (!disponibilidade.diasSemana?.length) {
-    return disponibilidade.datasIndisponiveis ? true : null;
+    return disponibilidade.datasIndisponiveis ||
+      disponibilidade.datasBloqueadas
+      ? true
+      : null;
   }
 
   const dia = diaSemanaDeDataIso(prazoIso);

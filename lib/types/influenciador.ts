@@ -14,10 +14,15 @@ export type DisponibilidadeInfluenciador = {
   diasSemana: DiaSemana[];
   observacao?: string;
   /**
-   * Datas ISO (`YYYY-MM-DD`) bloqueadas na agenda (dia inteiro).
-   * Complementa `diasSemana` — ocupadas por contratos ou bloqueio manual.
+   * Datas ISO (`YYYY-MM-DD`) ocupadas por contratos (dia inteiro).
+   * Gerenciadas pelo fluxo de pagamento — não editar manualmente.
    */
   datasIndisponiveis?: string[];
+  /**
+   * Datas ISO (`YYYY-MM-DD`) bloqueadas pelo próprio creator
+   * (férias, folga, indisponibilidade pontual).
+   */
+  datasBloqueadas?: string[];
 };
 
 /** Mídia própria do portfólio (foto/vídeo) — sem links externos de rede social. */

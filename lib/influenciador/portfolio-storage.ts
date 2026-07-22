@@ -334,6 +334,7 @@ function mesclarDisponibilidadeDoCatalogo(
       observacao:
         portfolio.disponibilidade?.observacao ?? doCatalogo.observacao,
       datasIndisponiveis: [...doCatalogo.datasIndisponiveis],
+      datasBloqueadas: portfolio.disponibilidade?.datasBloqueadas,
     },
   };
 }

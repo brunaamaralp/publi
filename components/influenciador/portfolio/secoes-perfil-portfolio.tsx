@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Hourglass } from "lucide-react";
-import { toast } from "sonner";
 
 import { PassoEquipamentosMetricas } from "@/components/influenciador/cadastro/passo-equipamentos-metricas";
 import {
@@ -11,7 +10,6 @@ import {
 } from "@/components/influenciador/cadastro/passo-pacotes-precificacao";
 import { AvisoContatoInline } from "@/components/negociacao/aviso-contato-inline";
 import { validarTextosLivresPortfolio } from "@/components/influenciador/portfolio/campo-texto-filtrado";
-import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import {
   dadosSecaoMetricas,
@@ -26,6 +24,7 @@ import {
 } from "@/lib/influenciador/cadastro-utils";
 import {
   carregarPerfilInfluenciador,
+  carregarSecoesCompletas,
   marcarSecaoCompleta,
   salvarPerfilInfluenciador,
 } from "@/lib/influenciador/perfil-storage";
@@ -41,17 +40,32 @@ import {
   validarSecaoPrecos,
 } from "@/lib/schemas/influenciador-cadastro";
 
-type SecoesPerfilPortfolioProps = {
-  onPerfilAtualizado?: () => void;
+export type ResultadoPersistenciaSecoes =
+  | { ok: true; mensagem?: string }
+  | {
+      ok: false;
+      secao: "metricas" | "precos";
+      mensagem: string;
+    };
+
+export type UseSecoesPerfilPortfolioResult = {
+  draft: CadastroDraft | null;
+  updateDraft: (partial: Partial<CadastroDraft>) => void;
+  contextoMercado: ContextoComparacaoMercado | null;
+  errorsMetricas: Record<string, string>;
+  errorsPrecos: Record<string, string>;
+  emAnalise: boolean;
+  avisoContatoPacotes: boolean;
+  setAvisoContatoPacotes: (v: boolean) => void;
+  /** Persiste métricas + preços no perfil e sincroniza o portfólio. */
+  persistirSecoes: (trabalhosCount: number) => ResultadoPersistenciaSecoes;
 };
 
 /**
- * Seções pós-cadastro (antigos passos 3 e 4 do wizard) — editáveis no portfólio.
- * Reutiliza os mesmos componentes/validação do cadastro original.
+ * Estado e persistência das seções pós-cadastro (métricas / preços),
+ * para o Salvar único do editor de portfólio.
  */
-export function SecoesPerfilPortfolio({
-  onPerfilAtualizado,
-}: SecoesPerfilPortfolioProps) {
+export function useSecoesPerfilPortfolio(): UseSecoesPerfilPortfolioResult {
   const { usuario } = useAuth();
   const [draft, setDraft] = useState<CadastroDraft | null>(null);
   const [contextoMercado, setContextoMercado] =
@@ -61,8 +75,6 @@ export function SecoesPerfilPortfolio({
   );
   const [errorsPrecos, setErrorsPrecos] = useState<Record<string, string>>({});
   const [emAnalise, setEmAnalise] = useState(false);
-  const [salvandoMetricas, setSalvandoMetricas] = useState(false);
-  const [salvandoPrecos, setSalvandoPrecos] = useState(false);
   const [avisoContatoPacotes, setAvisoContatoPacotes] = useState(false);
 
   const recarregar = useCallback(() => {
@@ -110,18 +122,6 @@ export function SecoesPerfilPortfolio({
     recarregar();
   }, [recarregar]);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const hash = window.location.hash.replace("#", "");
-    if (!hash) return;
-    const el = document.getElementById(hash);
-    if (el) {
-      requestAnimationFrame(() => {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    }
-  }, [draft]);
-
   const updateDraft = useCallback((partial: Partial<CadastroDraft>) => {
     setDraft((prev) => {
       if (!prev) return prev;
@@ -166,160 +166,186 @@ export function SecoesPerfilPortfolio({
     [usuario],
   );
 
-  const salvarMetricas = useCallback(() => {
-    if (!usuario || !draft) return;
-
-    const result = validarSecaoMetricas(dadosSecaoMetricas(draft));
-    if (!result.success) {
-      setErrorsMetricas(result.errors);
-      toast.error("Revise as métricas antes de salvar.");
-      return;
-    }
-
-    setErrorsMetricas({});
-    setSalvandoMetricas(true);
-
-    const existente = carregarPerfilInfluenciador(usuario.id);
-    const payload = montarPayload(draft, usuario, existente);
-    salvarPerfilInfluenciador(usuario.id, payload);
-    marcarSecaoCompleta(usuario.id, "metricas");
-    sincronizarPortfolio(payload);
-
-    const portfolioAtual = obterOuCriarPortfolioDoUsuario(usuario.id);
-    const trabalhosOk = portfolioAtual.trabalhos.filter(
-      (t) => t.titulo.trim() || t.marca.trim(),
-    ).length;
-    const pronto = perfilProntoParaAnalise(payload, {
-      trabalhosAnteriores: trabalhosOk,
-    });
-    const primeiroEnvio = !emAnalise && pronto;
-    if (pronto) {
-      enfileirarInfluenciadorParaModeracao(payload);
-      setEmAnalise(true);
-      if (primeiroEnvio) {
-        toast.success(
-          "Print recebido! Seu perfil entrou em análise pela moderação.",
-        );
-      } else {
-        toast.success("Métricas atualizadas.");
+  const persistirSecoes = useCallback(
+    (trabalhosCount: number): ResultadoPersistenciaSecoes => {
+      if (!usuario || !draft) {
+        return { ok: true };
       }
-    } else {
-      toast.success("Métricas salvas.");
-    }
 
-    onPerfilAtualizado?.();
-    setSalvandoMetricas(false);
-  }, [draft, emAnalise, onPerfilAtualizado, sincronizarPortfolio, usuario]);
+      const secoesJaCompletas = carregarSecoesCompletas(usuario.id);
+      const metricasIniciadas =
+        Boolean(draft.printMetricasUrl) ||
+        draft.seguidores !== "" ||
+        draft.engajamentoMedio !== "";
+      const pacotesFiltrados = draft.pacotes.filter(
+        (p) => p.nome.trim().length > 0,
+      );
+      const precosIniciados = pacotesFiltrados.length > 0;
 
-  const salvarPrecos = useCallback(() => {
-    if (!usuario || !draft) return;
+      const resultMetricas = validarSecaoMetricas(dadosSecaoMetricas(draft));
+      if (!resultMetricas.success) {
+        setErrorsMetricas(resultMetricas.errors);
+        if (secoesJaCompletas.metricas || metricasIniciadas) {
+          return {
+            ok: false,
+            secao: "metricas",
+            mensagem: "Revise as métricas na aba Prova antes de salvar.",
+          };
+        }
+      } else {
+        setErrorsMetricas({});
+      }
 
-    const pacotesFiltrados = draft.pacotes.filter((p) => p.nome.trim().length > 0);
-    const validacaoContato = validarTextosLivresPortfolio(
-      pacotesFiltrados.map((p) => p.descricao),
-    );
-    if (!validacaoContato.ok) {
-      setAvisoContatoPacotes(true);
-      toast.error("Remova telefones, e-mails e @ das descrições dos pacotes.");
-      return;
-    }
-    setAvisoContatoPacotes(false);
+      const validacaoContato = validarTextosLivresPortfolio(
+        pacotesFiltrados.map((p) => p.descricao),
+      );
+      if (!validacaoContato.ok) {
+        setAvisoContatoPacotes(true);
+        return {
+          ok: false,
+          secao: "precos",
+          mensagem:
+            "Remova telefones, e-mails e @ das descrições dos pacotes.",
+        };
+      }
+      setAvisoContatoPacotes(false);
 
-    const result = validarSecaoPrecos(dadosSecaoPrecos(draft));
-    if (!result.success) {
-      setErrorsPrecos(result.errors);
-      toast.error("Revise os preços antes de salvar.");
-      return;
-    }
+      const resultPrecos = validarSecaoPrecos(
+        dadosSecaoPrecos({ ...draft, pacotes: pacotesFiltrados }),
+      );
+      if (!resultPrecos.success) {
+        setErrorsPrecos(resultPrecos.errors);
+        if (secoesJaCompletas.precos || precosIniciados) {
+          return {
+            ok: false,
+            secao: "precos",
+            mensagem: "Revise os preços na aba Preços antes de salvar.",
+          };
+        }
+      } else {
+        setErrorsPrecos({});
+      }
 
-    setErrorsPrecos({});
-    setSalvandoPrecos(true);
+      const salvarMetricas = resultMetricas.success;
+      const salvarPrecos = resultPrecos.success;
+      if (!salvarMetricas && !salvarPrecos) {
+        return { ok: true };
+      }
 
-    const existente = carregarPerfilInfluenciador(usuario.id);
-    const payload = montarPayload(
-      {
-        ...draft,
-        pacotes: pacotesFiltrados,
-      },
-      usuario,
-      existente,
-    );
-    salvarPerfilInfluenciador(usuario.id, payload);
-    marcarSecaoCompleta(usuario.id, "precos");
-    sincronizarPortfolio(payload);
-    toast.success("Pacotes e preços atualizados.");
-    onPerfilAtualizado?.();
-    setSalvandoPrecos(false);
-  }, [draft, onPerfilAtualizado, sincronizarPortfolio, usuario]);
+      const existente = carregarPerfilInfluenciador(usuario.id);
+      const payload = montarPayload(
+        { ...draft, pacotes: pacotesFiltrados },
+        usuario,
+        existente,
+      );
+      salvarPerfilInfluenciador(usuario.id, payload);
+      if (salvarMetricas) marcarSecaoCompleta(usuario.id, "metricas");
+      if (salvarPrecos) marcarSecaoCompleta(usuario.id, "precos");
+      sincronizarPortfolio(payload);
 
-  if (!draft) {
-    return (
-      <p className="text-texto-secundario text-sm">
-        Complete o cadastro básico para editar métricas e preços.
-      </p>
-    );
-  }
+      const pronto = perfilProntoParaAnalise(payload, {
+        trabalhosAnteriores: trabalhosCount,
+      });
+      const primeiroEnvio = !emAnalise && pronto;
+      if (pronto) {
+        enfileirarInfluenciadorParaModeracao(payload);
+        setEmAnalise(true);
+      }
 
+      setDraft(draftFromPayload(payload));
+
+      return {
+        ok: true,
+        mensagem: primeiroEnvio
+          ? "Print recebido! Seu perfil entrou em análise pela moderação."
+          : undefined,
+      };
+    },
+    [draft, emAnalise, sincronizarPortfolio, usuario],
+  );
+
+  return {
+    draft,
+    updateDraft,
+    contextoMercado,
+    errorsMetricas,
+    errorsPrecos,
+    emAnalise,
+    avisoContatoPacotes,
+    setAvisoContatoPacotes,
+    persistirSecoes,
+  };
+}
+
+export function BannerPerfilEmAnalise() {
   return (
-    <div className="space-y-10">
-      {emAnalise ? (
-        <div
-          className="banner-informativo flex gap-3 rounded-card p-4"
-          role="status"
-        >
-          <Hourglass
-            className="text-verde-neon mt-0.5 size-4 shrink-0"
-            aria-hidden
-          />
-          <div className="space-y-1">
-            <p className="font-display text-sm font-bold">Perfil em análise</p>
-            <p className="text-texto-secundario text-sm font-normal leading-relaxed">
-              A moderação está revisando seu print de métricas. Enquanto isso,
-              você pode continuar editando o restante do perfil.
-            </p>
-          </div>
-        </div>
-      ) : null}
-
-      <section id="metricas" className="scroll-mt-24 space-y-4">
-        <PassoEquipamentosMetricas
-          draft={draft}
-          onChange={updateDraft}
-          errors={errorsMetricas}
-        />
-        <div className="flex justify-end">
-          <Button
-            type="button"
-            variant="cta"
-            disabled={salvandoMetricas}
-            onClick={salvarMetricas}
-          >
-            Salvar métricas
-          </Button>
-        </div>
-      </section>
-
-      <section id="precos" className="scroll-mt-24 space-y-4">
-        {avisoContatoPacotes ? (
-          <AvisoContatoInline tipo="bloqueado_padrao" variante="inline" />
-        ) : null}
-        <PassoPacotesPrecificacao
-          draft={draft}
-          onChange={updateDraft}
-          errors={errorsPrecos}
-          contextoMercado={contextoMercado}
-        />
-        <div className="flex justify-end">
-          <Button
-            type="button"
-            variant="cta"
-            disabled={salvandoPrecos}
-            onClick={salvarPrecos}
-          >
-            Salvar pacotes e preços
-          </Button>
-        </div>
-      </section>
+    <div
+      className="banner-informativo flex gap-3 rounded-card p-4"
+      role="status"
+    >
+      <Hourglass
+        className="text-verde-neon mt-0.5 size-4 shrink-0"
+        aria-hidden
+      />
+      <div className="space-y-1">
+        <p className="font-display text-sm font-bold">Perfil em análise</p>
+        <p className="text-texto-secundario text-sm font-normal leading-relaxed">
+          A moderação está revisando seu print de métricas. Enquanto isso, você
+          pode continuar editando o restante do perfil.
+        </p>
+      </div>
     </div>
+  );
+}
+
+type SecaoMetricasProps = {
+  draft: CadastroDraft;
+  onChange: (partial: Partial<CadastroDraft>) => void;
+  errors: Record<string, string>;
+};
+
+export function SecaoMetricasPortfolio({
+  draft,
+  onChange,
+  errors,
+}: SecaoMetricasProps) {
+  return (
+    <section id="metricas" className="scroll-mt-24 space-y-4">
+      <PassoEquipamentosMetricas
+        draft={draft}
+        onChange={onChange}
+        errors={errors}
+      />
+    </section>
+  );
+}
+
+type SecaoPrecosProps = {
+  draft: CadastroDraft;
+  onChange: (partial: Partial<CadastroDraft>) => void;
+  errors: Record<string, string>;
+  contextoMercado: ContextoComparacaoMercado | null;
+  avisoContato: boolean;
+};
+
+export function SecaoPrecosPortfolio({
+  draft,
+  onChange,
+  errors,
+  contextoMercado,
+  avisoContato,
+}: SecaoPrecosProps) {
+  return (
+    <section id="precos" className="scroll-mt-24 space-y-4">
+      {avisoContato ? (
+        <AvisoContatoInline tipo="bloqueado_padrao" variante="inline" />
+      ) : null}
+      <PassoPacotesPrecificacao
+        draft={draft}
+        onChange={onChange}
+        errors={errors}
+        contextoMercado={contextoMercado}
+      />
+    </section>
   );
 }

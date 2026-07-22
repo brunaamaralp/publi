@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -10,24 +10,14 @@ import {
   Scale,
   Wallet,
 } from "lucide-react";
-import { toast } from "sonner";
 
 import { BannerCompletarPerfil } from "@/components/influenciador/banner-completar-perfil";
+import { OnboardingCompletarPerfilDialog } from "@/components/influenciador/onboarding-completar-perfil-dialog";
 import {
   BadgeFormatoDemanda,
   IndicadorMatch,
 } from "@/components/influenciador/demandas/indicador-match";
-import { Button, buttonVariants } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { buttonVariants } from "@/components/ui/button";
 import { formatarNomeExibicao } from "@/lib/app/formatar-nome-exibicao";
 import { useAuth } from "@/lib/auth-context";
 import { hrefDetalheDemanda, labelFormatoEntrega } from "@/lib/demandas/utils";
@@ -47,7 +37,6 @@ import {
 import { nomeExibicaoPerfil } from "@/lib/influenciador/perfil-storage";
 import { INFLUENCIADOR_MOCK_ID } from "@/lib/mock-data/avaliacoes";
 import type { DemandaFeedItem } from "@/lib/mock-data/demandas";
-import { sacarSaldoDisponivel } from "@/lib/pagamento/saldo-influenciador";
 import type { ResumoComparacaoMercado } from "@/lib/utils/comparacao-mercado";
 import { cn } from "@/lib/utils";
 
@@ -82,29 +71,10 @@ export function DashboardInfluenciador({
   influenciadorId = INFLUENCIADOR_MOCK_ID,
 }: DashboardInfluenciadorProps) {
   const [dados, setDados] = useState<DashboardState | null>(null);
-  const [saqueAberto, setSaqueAberto] = useState(false);
-  const [valorSaque, setValorSaque] = useState("");
-  const valorNum = useMemo(() => Number(valorSaque) || 0, [valorSaque]);
 
   useEffect(() => {
     setDados(carregarDashboard(influenciadorId));
   }, [influenciadorId]);
-
-  function atualizar() {
-    setDados(carregarDashboard(influenciadorId));
-  }
-
-  function confirmarSaque() {
-    const resultado = sacarSaldoDisponivel(influenciadorId, valorNum);
-    if (!resultado.ok) {
-      toast.error(resultado.motivo);
-      return;
-    }
-    toast.success("Saque solicitado — valor debitado do saldo disponível.");
-    setValorSaque("");
-    setSaqueAberto(false);
-    atualizar();
-  }
 
   if (!dados) {
     return (
@@ -137,6 +107,7 @@ export function DashboardInfluenciador({
       </header>
 
       <BannerCompletarPerfil />
+      <OnboardingCompletarPerfilDialog />
 
       <section className="space-y-3" aria-labelledby="acoes-pendentes">
         <div className="flex flex-wrap items-end justify-between gap-2">
@@ -214,16 +185,20 @@ export function DashboardInfluenciador({
             <p className="text-texto-secundario mt-1 text-xs font-normal">
               Entregas aprovadas ainda não sacadas
             </p>
-            <Button
-              type="button"
-              variant="cta"
-              size="sm"
-              className="mt-4"
-              disabled={dados.saldo.disponivel <= 0}
-              onClick={() => setSaqueAberto(true)}
+            <Link
+              href="/influenciador/financeiro"
+              className={cn(
+                buttonVariants({
+                  variant: dados.saldo.disponivel > 0 ? "cta" : "outline",
+                  size: "sm",
+                }),
+                "mt-4 inline-flex",
+                dados.saldo.disponivel <= 0 && "pointer-events-none opacity-50",
+              )}
+              aria-disabled={dados.saldo.disponivel <= 0}
             >
-              Sacar
-            </Button>
+              Sacar no financeiro
+            </Link>
           </article>
 
           <article className="rounded-card border border-cinza-200 bg-white p-4">
@@ -337,61 +312,23 @@ export function DashboardInfluenciador({
           <p className="font-display mt-2 text-sm font-bold leading-snug">
             {dados.agenda.texto}
           </p>
-          {dados.agenda.proximasDatas.length > 0 ? (
+          {dados.agenda.proximasDatasLivres.length > 0 ? (
             <p className="text-texto-secundario mt-1 text-xs font-normal">
-              Próximos: {dados.agenda.proximasDatas.join(" · ")}
+              Próximos livres: {dados.agenda.proximasDatasLivres.join(" · ")}
             </p>
-          ) : null}
+          ) : (
+            <p className="text-texto-secundario mt-1 text-xs font-normal">
+              Nenhuma data livre na janela — ajuste a disponibilidade.
+            </p>
+          )}
           <Link
-            href="/influenciador/meu-portfolio"
+            href="/influenciador/meu-portfolio#agenda"
             className="text-verde-acao mt-3 inline-flex text-xs font-medium hover:underline"
           >
-            Ver agenda
+            Gerenciar agenda
           </Link>
         </article>
       </section>
-
-      <Dialog open={saqueAberto} onOpenChange={setSaqueAberto}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Solicitar saque</DialogTitle>
-            <DialogDescription>
-              Disponível: {formatarMoeda(dados.saldo.disponivel)}. O valor será
-              debitado do saldo liberado.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-2">
-            <Label htmlFor="dashboard-valor-saque">Valor (R$)</Label>
-            <Input
-              id="dashboard-valor-saque"
-              type="number"
-              min={0}
-              step={0.01}
-              className="font-data"
-              value={valorSaque}
-              onChange={(e) => setValorSaque(e.target.value)}
-              placeholder="0,00"
-            />
-          </div>
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setSaqueAberto(false)}
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="button"
-              variant="cta"
-              disabled={dados.saldo.disponivel <= 0 || valorNum <= 0}
-              onClick={confirmarSaque}
-            >
-              Confirmar saque
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

@@ -31,6 +31,7 @@ export const cadastroPasso2Schema = z.object({
       ),
       observacao: z.string().optional(),
       datasIndisponiveis: z.array(z.string()).optional(),
+      datasBloqueadas: z.array(z.string()).optional(),
     })
     .nullable()
     .optional(),

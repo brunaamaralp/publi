@@ -61,7 +61,7 @@ export function TreinamentosFlow() {
 
     toast.success(
       subiuNivel
-        ? `Parabéns! Você subiu para ${LABELS_NIVEL[next.influenciador.nivelAtual]}! 🎉`
+        ? `Parabéns! Você subiu para ${LABELS_NIVEL[next.influenciador.nivelAtual]}!`
         : `Treinamento concluído! +${XP_POR_TREINAMENTO} XP`,
       {
         description: subiuNivel
@@ -74,7 +74,7 @@ export function TreinamentosFlow() {
 
   if (!carregado || !estado) {
     return (
-      <div className="text-muted-foreground flex min-h-[40vh] items-center justify-center text-sm">
+      <div className="text-texto-secundario flex min-h-[40vh] items-center justify-center text-sm">
         Carregando trilhas…
       </div>
     );
@@ -89,13 +89,16 @@ export function TreinamentosFlow() {
     : "nao_iniciado";
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6">
-      <div>
-        <p className="text-primary text-sm font-medium">Academia</p>
-        <p className="text-muted-foreground mt-1 text-sm">
+    <div className="mx-auto max-w-5xl space-y-8 px-4 py-8 sm:px-6">
+      <header className="space-y-2">
+        <p className="text-texto-secundario text-sm font-medium">Academia</p>
+        <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">
+          Treinamentos
+        </h1>
+        <p className="text-texto-secundario max-w-2xl text-sm font-normal leading-relaxed">
           Trilhas para evoluir em precificação, negociação e criação de conteúdo.
         </p>
-      </div>
+      </header>
 
       <HeaderNivelXp influenciador={estado.influenciador} />
 

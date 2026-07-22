@@ -23,7 +23,7 @@ export function HeaderNivelXp({ influenciador }: HeaderNivelXpProps) {
   return (
     <header className="border-border bg-card flex flex-col gap-6 rounded-card border p-6 sm:flex-row sm:items-center sm:justify-between">
       <div className="space-y-2">
-        <p className="text-primary text-sm font-medium">Seu nível</p>
+        <p className="text-texto-secundario text-sm font-medium">Seu nível</p>
         <h1 className="font-display text-2xl font-semibold tracking-tight">
           {LABELS_NIVEL[nivelAtual] ?? `Nível ${nivelAtual}`}
         </h1>

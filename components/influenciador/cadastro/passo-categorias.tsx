@@ -140,6 +140,37 @@ export function PassoCategorias({
                   );
                 })}
               </div>
+              <div className="space-y-1.5 pt-1">
+                <Label htmlFor="cadastro-agenda-obs">
+                  Observação{" "}
+                  <span className="text-texto-secundario font-normal">
+                    (opcional)
+                  </span>
+                </Label>
+                <input
+                  id="cadastro-agenda-obs"
+                  value={draft.disponibilidade?.observacao ?? ""}
+                  onChange={(e) =>
+                    onChange({
+                      disponibilidade: {
+                        diasSemana: dias,
+                        observacao: e.target.value,
+                        datasIndisponiveis:
+                          draft.disponibilidade?.datasIndisponiveis,
+                        datasBloqueadas:
+                          draft.disponibilidade?.datasBloqueadas,
+                      },
+                    })
+                  }
+                  placeholder="Ex.: disponível só pela manhã"
+                  className="border-cinza-200 focus-visible:ring-verde-acao/30 w-full rounded-button border bg-white px-3 py-2 text-sm outline-none focus-visible:ring-2"
+                  maxLength={160}
+                />
+              </div>
+              <p className="text-texto-secundario text-xs font-normal">
+                Depois do cadastro você pode bloquear datas pontuais em Minha
+                agenda no portfólio.
+              </p>
               {errors.disponibilidade ? (
                 <p className="text-destructive text-xs">
                   {errors.disponibilidade}

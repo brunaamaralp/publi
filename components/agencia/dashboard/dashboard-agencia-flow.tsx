@@ -104,6 +104,12 @@ export function DashboardAgenciaFlow() {
             </div>
             <div className="flex flex-wrap gap-2">
               <Link
+                href="/agencia/financeiro"
+                className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+              >
+                Financeiro
+              </Link>
+              <Link
                 href="/agencia/demandas"
                 className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
               >

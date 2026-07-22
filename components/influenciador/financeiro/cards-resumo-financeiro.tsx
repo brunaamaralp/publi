@@ -15,20 +15,55 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { ResumoFinanceiro } from "@/lib/mock-data/financeiro";
+import type { ResumoFinanceiro } from "@/lib/financeiro/types";
 import { formatarMoeda } from "@/lib/influenciador/cadastro-utils";
 import { cn } from "@/lib/utils";
 
 type CardsResumoFinanceiroProps = {
   resumo: ResumoFinanceiro;
+  /** destaque = KPIs acima da dobra; projecao = só card de projeção; completo = tudo */
+  variante?: "destaque" | "projecao" | "completo";
 };
 
-export function CardsResumoFinanceiro({ resumo }: CardsResumoFinanceiroProps) {
+export function CardsResumoFinanceiro({
+  resumo,
+  variante = "completo",
+}: CardsResumoFinanceiroProps) {
   const variacaoPositiva = resumo.variacaoMesAnterior >= 0;
+  const projecao = resumo.projecaoMes ?? resumo.ganhosMesAtual;
+
+  if (variante === "projecao") {
+    return (
+      <Card className="banner-informativo border-0">
+        <CardHeader className="pb-2">
+          <CardDescription>Projeção</CardDescription>
+          <CardTitle className="text-base font-semibold">
+            Ritmo de crescimento
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-texto-secundario text-sm leading-relaxed">
+            Mantendo o ritmo deste mês, a projeção de fechamento é{" "}
+            <span className="text-foreground font-data font-medium">
+              {formatarMoeda(projecao)}
+            </span>
+            .
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <Card className="sm:col-span-2 lg:col-span-1">
+    <div
+      className={cn(
+        "grid gap-4",
+        variante === "destaque"
+          ? "sm:grid-cols-3"
+          : "sm:grid-cols-2 lg:grid-cols-4",
+      )}
+    >
+      <Card className={variante === "completo" ? "sm:col-span-2 lg:col-span-1" : undefined}>
         <CardHeader className="pb-2">
           <CardDescription className="flex items-center gap-1.5">
             <TrendingUp className="size-3.5" aria-hidden />
@@ -54,7 +89,7 @@ export function CardsResumoFinanceiro({ resumo }: CardsResumoFinanceiroProps) {
               {variacaoPositiva ? "+" : ""}
               {resumo.variacaoMesAnterior.toFixed(1)}%
             </span>
-            <span className="text-muted-foreground font-normal">
+            <span className="text-texto-secundario font-normal">
               vs. mês anterior
             </span>
           </p>
@@ -72,7 +107,7 @@ export function CardsResumoFinanceiro({ resumo }: CardsResumoFinanceiroProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground text-xs">Neste mês</p>
+          <p className="text-texto-secundario text-xs">Neste mês</p>
         </CardContent>
       </Card>
 
@@ -87,27 +122,29 @@ export function CardsResumoFinanceiro({ resumo }: CardsResumoFinanceiroProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground text-xs">Por contrato fechado</p>
+          <p className="text-texto-secundario text-xs">Por contrato fechado</p>
         </CardContent>
       </Card>
 
-      <Card className="banner-informativo border-0 sm:col-span-2 lg:col-span-1">
-        <CardHeader className="pb-2">
-          <CardDescription>Projeção</CardDescription>
-          <CardTitle className="text-base font-semibold">
-            Ritmo de crescimento
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground text-sm leading-relaxed">
-            Mantendo o ritmo dos últimos 3 meses, você pode fechar julho com{" "}
-            <span className="text-foreground font-data font-medium">
-              {formatarMoeda(13200)}
-            </span>{" "}
-            em ganhos.
-          </p>
-        </CardContent>
-      </Card>
+      {variante === "completo" ? (
+        <Card className="banner-informativo border-0 sm:col-span-2 lg:col-span-1">
+          <CardHeader className="pb-2">
+            <CardDescription>Projeção</CardDescription>
+            <CardTitle className="text-base font-semibold">
+              Ritmo de crescimento
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-texto-secundario text-sm leading-relaxed">
+              Mantendo o ritmo deste mês, a projeção de fechamento é{" "}
+              <span className="text-foreground font-data font-medium">
+                {formatarMoeda(projecao)}
+              </span>
+              .
+            </p>
+          </CardContent>
+        </Card>
+      ) : null}
     </div>
   );
 }

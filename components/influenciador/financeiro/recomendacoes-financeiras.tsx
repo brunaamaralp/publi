@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { RecomendacaoFinanceira } from "@/lib/mock-data/financeiro";
+import type { RecomendacaoFinanceira } from "@/lib/financeiro/types";
 
 type RecomendacoesFinanceirasProps = {
   recomendacoes: RecomendacaoFinanceira[];

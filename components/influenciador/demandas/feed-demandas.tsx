@@ -213,7 +213,7 @@ function FeedDemandasInner() {
 
   return (
     <div className="min-h-full bg-fundo-pagina">
-      <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:py-8">
+      <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:py-8">
         <header className="mb-6 max-w-2xl">
           <p className="text-texto-secundario text-sm font-medium">
             Oportunidades
@@ -221,7 +221,7 @@ function FeedDemandasInner() {
           <h1 className="font-display mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
             Demandas para você
           </h1>
-          <p className="text-texto-secundario mt-2 text-sm font-normal">
+          <p className="text-texto-secundario mt-2 text-sm font-normal leading-relaxed">
             Cada oportunidade traz um score de compatibilidade com o seu perfil.
             Foque nos percentuais mais altos para aumentar a chance de fechar.
           </p>
@@ -352,7 +352,7 @@ export function FeedDemandas() {
     <Suspense
       fallback={
         <div className="min-h-full bg-fundo-pagina">
-          <div className="mx-auto max-w-6xl px-4 py-8">
+          <div className="mx-auto max-w-5xl px-4 py-8">
             <p className="text-texto-secundario text-sm">Carregando demandas…</p>
           </div>
         </div>

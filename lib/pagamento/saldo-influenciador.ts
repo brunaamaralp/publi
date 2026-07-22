@@ -3,14 +3,8 @@
  * Persistido em localStorage — mock sem backend.
  */
 
+import { listarContextosInfluenciador } from "@/lib/financeiro/contratos-influenciador";
 import type { SaldoInfluenciador } from "@/lib/pagamento/pagamento-types";
-import {
-  CONTRATO_APROVADO_ID,
-  CONTRATO_AJUSTE_ID,
-  CONTRATO_CPF_ID,
-  CONTRATO_ENTREGUE_ID,
-  getContratoPagamentoContexto,
-} from "@/lib/mock-data/contratos-pagamento";
 import {
   carregarPagamentoEstado,
   valorLiberadoPagamentoRetido,
@@ -80,20 +74,11 @@ export function sacarSaldoDisponivel(
 export function calcularSaldoInfluenciador(
   influenciadorId: string = INFLUENCIADOR_MOCK_ID,
 ): SaldoInfluenciador {
-  const ids = [
-    CONTRATO_CPF_ID,
-    CONTRATO_APROVADO_ID,
-    CONTRATO_AJUSTE_ID,
-    CONTRATO_ENTREGUE_ID,
-  ];
-
   let retido = 0;
   let liberadoNosContratos = 0;
 
-  for (const id of ids) {
-    const ctx = getContratoPagamentoContexto(id);
-    if (!ctx || ctx.influenciador.id !== influenciadorId) continue;
-    const estado = carregarPagamentoEstado(id);
+  for (const ctx of listarContextosInfluenciador(influenciadorId)) {
+    const estado = carregarPagamentoEstado(ctx.contrato.id);
     if (!estado) continue;
     retido += valorRetidoPagamentoRetido(estado);
     liberadoNosContratos += valorLiberadoPagamentoRetido(estado);

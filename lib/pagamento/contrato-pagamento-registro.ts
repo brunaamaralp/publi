@@ -98,6 +98,12 @@ export function obterContextoPagamentoRegistrado(
   return memoria[contratoId] ?? null;
 }
 
+/** Contextos criados em runtime (negociação / portfólio). */
+export function listarContextosPagamentoRegistrados(): ContratoPagamentoContexto[] {
+  hidratar();
+  return Object.values(memoria);
+}
+
 /** Mantém contrato.status alinhado entre negociação e pagamento quando ambos existem. */
 export function sincronizarStatusContratoRegistrado(
   contratoId: string,

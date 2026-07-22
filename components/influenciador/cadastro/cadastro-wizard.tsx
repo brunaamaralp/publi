@@ -23,6 +23,7 @@ import {
   carregarPerfilInfluenciador,
   salvarPerfilInfluenciador,
 } from "@/lib/influenciador/perfil-storage";
+import { marcarOnboardingGuiaPendente } from "@/lib/influenciador/onboarding-storage";
 import { obterOuCriarPortfolioDoUsuario } from "@/lib/influenciador/portfolio-storage";
 import { definirStatusConta } from "@/lib/mock-data/influenciadores-status";
 import { validarPassoCadastro } from "@/lib/schemas/influenciador-cadastro";
@@ -56,9 +57,19 @@ export function CadastroWizard() {
 
   const salvarRascunho = useCallback((estado: CadastroDraft) => {
     const serializavel = { ...estado };
-    delete (serializavel as Partial<CadastroDraft>).fotoPerfilUrl;
+    // printMetricasUrl não faz parte do cadastro curto; foto (data URL) persiste.
     delete (serializavel as Partial<CadastroDraft>).printMetricasUrl;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(serializavel));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(serializavel));
+    } catch {
+      // Quota — tenta de novo sem foto
+      const semFoto = { ...serializavel, fotoPerfilUrl: null };
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(semFoto));
+      } catch {
+        /* ignore */
+      }
+    }
   }, []);
 
   const updateDraft = useCallback(
@@ -94,12 +105,13 @@ export function CadastroWizard() {
       "pendente_verificacao",
     );
     obterOuCriarPortfolioDoUsuario(usuario.id);
+    marcarOnboardingGuiaPendente(usuario.id);
 
     localStorage.removeItem(STORAGE_KEY);
     toast.success(
       "Conta criada! Complete métricas e preços quando quiser — você já pode usar o app.",
     );
-    router.push("/inicio");
+    router.push("/influenciador?onboarding=1");
   }, [draft, router, usuario]);
 
   const validarEAvancar = useCallback(() => {
