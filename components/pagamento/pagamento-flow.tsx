@@ -137,6 +137,27 @@ export function PagamentoFlow({ contratoId }: PagamentoFlowProps) {
     setCarregado(true);
   }, [contratoId, contexto]);
 
+  useEffect(() => {
+    if (!estado) return;
+    const pagamentoLiberado =
+      estado.contrato.statusEntrega === "aprovado" &&
+      (estado.pagamento?.status === "liberado" ||
+        valorRetidoPagamentoRetido(estado) === 0);
+    if (!pagamentoLiberado || papel !== "influenciador") return;
+    if (celebracao) return;
+    const valor = valorExibicaoPagamento(estado);
+    const key = `celeb-entrega-inf-${contratoId}`;
+    try {
+      if (typeof sessionStorage !== "undefined" && sessionStorage.getItem(key)) {
+        return;
+      }
+      sessionStorage.setItem(key, "1");
+    } catch {
+      /* ignore */
+    }
+    setCelebracao({ tipo: "entrega", valor });
+  }, [estado, papel, contratoId, celebracao]);
+
   if (!contexto) {
     return (
       <div className="min-h-full bg-fundo-pagina">
@@ -202,21 +223,6 @@ export function PagamentoFlow({ contratoId }: PagamentoFlowProps) {
     cicloContrato,
     cicloContrato.prazoEntrega,
   );
-
-  useEffect(() => {
-    if (!pagamentoLiberado || papel !== "influenciador") return;
-    if (celebracao) return;
-    const key = `celeb-entrega-inf-${contratoId}`;
-    try {
-      if (typeof sessionStorage !== "undefined" && sessionStorage.getItem(key)) {
-        return;
-      }
-      sessionStorage.setItem(key, "1");
-    } catch {
-      /* ignore */
-    }
-    setCelebracao({ tipo: "entrega", valor });
-  }, [pagamentoLiberado, papel, contratoId, celebracao, valor]);
 
   function abrirRegistro(alvo: AlvoEntrega) {
     setAlvoDialog(alvo);
