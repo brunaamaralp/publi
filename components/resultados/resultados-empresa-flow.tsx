@@ -21,7 +21,7 @@ import {
 import { useAgenciaOpcional } from "@/lib/contexts/agencia-context";
 import { getResultadoPorContratoId } from "@/lib/mock-data/resultados";
 import type { ResultadoCampanhaRegistro } from "@/lib/mock-data/resultados";
-import { EMPRESA_NEGOCIACAO_USUARIO_ID } from "@/lib/mock-data/negociacao";
+import { EMPRESA_NEGOCIACAO_USUARIO_ID } from "@/lib/negociacao/negociacao-constantes";
 import {
   carregarResultados,
   consolidarResultadosEmpresa,

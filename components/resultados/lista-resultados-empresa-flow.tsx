@@ -7,7 +7,7 @@ import { BarChart3 } from "lucide-react";
 import { SeletorEmpresaCliente } from "@/components/agencia/seletor-empresa-cliente";
 import { BadgeStatusResultado } from "@/components/resultados/badge-status-resultado";
 import { useAgenciaOpcional } from "@/lib/contexts/agencia-context";
-import { EMPRESA_NEGOCIACAO_USUARIO_ID } from "@/lib/mock-data/negociacao";
+import { EMPRESA_NEGOCIACAO_USUARIO_ID } from "@/lib/negociacao/negociacao-constantes";
 import type { ResultadoCampanhaRegistro } from "@/lib/mock-data/resultados";
 import {
   carregarResultados,

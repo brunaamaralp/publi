@@ -5,7 +5,7 @@ import {
 import {
   EMPRESA_NEGOCIACAO_USUARIO_ID,
   INFLUENCIADOR_NEGOCIACAO_USUARIO_ID,
-} from "@/lib/mock-data/negociacao";
+} from "@/lib/negociacao/negociacao-constantes";
 import { DEMANDAS_FEED_MOCK } from "@/lib/mock-data/demandas";
 import { isoDiasAPartirDeHoje } from "@/lib/influenciador/agenda-utils";
 import { obterContextoPagamentoRegistrado } from "@/lib/pagamento/contrato-pagamento-registro";
